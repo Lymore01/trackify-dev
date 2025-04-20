@@ -10,12 +10,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { WebhookIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function EndpointsTable() {
   const router = useRouter();
+  const {app} = useParams()
   const addQueryParameters = (id: string) => {
-    router.push(`/dashboard/webhooks?endpoint=${id}`);
+    router.push(`/dashboard/${app}/webhooks?endpoint=${id}`);
   };
   return (
     <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto">

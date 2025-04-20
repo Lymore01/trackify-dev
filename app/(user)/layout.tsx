@@ -5,7 +5,7 @@ import AppSideBar from "@/components/app-sidebar";
 import { Home } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "DocX | Dashboard",
+  title: "Trackify | Dashboard",
   description: "User Dashboard",
 };
 
