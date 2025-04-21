@@ -35,10 +35,12 @@ import EditWebhookDescription from "./forms/edit-webhook-description";
 import Tag from "./tag";
 import TestEndpoint from "./forms/test-endpoint";
 import RequestSummary from "./request-summary";
+import { useParams } from "next/navigation";
 
 export default function Endpoint({ endpoint }: { endpoint: string }) {
   const endpointRef = useRef<HTMLHeadingElement>(null);
   const descriptionRef = useRef<HTMLHeadingElement>(null);
+  const { app } = useParams();
   return (
     <div className="mt-6 flex flex-col">
       <div className="flex justify-between items-center">
@@ -46,7 +48,7 @@ export default function Endpoint({ endpoint }: { endpoint: string }) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard/webhooks">
+                <BreadcrumbLink href={`/dashboard/${app}/webhooks`}>
                   Endpoints
                 </BreadcrumbLink>
               </BreadcrumbItem>

@@ -5,8 +5,8 @@ import { BookOpen, Copy } from "lucide-react";
 
 export default function Api() {
   return (
-    <div className="flex flex-col h-max w-[60%] mx-auto my-8">
-      <h1 className="text-xl my-4">Api Keys</h1>
+    <div className="flex flex-col h-max w-[60%] mx-auto my-4">
+      <h1 className="text-xl my-2">Api Keys</h1>
       <Separator className="my-4" />
       <ApiTable />
       <div className="mt-4 space-y-4">
@@ -25,7 +25,7 @@ export default function Api() {
             </div>
             <div className="flex gap-4 items-center w-full mt-4">
               <p className="max-w-[70%] truncate text-gray-600 text-sm border p-2">
-                pk_test_ZGlzdGluY3QteWV0aS01NC5jbGVyay5hY2NvdW50cy5kZXYk
+                pk_test_ZGlzdGluY3QteWV0aS0andItsfakebro
               </p>
               <Button variant={"outline"} className="cursor-pointer">
                 <Copy size={16} />

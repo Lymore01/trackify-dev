@@ -38,8 +38,8 @@ const apps = [
 
 export default function Dashboard() {
   return (
-    <div className="flex flex-col h-max w-[60%] mx-auto my-8">
-      <h1 className="text-xl my-4">Hello👋, Kelly!</h1>
+    <div className="flex flex-col h-max w-[60%] mx-auto my-4 bg-[]">
+      <h1 className="text-xl my-2">Hello👋, Kelly!</h1>
       <div className="flex gap-2 items-center">
         <Info size={16} />
         <p className="text-zinc-700 text-sm">Overview of your applications.</p>

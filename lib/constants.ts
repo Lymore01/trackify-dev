@@ -1,10 +1,44 @@
+import { ItemsProp } from "@/types/types";
+import { Home, Key, KeyIcon, Settings, Webhook } from "lucide-react";
+
+export const NAV_ITEMS: ItemsProp[] = [
+  {
+    href: "/dashboard",
+    icon: Home,
+    title: "Dashboard",
+    type: "application",
+  },
+  {
+    href: "/dashboard/Docx/webhooks",
+    icon: Webhook,
+    title: "Webhooks",
+    type: "developers",
+  },
+  {
+    href: "/dashboard/Docx/api",
+    icon: KeyIcon,
+    title: "Api keys",
+    type: "developers",
+  },
+  {
+    href: "/dashboard/settings",
+    icon: Settings,
+    title: "Settings",
+    type: "application"
+  },
+];
+
 export const LINK_EVENTS: string[] = [
-    "link.created",
-    "link.updated",
-    "link.deleted",
-    "link.clicked",
-  ];
-export const USER_EVENTS: string[] = ["user.created", "user.updated", "user.deleted"];
+  "link.created",
+  "link.updated",
+  "link.deleted",
+  "link.clicked",
+];
+export const USER_EVENTS: string[] = [
+  "user.created",
+  "user.updated",
+  "user.deleted",
+];
 
 export const eventPayloadMap: Record<string, string> = {
   "user.created": `
@@ -74,10 +108,10 @@ export const eventPayloadMap: Record<string, string> = {
         "callbackUrl": "https://www.example.com/api/webhooks/trackify"
       }
     }
-  `
+  `,
 };
 
-export  const mockRequest = {
+export const mockRequest = {
   headers: {
     "Content-Type": "application/json",
     Authorization: "Bearer abc123",

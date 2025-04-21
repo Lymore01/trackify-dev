@@ -20,12 +20,17 @@ export default function ApiTable() {
           <TableHead>
             <p className="lowercase">.env</p>
           </TableHead>
-          <div className="absolute top-3 right-4 flex text-xs gap-2 cursor-pointer font-normal group">
-            <Copy size={16} />{" "}
-            <span className="group-hover:transition-colors group-hover:font-bold">
-              Copy
-            </span>
-          </div>
+          <td>
+            <div
+              className="absolute top-3 right-4 flex text-xs gap-2 cursor-pointer font-normal group"
+              data-slot="table-row"
+            >
+              <Copy size={16} />
+              <span className="group-hover:transition-colors group-hover:font-bold">
+                Copy
+              </span>
+            </div>
+          </td>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -34,7 +39,7 @@ export default function ApiTable() {
             <p className="inline-flex ">
               TRACKIFY_PUBLISHABLE_KEY:{" "}
               <span className="ml-4 text-sm text-gray-600">
-                pk_test_ZGlzdGluY3QteWV0aS01NC5jbGVyay5hY2NvdW50cy5kZXYk{" "}
+                pk_test_ZGlzdGluY3QteWV0aSandItsFakeBro{" "}
               </span>
             </p>
           </TableCell>
@@ -43,7 +48,9 @@ export default function ApiTable() {
           <TableCell className="flex items-center gap-2 my-2">
             <p className="inline-flex ">
               TRACKIFY_WEBHOOK_SIGNING_SECRET:{" "}
-              <span className="ml-4 blur hover:blur-none transition text-sm text-gray-600">whsec_8 </span>
+              <span className="ml-4 blur hover:blur-none transition text-sm text-gray-600">
+                whsec_8{" "}
+              </span>
             </p>
           </TableCell>
         </TableRow>

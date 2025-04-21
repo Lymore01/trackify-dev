@@ -1,3 +1,5 @@
+import { LucideIcon } from "lucide-react";
+
 type User = {
   name: string;
   email: string;
@@ -5,6 +7,13 @@ type User = {
   profilePicture: string;
   apiKey: string;
 };
+
+export interface ItemsProp {
+  icon: LucideIcon;
+  title: string;
+  href: string;
+  type: "application" | "developers"
+}
 
 export const LINK_EVENTS = [
   "link.created",
