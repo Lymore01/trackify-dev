@@ -39,7 +39,7 @@ export default function ApiTable() {
             <p className="inline-flex ">
               TRACKIFY_PUBLISHABLE_KEY:{" "}
               <span className="ml-4 text-sm text-gray-600">
-                pk_test_ZGlzdGluY3QteWV0aS01NC5jbGVyay5hY2NvdW50cy5kZXYk{" "}
+                pk_test_ZGlzdGluY3QteWV0aSandItsFakeBro{" "}
               </span>
             </p>
           </TableCell>
