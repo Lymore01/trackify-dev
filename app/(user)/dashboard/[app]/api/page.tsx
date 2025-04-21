@@ -25,7 +25,7 @@ export default function Api() {
             </div>
             <div className="flex gap-4 items-center w-full mt-4">
               <p className="max-w-[70%] truncate text-gray-600 text-sm border p-2">
-                pk_test_ZGlzdGluY3QteWV0aS01NC5jbGVyay5hY2NvdW50cy5kZXYk
+                pk_test_ZGlzdGluY3QteWV0aS0andItsfakebro
               </p>
               <Button variant={"outline"} className="cursor-pointer">
                 <Copy size={16} />
