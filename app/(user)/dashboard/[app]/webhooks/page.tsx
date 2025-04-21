@@ -20,7 +20,7 @@ export default function Webhooks() {
   const endpoint = searchParams.get("endpoint");
   const { app } = useParams();
   return (
-    <div className="flex flex-col h-max w-[60%] mx-auto my-8">
+    <div className="flex flex-col h-max w-[60%] mx-auto my-4">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -34,7 +34,7 @@ export default function Webhooks() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="text-xl my-4">Webhooks</h1>
+      <h1 className="text-xl my-2">Webhooks</h1>
       <div className="flex items-center">
         <BookOpen size={16} />
         <p className="text-sm text-zinc-700 ml-2">

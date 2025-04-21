@@ -5,8 +5,8 @@ import { BookOpen, Copy } from "lucide-react";
 
 export default function Api() {
   return (
-    <div className="flex flex-col h-max w-[60%] mx-auto my-8">
-      <h1 className="text-xl my-4">Api Keys</h1>
+    <div className="flex flex-col h-max w-[60%] mx-auto my-4">
+      <h1 className="text-xl my-2">Api Keys</h1>
       <Separator className="my-4" />
       <ApiTable />
       <div className="mt-4 space-y-4">

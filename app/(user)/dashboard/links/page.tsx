@@ -15,9 +15,9 @@ export default function Link() {
   const link = searchParams.get("link");
   const app = searchParams.get("app");
   return (
-    <div className="flex flex-col h-max w-[60%] mx-auto my-8">
+    <div className="flex flex-col h-max w-[60%] mx-auto my-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl my-4">{app}</h1>
+        <h1 className="text-xl my-2">{app}</h1>
         <Button
           variant={"link"}
           className="cursor-pointer"

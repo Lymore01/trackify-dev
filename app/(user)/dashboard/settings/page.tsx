@@ -3,34 +3,47 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Edit, Eye, EyeClosed } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  EyeClosed,
+  LogOut,
+  LucideIcon,
+  User,
+  UserCircle,
+  UserCogIcon,
+  UserRound,
+} from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function Settings() {
   const [currentTab, setCurrentTab] = useState("profile");
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   return (
-    <div className="flex flex-col h-max w-[60%] mx-auto my-8">
+    <div className="flex flex-col h-max w-[60%] mx-auto my-4">
       <h1 className="text-xl my-2">Settings</h1>
       <Separator className="my-4" />
       {/* content */}
       <div className="grid grid-cols-3 gap-4 mt-4">
         <div className="space-y-4 text-gray-600 p-4">
           <ul className="space-y-4 text-base">
-            <li
-              className={`${currentTab === "profile" && "bg-gray-100"} font-medium hover:bg-gray-100 cursor-pointer transition duration-200 ease-in-out  p-2 rounded-md`}
-              onClick={() => setCurrentTab("profile")}
-            >
-              Profile
-            </li>
-            <li
-              className={`${currentTab === "account" && "bg-gray-100"} font-medium hover:bg-gray-100 cursor-pointer transition duration-200 ease-in-out  p-2 rounded-md`}
-              onClick={() => setCurrentTab("account")}
-            >
-              Account Settings
-            </li>
-            <Button className="cursor-pointer">Logout</Button>
+            <TabButton
+              currentTab={currentTab}
+              setCurrentTab={setCurrentTab}
+              tab="profile"
+              Icon={UserCircle}
+            />
+            <TabButton
+              currentTab={currentTab}
+              setCurrentTab={setCurrentTab}
+              tab="account"
+              Icon={UserCogIcon}
+            />
+
+            <LogoutButton />
           </ul>
         </div>
         {currentTab === "profile" ? (
@@ -106,3 +119,74 @@ export default function Settings() {
     </div>
   );
 }
+
+const TabButton = ({
+  currentTab,
+  setCurrentTab,
+  tab,
+  Icon,
+}: {
+  currentTab: string;
+  setCurrentTab: (value: string) => void;
+  tab: string;
+  Icon: LucideIcon;
+}) => {
+  return (
+    <motion.li
+      layout
+      className={`${
+        currentTab === tab
+          ? "bg-indigo-100 text-blue-600"
+          : "text-slate-500 hover:bg-slate-100"
+      } font-medium cursor-pointer transition-colors p-2 rounded-md text-sm capitalize flex items-center`}
+      onClick={() => setCurrentTab(tab)}
+    >
+      <motion.div
+        layout
+        className="grid h-full w-10 place-content-center text-lg"
+      >
+        <Icon />
+      </motion.div>
+
+      <motion.span
+        layout
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.125 }}
+        className="text-sm font-medium"
+      >
+        {tab}
+      </motion.span>
+    </motion.li>
+  );
+};
+
+const LogoutButton = () => {
+  const router = useRouter();
+  const handleLogout = () => {
+    router.push("/login");
+  };
+  return (
+    <motion.button
+      layout
+      className="flex font-medium w-full rounded-md bg-primary p-2 capitalize items-center text-primary-foreground cursor-pointer"
+      onClick={handleLogout}
+    >
+      <motion.div
+        layout
+        className="grid h-full place-content-center text-lg w-10"
+      >
+        <LogOut />
+      </motion.div>
+      <motion.span
+        layout
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.125 }}
+        className="text-sm font-medium"
+      >
+        Logout
+      </motion.span>
+    </motion.button>
+  );
+};

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
 import localFont from "next/font/local";
 import "./globals.css";
+import CustomSidebar from "@/components/custom-sidebar";
+import TopNav from "@/components/top-nav";
 
 const lexend = localFont({
   src: [
@@ -29,9 +31,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${lexend.className} antialiased font-sans`}>
-        {children}
-        <Toaster richColors  />
+      <body className={`${lexend.className} antialiased font-sans flex`}>
+        <CustomSidebar />
+        <div className="w-full">
+          <div className="flex w-[60%] mx-auto py-2">
+            <TopNav />
+          </div>
+          {children}
+        </div>
+        <Toaster richColors />
       </body>
     </html>
   );
