@@ -1,9 +1,14 @@
+"use client";
+
 import ApplicationCard from "@/components/cards/applications-card";
 import CreateApplication from "@/components/forms/create-application";
 import Tag from "@/components/tag";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { delay } from "@/lib/utils";
 import { ArrowRight, Info, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const apps = [
   {
@@ -37,9 +42,24 @@ const apps = [
 ];
 
 export default function Dashboard() {
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    async function simulate() {
+      setIsLoading(true);
+      await delay(3000);
+      setIsLoading(false);
+    }
+
+    simulate();
+  }, []);
   return (
     <div className="flex flex-col h-max w-[60%] mx-auto my-4 bg-[]">
-      <h1 className="text-xl my-2">Hello👋, Kelly!</h1>
+      <h1 className="text-xl my-2 flex gap-2 items-center">
+        Hello👋,{" "}
+        <span>
+          {isLoading ? <Skeleton className="w-24 h-6" /> : <span>Kelly!</span>}
+        </span>
+      </h1>
       <div className="flex gap-2 items-center">
         <Info size={16} />
         <p className="text-zinc-700 text-sm">Overview of your applications.</p>

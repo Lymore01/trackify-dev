@@ -32,13 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${lexend.className} antialiased font-sans flex`}>
-        <CustomSidebar />
-        <div className="w-full">
-          <div className="flex w-[60%] mx-auto py-2">
-            <TopNav />
-          </div>
-          {children}
-        </div>
+        <div className="w-full">{children}</div>
         <Toaster richColors />
       </body>
     </html>
