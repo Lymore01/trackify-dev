@@ -16,6 +16,12 @@ enum EventsToSubscribe {
   link_deleted
 }
 
+enum Plan {
+  Free_Plan
+  Premium_Plan
+  Enterprise_Plan
+}
+
 model User {
   id        String     @id @default(uuid())
   name      String?
@@ -23,21 +29,36 @@ model User {
   password  String
   apiKey    String     @unique @default(uuid())
   urls      UrlShort[]
-  salt      String @unique
+  salt      String     @unique
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   endpoints Endpoint[]
+  App       App[]
 }
 
-model Endpoint {
+model App {
+  id        String     @id @default(uuid())
+  name      String
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String
+  endpoint  Endpoint[]
+  plan Plan @default(Free_Plan)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Endpoint { 
   id               String              @id @default(uuid())
-  name             String /// webhook name
+  description      String /// webhook name/desc
   url              String
   subscribedEvents EventsToSubscribe[]
+  signingSecret    String
   user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  app              App                 @relation(fields: [appId], references: [id], onDelete: Cascade)
   userId           String
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
+  appId            String
 }
 
 model UrlShort {

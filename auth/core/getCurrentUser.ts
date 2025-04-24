@@ -12,7 +12,7 @@ type FullUser = Exclude<
 >;
 
 type User = Exclude<
-  Awaited<ReturnType<typeof getUserFromDb>>,
+  Awaited<ReturnType<typeof getUserFromSession>>,
   undefined | null
 >;
 

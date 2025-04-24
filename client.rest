@@ -17,3 +17,6 @@ Content-Type: application/json
     "email": "jane@gmail.com",
     "password": "1234567t"
 }
+
+###
+GET {{base_url}}/application

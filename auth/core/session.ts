@@ -52,7 +52,7 @@ export function setCookie(sessionId: string, cookies: Pick<Cookie, "set">) {
   });
 }
 
-export async function getUserFromSession(cookies: Pick<Cookie, "get">) {
+export async function getUserFromSession(cookies: Pick<Cookie, "get">): Promise<UserType | null> {
   const sessionId = cookies.get(COOKIE_SESSION_KEY)?.value;
 
   if (!sessionId) return null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,10 +28,17 @@ import { Input } from "../ui/input";
 import EventSelection from "../events-selection";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  applicationName: z.string().min(5, "Application name should be atleast 5 characters long").nonempty("Application name is required"),
+  applicationName: z
+    .string()
+    .min(2, "Application name should be atleast 2 characters long")
+    .nonempty("Application name is required"),
 });
+
+type ApplicationType = z.infer<typeof formSchema>;
 
 export default function CreateApplication() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -41,10 +48,36 @@ export default function CreateApplication() {
       applicationName: "",
     },
   });
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast.success("Application Created Successfully!");
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (data: ApplicationType) => {
+      const response = await fetch("/api/application", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          appName: data.applicationName,
+        }),
+      });
+      if (!response.ok) {
+        const res = await response.json();
+        throw new Error(res.message);
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const onSubmit = async (values: ApplicationType) => {
+    await mutateAsync(values);
   };
+
   return (
     <div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -113,7 +146,11 @@ export default function CreateApplication() {
               type="submit"
               form="create-app-form"
             >
-              Create
+              {isPending ? (
+                <Loader size={16} className="animate-spin" />
+              ) : (
+                <span>Create</span>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

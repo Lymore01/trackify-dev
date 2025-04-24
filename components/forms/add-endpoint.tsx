@@ -28,21 +28,25 @@ import { Input } from "../ui/input";
 import EventSelection from "../events-selection";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { useParams } from "next/navigation";
 
-const formSchema = z.object({
+export const formSchema = z.object({
   url: z.string().url().nonempty("URL is required"),
   description: z.string().min(5, "Description must be at least 5 characters"),
   events: z.array(z.string()),
+  app: z.string(),
 });
 
 export default function AddEndpoint() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const { app: appId } = useParams();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       url: "",
       description: "",
       events: [],
+      app: appId as string,
     },
   });
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
