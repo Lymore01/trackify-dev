@@ -1,26 +1,30 @@
 import axiosInstance from "@/lib/axios";
+import userSchema from "@/schemas/userSchema";
 import { NextResponse } from "next/server";
+import z from "zod";
+import { prisma } from "@/lib/prisma";
+import { generateSalt, hashPassword } from "@/auth/core/password-hash";
+import { createSession } from "@/auth/core/session";
+import { cookies } from "next/headers";
 
 // register
 export async function POST(request: Request) {
   try {
-    const body: Pick<User, "name" | "email" | "password"> =
-      await request.json();
-    const { email, password } = body;
+    const body: z.infer<typeof userSchema> = await request.json();
+    const { email, password, name } = body;
 
-    const missingFields: string[] = [];
-    // if (!name) missingFields.push("name");
-    if (!email) missingFields.push("email");
-    if (!password) missingFields.push("password");
+    //  check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
 
-    // validations
-    if (missingFields.length > 0) {
+    if (existingUser) {
       return NextResponse.json(
         {
-          error: "All fields are required",
-          details: {
-            missingFields,
-          },
+          success: false,
+          message: "User already Exists!",
         },
         {
           status: 400,
@@ -28,31 +32,46 @@ export async function POST(request: Request) {
       );
     }
 
-    // send the payload to the api endpoint
-    const response = await axiosInstance.post("/auth/register", body);
+    const salt = generateSalt();
+    const hashedPassword = (await hashPassword(password, salt)) as string;
 
-    if (response.data.success === false) {
+    // add to the database
+    const user = await prisma.user.create({
+      data: {
+        name: name ,
+        email,
+        password: hashedPassword,
+        salt: salt,
+      },
+    });
+
+    if (!user) {
       return NextResponse.json(
         {
-          error: "Registration attempt failed!",
-          details: response.data.error,
+          success: false,
+          message: "Failed to create user!",
         },
         {
           status: 400,
         }
       );
     }
+
+    // create session - set data into redis, cookie
+    await createSession(user, await cookies());
 
     return NextResponse.json(
       {
-        user: response.data
+        success: true,
+        message: "User Registered Successfully. Redirecting....",
+        redirectUrl: "/dashboard",
       },
       {
         status: 201,
       }
     );
   } catch (error) {
-    console.error("Error registering user", (error as Error).message);
+    console.error("Error registering in user", (error as Error).message);
     return NextResponse.json(
       {
         error: "Internal Server Error!",

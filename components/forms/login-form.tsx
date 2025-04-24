@@ -16,9 +16,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
-import { Eye, EyeClosed, EyeClosedIcon } from "lucide-react";
+import { Eye, EyeClosed, EyeClosedIcon, Loader } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 const formschema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -28,19 +30,48 @@ const formschema = z.object({
   rememberMe: z.boolean().optional(),
 });
 
+type FormType = z.infer<typeof formschema>;
+
 export default function LoginForm() {
-  const form = useForm<z.infer<typeof formschema>>({
+  const router = useRouter();
+  const form = useForm<FormType>({
     resolver: zodResolver(formschema),
     defaultValues: {
       email: "",
       password: "",
-      rememberMe: false,
+      rememberMe: true,
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formschema>) => {
-    console.log(values);
-    toast.success('User Logged in Successfully')
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (data: FormType) => {
+      const response = await fetch("/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+      if (!response.ok) {
+        const res = await response.json();
+        throw new Error(res.message);
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+      router.push(data.redirectUrl);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const onSubmit = async (values: FormType) => {
+    await mutateAsync(values);
   };
 
   return (
@@ -129,7 +160,10 @@ export default function LoginForm() {
                         </label>
                       </div>
                     </div>
-                    <Link href={"/forgot-password"} className="text-blue-600 font-semibold text-sm hover:underline cursor-pointer">
+                    <Link
+                      href={"/forgot-password"}
+                      className="text-blue-600 font-semibold text-sm hover:underline cursor-pointer"
+                    >
                       Forgot password?
                     </Link>
                   </div>
@@ -140,8 +174,12 @@ export default function LoginForm() {
           }}
         />
 
-        <Button type="submit" className="w-full">
-          Login
+        <Button type="submit" className="w-full shrink-0">
+          {isPending ? (
+            <Loader size={16} className="animate-spin" />
+          ) : (
+            <span>Login</span>
+          )}
         </Button>
         <div className="w-full items-center justify-center flex">
           <p className="font-medium text-zinc-700 text-sm">

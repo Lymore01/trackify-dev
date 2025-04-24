@@ -1,10 +1,8 @@
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 
-export default function CoreLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function NotFound() {
   return (
     <div className="flex flex-col lg:flex-row max-w-full max-h-screen overflow-auto relative">
       <main className="flex-1 px-4 py-16 lg:px-8 lg:py-16 flex justify-start items-center relative">
@@ -27,7 +25,19 @@ export default function CoreLayout({
             </svg>
           </div>
         </div>
-        {children}
+        <div className="space-y-4">
+          <h1 className="text-2xl text-zinc-700">Something's, missing...</h1>
+          <p className="text-sm text-gray-500">
+            This page is missing or you assembled <br></br>the wrong link
+          </p>
+          <Button className="items-center flex gap-2 cursor-pointer group">
+            <ArrowLeft
+              size={16}
+              className="hidden group-hover:block transition-all"
+            />
+            <span>Go back home</span>
+          </Button>
+        </div>
         <div className="absolute bottom-4 left-4">
           <p className="text-xs text-gray-500">
             copyright @ 2025-trackify. All rights recerved

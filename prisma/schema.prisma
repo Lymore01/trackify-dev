@@ -1,9 +1,61 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum EventsToSubscribe {
+  user_created
+  user_updated
+  user_deleted
+  link_created
+  link_updated
+  link_deleted
+}
+
+model User {
+  id        String     @id @default(uuid())
+  name      String?
+  email     String     @unique
+  password  String
+  apiKey    String     @unique @default(uuid())
+  urls      UrlShort[]
+  salt      String @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  endpoints Endpoint[]
+}
+
+model Endpoint {
+  id               String              @id @default(uuid())
+  name             String /// webhook name
+  url              String
+  subscribedEvents EventsToSubscribe[]
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model UrlShort {
+  id        String         @id @default(nanoid())
+  original  String
+  shortId   String         @unique
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  clicks    ClickTracker[]
+  createdAt DateTime       @default(now())
+}
+
+model ClickTracker {
+  id        String   @id @default(uuid())
+  url       UrlShort @relation(fields: [urlId], references: [id], onDelete: Cascade)
+  urlId     String
+  ip        String?
+  country   String?
+  userAgent String?
+  createdAt DateTime @default(now())
 }

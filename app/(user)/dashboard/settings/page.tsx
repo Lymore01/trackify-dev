@@ -17,7 +17,7 @@ import {
 import Image from "next/image";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { logOut } from "@/actions/actions";
 
 export default function Settings() {
   const [currentTab, setCurrentTab] = useState("profile");
@@ -162,9 +162,8 @@ const TabButton = ({
 };
 
 const LogoutButton = () => {
-  const router = useRouter();
-  const handleLogout = () => {
-    router.push("/login");
+  const handleLogout = async () => {
+    await logOut();
   };
   return (
     <motion.button
@@ -184,6 +183,7 @@ const LogoutButton = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.125 }}
         className="text-sm font-medium"
+        onClick={handleLogout}
       >
         Logout
       </motion.span>

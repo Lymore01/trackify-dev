@@ -1,26 +1,28 @@
-import axiosInstance from "@/lib/axios";
+import { comparePassword, hashPassword } from "@/auth/core/password-hash";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import crypto from "crypto";
+import { createSession } from "@/auth/core/session";
+import { cookies } from "next/headers";
 
-// register
+// login
 export async function POST(request: Request) {
   try {
-    const body: Pick<User, "email" | "password"> = await request.json();
-    const { email, password } = body;
+    const body: { email: string; password: string } = await request.json();
+    const data = body;
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password are required!" },
-        { status: 400 }
-      );
-    }
+    //  check user
+    const user = await prisma.user.findUnique({
+      where: {
+        email: data.email,
+      },
+    });
 
-    const response = await axiosInstance.post("/auth/login", body);
-
-    if (response.data.success === false) {
+    if (!user) {
       return NextResponse.json(
         {
-          error: "Login attempt failed!",
-          details: response.data.error,
+          success: false,
+          message: "Invalid Email or Password",
         },
         {
           status: 400,
@@ -28,9 +30,37 @@ export async function POST(request: Request) {
       );
     }
 
+    const isCorrectPassword = await comparePassword({
+      password: data.password,
+      hashedPassword: user.password,
+      salt: user.salt,
+    });
+
+    if (!isCorrectPassword) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid Email or Password",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    await createSession(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      await cookies()
+    );
+
     return NextResponse.json(
       {
-        user: response.data,
+        success: true,
+        message: "User Logged in Successfull, Redirecting....",
+        redirectUrl: "/dashboard",
       },
       {
         status: 201,
