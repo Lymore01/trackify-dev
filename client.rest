@@ -20,3 +20,9 @@ Content-Type: application/json
 
 ###
 GET {{base_url}}/application
+
+###
+GET {{base_url}}/url?appId=1f818cdb-2964-480c-af2d-0d325077bf49
+
+###
+GET {{base_url}}/url?appId=1f818cdb-2964-480c-af2d-0d325077bf49&shortId=2hdn1

@@ -42,12 +42,13 @@ model App {
   user      User       @relation(fields: [userId], references: [id])
   userId    String
   endpoint  Endpoint[]
-  plan Plan @default(Free_Plan)
+  urls      UrlShort[]
+  plan      Plan       @default(Free_Plan)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
 
-model Endpoint { 
+model Endpoint {
   id               String              @id @default(uuid())
   description      String /// webhook name/desc
   url              String
@@ -62,13 +63,17 @@ model Endpoint {
 }
 
 model UrlShort {
-  id        String         @id @default(nanoid())
-  original  String
-  shortId   String         @unique
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  clicks    ClickTracker[]
-  createdAt DateTime       @default(now())
+  id          String         @id @default(nanoid())
+  original    String
+  description String?
+  shortId     String         @unique
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  clicks      ClickTracker[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  App         App?           @relation(fields: [appId], references: [id])
+  appId       String?
 }
 
 model ClickTracker {

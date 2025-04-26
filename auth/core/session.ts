@@ -57,7 +57,7 @@ export async function getUserFromSession(cookies: Pick<Cookie, "get">): Promise<
 
   if (!sessionId) return null;
 
-  return await getSessionById(sessionId);
+  return await getSessionById(sessionId); //from redis
 }
 
 export async function getSessionById(sessionId: string) {

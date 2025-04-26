@@ -13,7 +13,7 @@ export interface ItemsProp {
   icon: LucideIcon;
   title: string;
   href: string;
-  type: "application" | "developers"
+  type: "application" | "developers";
 }
 
 export const LINK_EVENTS = [
@@ -28,7 +28,9 @@ export const USER_EVENTS = [
   "user.deleted",
 ] as const;
 
-export type EventType = typeof LINK_EVENTS[number] | typeof USER_EVENTS[number];
+export type EventType =
+  | (typeof LINK_EVENTS)[number]
+  | (typeof USER_EVENTS)[number];
 
 // webhooks
 export interface UserJSON {
@@ -61,3 +63,20 @@ export type LinkWebhookEvent = Webhook<
 >;
 export type WebhookEvent = UserWebhookEvent | LinkWebhookEvent;
 export type WebhookEventType = WebhookEvent["type"];
+
+export type LinkType = {
+  id: string;
+  shortId: string;
+  original: string;
+  clicks: number;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type AppType = {
+  id: string;
+  name: string;
+  plan: string;
+  updatedAt: Date;
+};

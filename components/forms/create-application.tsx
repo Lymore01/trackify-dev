@@ -28,7 +28,7 @@ import { Input } from "../ui/input";
 import EventSelection from "../events-selection";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
@@ -48,6 +48,7 @@ export default function CreateApplication() {
       applicationName: "",
     },
   });
+  const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: ApplicationType) => {
@@ -68,6 +69,9 @@ export default function CreateApplication() {
     },
     onSuccess: (data) => {
       toast.success(data.message);
+      setIsDialogOpen(false);
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["applications"] });
     },
     onError: (err) => {
       toast.error(err.message);

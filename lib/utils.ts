@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import crypto from "crypto";
+import { NextResponse } from "next/server";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,3 +27,11 @@ export function getDaysDifference(dateString: string) {
   return differenceInDays;
 }
 
+// api repsonse
+export function apiResponse(data: any, status = 200) {
+  return NextResponse.json(data, { status });
+}
+
+export const generateShortId: () => string = () => {
+  return Math.random().toString(36).substring(2, 7);
+}

@@ -4,13 +4,13 @@ import { ArrowRight } from "lucide-react";
 import Tag from "../tag";
 import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
-import { AppType } from "@/app/(user)/dashboard/page";
 import { getDaysDifference } from "@/lib/utils";
+import { AppType } from "@/types/types";
 
 export default function ApplicationCard({ app }: { app: AppType }) {
   const router = useRouter();
-  const addQueryParameters = (appName: string) => {
-    router.push(`/dashboard/links?app=${appName}`);
+  const addQueryParameters = (appId: string) => {
+    router.push(`/dashboard/links?app=${appId}&name=${app.name}`); 
   };
   return (
     <div className="rounded-lg border">
@@ -31,7 +31,7 @@ export default function ApplicationCard({ app }: { app: AppType }) {
         </p>
         <div
           className="flex gap-1 group items-center text-xs text-zinc-700 cursor-pointer"
-          onClick={() => addQueryParameters(app.name)}
+          onClick={() => addQueryParameters(app.id)}
         >
           <span>Go to app</span>
           <ArrowRight

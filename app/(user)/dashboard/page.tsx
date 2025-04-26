@@ -3,21 +3,11 @@
 import ApplicationCard from "@/components/cards/applications-card";
 import CreateApplication from "@/components/forms/create-application";
 import ApplicationCardSkelton from "@/components/skeletons/application-card-skelton";
-import Tag from "@/components/tag";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { delay } from "@/lib/utils";
+import { AppType } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Info, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
-
-export type AppType = {
-  id: string;
-  name: string;
-  plan: string;
-  updatedAt: Date;
-};
+import { Info } from "lucide-react";
 
 export default function Dashboard() {
   const {
@@ -63,10 +53,8 @@ export default function Dashboard() {
         </div>
         <div className="grid grid-cols-3 gap-4">
           {isLoading ? (
-            Array.from({
-              length: 4,
-            }).map((_, idx) => <ApplicationCardSkelton key={idx} />)
-          ) : apps && Array.isArray(apps) && apps.length > 0 ? (
+            [...Array(3)].map((_, idx) => <ApplicationCardSkelton key={idx} />)
+          ) : apps?.length > 0 ? (
             apps.map((app: AppType) => (
               <ApplicationCard key={app.id} app={app} />
             ))

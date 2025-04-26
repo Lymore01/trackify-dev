@@ -1,123 +1,61 @@
 import { getCurrentUser } from "@/auth/core/getCurrentUser";
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { apiResponse } from "@/lib/utils";
+import { createApp, fetchApplications } from "@/services/appServices";
+import { createAppSchema } from "@/validations/appValidations";
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body: {
-      appName: string;
-    } = await request.json();
-    const { appName } = body;
+    const body = await req.json();
+
+    const { data: app, success } = createAppSchema.safeParse(body);
+
+    if (!success) {
+      return apiResponse(
+        { success: false, message: "Invalid request body" },
+        400
+      );
+    }
+
     const user = await getCurrentUser({
       withFullUser: false,
       redirectIfNotFound: false,
     });
 
     if (!user) {
-      return NextResponse.json(
+      return apiResponse(
         {
           success: false,
-          message: "Failed to create application",
+          message: "User not found",
         },
-        {
-          status: 400,
-        }
+        401
       );
     }
 
-    const application = await prisma.app.create({
-      data: {
-        name: appName,
-        user: {
-          connect: {
-            id: user.id,
-          },
-        },
-      },
-    });
+    await createApp(app.appName, user.id);
 
-    if (!application) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Failed to create application",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Created application successfully",
-      },
-      {
-        status: 201,
-      }
-    );
+    return apiResponse({ success: true, message: "Application created" }, 201);
   } catch (error) {
-    console.error("Error creating application", (error as Error).message);
-    return NextResponse.json(
-      {
-        error: "Internal Server Error!",
-      },
-      {
-        status: 500,
-      }
-    );
+    console.error("POST /api/app error:", error);
+    return apiResponse({ error: "Internal Server Error" }, 500);
   }
 }
 
-// get applications
-export async function GET(request: Request) {
+export async function GET(req: Request) {
   try {
     const user = await getCurrentUser({
       withFullUser: false,
       redirectIfNotFound: false,
     });
 
-    const applications = await prisma.app.findMany({
-      where: {
-        userId: user?.id,
-      },
-      select: {
-        name: true,
-        plan: true,
-        updatedAt: true,
-        user: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
-
-    if (!applications) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Failed to fetch applications",
-        },
-        {
-          status: 400,
-        }
-      );
+    if (!user) {
+      return apiResponse({ error: "User not found" }, 401);
     }
 
-    return NextResponse.json(applications, {
-      status: 200,
-    });
+    const applications = await fetchApplications(user.id);
+
+    return apiResponse(applications, 200);
   } catch (error) {
-    console.error("Error fetching applications", (error as Error).message);
-    return NextResponse.json(
-      {
-        error: "Internal Server Error!",
-      },
-      {
-        status: 500,
-      }
-    );
+    console.error("GET /api/app error:", error);
+    return apiResponse({ error: "Internal Server Error" }, 500);
   }
 }
