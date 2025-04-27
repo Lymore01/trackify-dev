@@ -68,7 +68,7 @@ export type LinkType = {
   id: string;
   shortId: string;
   original: string;
-  clicks: number;
+  clicks: any[];
   description: string;
   createdAt: Date;
   updatedAt: Date;

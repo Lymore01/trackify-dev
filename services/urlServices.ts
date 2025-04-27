@@ -48,7 +48,7 @@ export async function fetchUrl({
     return prisma.urlShort.findFirst({ where });
   }
 
-  return prisma.urlShort.findMany({ where });
+  return prisma.urlShort.findMany({ where, include: { clicks: true } });
 }
 
 export async function deleteUrl(id: string) {
@@ -60,10 +60,14 @@ export async function deleteUrl(id: string) {
 }
 
 export async function updateUrl(id: string, data: any) {
+  const payload: any = {};
+
+  if (data.originalUrl) payload.original = data.originalUrl;
+  if (data.description) payload.description = data.description;
   return prisma.urlShort.update({
     where: {
       id,
     },
-    data,
+    data: payload,
   });
 }

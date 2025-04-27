@@ -174,7 +174,7 @@ export default function Links() {
             <div className="p-4 text-sm space-y-4">
               <div className="flex justify-between items-center">
                 <h1>Original URL</h1>
-                <EditLinkURL current={originalLinkRef} />
+                <EditLinkURL current={originalLinkRef} linkID={data.id}/>
               </div>
               <div className="p-2 border text-gray-600" ref={originalLinkRef}>
                 {data.original}
@@ -183,7 +183,7 @@ export default function Links() {
             <div className="p-4 text-sm space-y-4">
               <div className="flex justify-between items-center">
                 <h1>Description</h1>
-                <EditLinkDescription current={descriptionRef} />
+                <EditLinkDescription current={descriptionRef} linkID={data.id}/>
               </div>
               <div className="p-2 border text-gray-600" ref={descriptionRef}>
                 {data.description}

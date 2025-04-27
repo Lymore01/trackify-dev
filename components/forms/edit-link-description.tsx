@@ -26,6 +26,9 @@ import { z } from "zod";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Loader } from "lucide-react";
 
 const formSchema = z.object({
   description: z.string(),
@@ -33,8 +36,10 @@ const formSchema = z.object({
 
 export default function EditLinkDescription({
   current,
+  linkID,
 }: {
   current: RefObject<HTMLHeadingElement | null>;
+  linkID: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,8 +48,36 @@ export default function EditLinkDescription({
       description: current?.current?.textContent || "",
     },
   });
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: updateLinkDescription, isPending } = useMutation({
+    mutationFn: async (data: z.infer<typeof formSchema>) => {
+      const response = await fetch(`/api/url/${linkID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update original link");
+      }
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["links"],
+      });
+      toast.success("Link description updated successfully!");
+      setIsDialogOpen(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update link description");
+    },
+  });
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    await updateLinkDescription(values);
   };
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -61,10 +94,7 @@ export default function EditLinkDescription({
         <Separator />
         {/* content */}
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            id="edit-link-desc-form"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} id="edit-link-desc-form">
             <FormField
               control={form.control}
               name="description"
@@ -100,7 +130,14 @@ export default function EditLinkDescription({
             type="submit"
             form="edit-link-desc-form"
           >
-            Submit
+            {isPending ? (
+              <div className="flex items-center gap-2">
+                <Loader className="animate-spin" size={16} />
+                <span>Submitting...</span>
+              </div>
+            ) : (
+              <span>Submit</span>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

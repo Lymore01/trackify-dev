@@ -1,8 +1,10 @@
 import { getUserFromSession } from "@/auth/core/session";
 import { NextResponse, type NextRequest } from "next/server";
+import { trackClick } from "./lib/middlewares/click-tracker";
 
 const privateRoutePattern = /^\/dashboard(\/|$)/;
 const publicRoutePattern = /^\/(login|signup)(\/|$)/;
+const redirectRoutesPattern = /^\/u\/[^/]+$/;
 
 export async function middleware(request: NextRequest) {
   const response = (await middlewareAuth(request)) ?? NextResponse.next();
@@ -15,6 +17,9 @@ export async function middlewareAuth(request: NextRequest) {
   }
   if (publicRoutePattern.test(request.nextUrl.pathname)) {
     return handlePublicRoutes(request);
+  }
+  if(redirectRoutesPattern.test(request.nextUrl.pathname)) {
+    return handleRedirectRoutes(request);
   }
 }
 
@@ -30,6 +35,10 @@ export async function handlePublicRoutes(request: NextRequest) {
   if (user) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
+}
+
+export async function handleRedirectRoutes(request: NextRequest) {
+  await trackClick(request)
 }
 
 export const config = {

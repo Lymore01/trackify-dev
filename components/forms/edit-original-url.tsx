@@ -25,25 +25,59 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Loader } from "lucide-react";
 
 const formSchema = z.object({
-  url: z.string().url().nonempty("URL is required"),
+  originalUrl: z.string().url().nonempty("URL is required"),
 });
 
 export default function EditLinkURL({
   current,
+  linkID,
 }: {
   current: RefObject<HTMLHeadingElement | null>;
+  linkID: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      url: current?.current?.textContent || "",
+      originalUrl: current?.current?.textContent || "",
+    },
+  });
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: updateOriginalLink, isPending } = useMutation({
+    mutationFn: async (data: z.infer<typeof formSchema>) => {
+      const response = await fetch(`/api/url/${linkID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update original link");
+      }
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["links"],
+      });
+      toast.success("Original link updated successfully!");
+      setIsDialogOpen(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update original link");
     },
   });
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
+    await updateOriginalLink(values);
   };
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -63,7 +97,7 @@ export default function EditLinkURL({
           <form onSubmit={form.handleSubmit(onSubmit)} id="edit-link-url-form">
             <FormField
               control={form.control}
-              name="url"
+              name="originalUrl"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Original URL</FormLabel>
@@ -97,7 +131,14 @@ export default function EditLinkURL({
             type="submit"
             form="edit-link-url-form"
           >
-            Submit
+            {isPending ? (
+              <div className="flex items-center gap-2">
+                <Loader className="animate-spin" size={16} />
+                <span>Submitting...</span>
+              </div>
+            ) : (
+              <span>Submit</span>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

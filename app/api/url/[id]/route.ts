@@ -29,6 +29,8 @@ export async function PUT(
   try {
     const { id } = params;
 
+    console.log("ID:", id);
+
     if (!id) {
       return apiResponse({ error: "Invalid ID" }, 400);
     }

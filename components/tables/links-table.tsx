@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import LinksSkeleton from "../skeletons/links-skeleton";
 import { LinkType } from "@/types/types";
 import { useUrl } from "@/hooks/use-url";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 export default function LinksTable() {
   const searchParams = useSearchParams();
@@ -56,7 +57,7 @@ export default function LinksTable() {
                 <TableCell className="flex items-center gap-2 my-2">
                   <p className="truncate max-w-md">{link.original}</p>
                 </TableCell>
-                <TableCell>{link.clicks ?? 0}</TableCell>
+                <TableCell>{link.clicks.length ?? 0}</TableCell>
               </TableRow>
             )
           )

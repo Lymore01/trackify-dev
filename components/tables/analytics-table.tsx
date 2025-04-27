@@ -21,7 +21,7 @@ export default function AnalyticsTable() {
         <TableHeader className="rounded-tr-lg rounded-tl-lg p-4">
           <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase ">
             <TableHead>Date</TableHead>
-            <TableHead>No. of clicks</TableHead>
+            {/* <TableHead>No. of clicks</TableHead> */}
             <TableHead>IP</TableHead>
             <TableHead>Country</TableHead>
             <TableHead>Device</TableHead>
