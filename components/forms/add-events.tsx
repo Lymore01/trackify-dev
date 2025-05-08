@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,7 +27,9 @@ import {
 import { Input } from "../ui/input";
 import EventSelection from "../events-selection";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import useUpdateWebhook from "@/hooks/use-update-webhook";
+import { useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   events: z.array(z.string()),
@@ -35,16 +37,26 @@ const formSchema = z.object({
 
 export default function AddMoreEvents() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
+  const endpoint = searchParams.get("endpoint");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      events: ["link.created", "link.clicked"],
+      events: [],
     },
   });
 
+  const { updateWebhook, isPending } = useUpdateWebhook(endpoint as string);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
-    toast.success("Events added Successfully!");
+    await updateWebhook(values);
+    setIsDialogOpen(false);
+    form.reset();
+    queryClient.invalidateQueries({
+      queryKey: ["webhooks"],
+    });
   };
   return (
     <div>
@@ -104,7 +116,14 @@ export default function AddMoreEvents() {
               type="submit"
               form="add-event-form"
             >
-              Submit
+              {isPending ? (
+                <div className="flex items-center gap-2">
+                  <Loader className="animate-spin" size={16} />
+                  <span>Submitting...</span>
+                </div>
+              ) : (
+                <span>Submit</span>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,0 +1,143 @@
+"use client";
+
+import ApiTable from "@/components/tables/api-table";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { BookOpen, Copy, Loader } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+export default function Api() {
+  const queryClient = useQueryClient();
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const {
+    data: apiData,
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ["api-key"],
+    queryFn: async () => {
+      const res = await fetch("/api/api_keys", {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) {
+        throw new Error("Failed to fetch API key");
+      }
+      return res.json();
+    },
+  });
+
+  useEffect(() => {
+    console.log(apiData);
+  }, [apiData]);
+
+  const handleApiKeyGen = async () => {
+    setUpdateLoading(true);
+    const res = await fetch("/api/api_keys?new=true", {
+      method: "PUT",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      setUpdateLoading(false);
+      toast.error("Failed to generate new API key");
+      return;
+    }
+    const data = await res.json();
+    if (data.success) {
+      setUpdateLoading(false);
+      toast.success("New API key generated successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["api-key"],
+      });
+    } else {
+      setUpdateLoading(false);
+      toast.error("Failed to generate new API key");
+    }
+  };
+
+  if (isError) {
+    return (
+      <div className="flex justify-center items-center">
+        <p className="text-red-500">Error fetching API key</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-max w-[100%] lg:w-[60%] mx-auto my-4 p-2 lg:p-0">
+      <h1 className="text-xl my-2">Api Keys</h1>
+      <Separator className="my-4" />
+      <ApiTable apiKey={apiData?.data} />
+      <div className="mt-4 space-y-4">
+        <div className="rounded-lg border">
+          <div className="bg-slate-200 p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600">
+            <h1>Publishable Key</h1>
+          </div>
+          <Separator />
+          <div className="p-4">
+            <div className="text-sm space-y-4">
+              <p className="text-gray-600">
+                Your publishable secret key ensures secure integration with
+                Trackify's services; keep it safe and avoid client-side
+                exposure.
+              </p>
+            </div>
+            <div className="flex gap-4 items-center w-full mt-4">
+              <p className="max-w-[70%] truncate text-gray-600 text-sm border p-2">
+                {apiData?.data}
+              </p>
+              <Button variant={"outline"} className="cursor-pointer">
+                <Copy size={16} />
+              </Button>
+            </div>
+            <div className="w-full flex items-center justify-end mt-4">
+              <Button className="cursor-pointer" onClick={handleApiKeyGen}>
+                {updateLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader className="animate-spin" size={16} /> Generating
+                  </div>
+                ) : (
+                  <span>Generate new key</span>
+                )}{" "}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* signing secret */}
+      <div className="mt-4 space-y-4">
+        <div className="rounded-lg border">
+          <div className="bg-slate-200 p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600">
+            <h1>Signing Secret</h1>
+          </div>
+          <Separator />
+          <div className="p-4">
+            <div className="text-sm space-y-4">
+              <p className="text-gray-600">
+                Your signing secret is used to verify the integrity of incoming
+                webhook requests. Ensure it is kept confidential and only used
+                on your server-side.
+              </p>
+            </div>
+            <div className="flex gap-4 items-center w-full mt-4">
+              <p className="ml-4  transition border p-2 text-sm text-gray-600">
+                whsec_8{" "}
+              </p>
+              <Button variant={"outline"} className="cursor-pointer">
+                <Copy size={16} />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

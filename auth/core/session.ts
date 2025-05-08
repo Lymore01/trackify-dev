@@ -21,7 +21,7 @@ type Cookie = {
     options: {
       secure?: boolean;
       httpOnly?: boolean;
-      sameSite?: "strict" | "lax";
+      sameSite?: "strict" | "lax" | "none";
       expires?: number;
     }
   ) => void;
@@ -47,7 +47,7 @@ export function setCookie(sessionId: string, cookies: Pick<Cookie, "set">) {
   cookies.set(COOKIE_SESSION_KEY, sessionId, {
     secure: true,
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "none",
     expires: Date.now() + SESSION_EXPIRATION_SECONDS * 1000,
   });
 }

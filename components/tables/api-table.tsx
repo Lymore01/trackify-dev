@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/table";
 import { Copy } from "lucide-react";
 
-export default function ApiTable() {
+export default function ApiTable({ apiKey }: { apiKey: string }) {
   return (
-    <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto">
+    <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto max-w-full">
       <TableCaption>A list of your API and secret key.</TableCaption>
       <TableHeader className="rounded-tr-lg rounded-tl-lg p-4 w-full">
         <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase relative">
@@ -38,9 +38,7 @@ export default function ApiTable() {
           <TableCell className="flex items-center gap-2 my-2">
             <p className="inline-flex ">
               TRACKIFY_PUBLISHABLE_KEY:{" "}
-              <span className="ml-4 text-sm text-gray-600">
-                pk_test_ZGlzdGluY3QteWV0aSandItsFakeBro{" "}
-              </span>
+              <span className="ml-4 text-sm text-gray-600">{apiKey} </span>
             </p>
           </TableCell>
         </TableRow>
@@ -48,7 +46,7 @@ export default function ApiTable() {
           <TableCell className="flex items-center gap-2 my-2">
             <p className="inline-flex ">
               TRACKIFY_WEBHOOK_SIGNING_SECRET:{" "}
-              <span className="ml-4 blur hover:blur-none transition text-sm text-gray-600">
+              <span className="ml-4  transition text-sm text-gray-600">
                 whsec_8{" "}
               </span>
             </p>

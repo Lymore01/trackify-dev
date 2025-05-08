@@ -2,7 +2,6 @@ import { getCurrentUser } from "@/auth/core/getCurrentUser";
 import { apiResponse, generateShortId } from "@/lib/utils";
 import { createUrl, fetchUrl } from "@/services/urlServices";
 import { urlSchema } from "@/validations/urlValidations";
-import { useDragControls } from "framer-motion";
 
 export async function POST(req: Request) {
   try {

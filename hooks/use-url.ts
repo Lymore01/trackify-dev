@@ -14,7 +14,7 @@ export function useUrl(params: useUrlOptions) {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["links"],
+    queryKey: ["links", query],
     queryFn: async () => {
       const response = await fetch(`/api/url?${query}`, {
         method: "GET",

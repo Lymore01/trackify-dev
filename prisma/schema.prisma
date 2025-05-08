@@ -14,6 +14,7 @@ enum EventsToSubscribe {
   link_created
   link_updated
   link_deleted
+  link_clicked
 }
 
 enum Plan {

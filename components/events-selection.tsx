@@ -4,12 +4,12 @@ import { Input } from "./ui/input";
 import { useState } from "react";
 
 const LINK_EVENTS: string[] = [
-  "link.created",
-  "link.updated",
-  "link.deleted",
-  "link.clicked",
+  "link_created",
+  "link_updated",
+  "link_deleted",
+  "link_clicked",
 ];
-const USER_EVENTS: string[] = ["user.created", "user.updated", "user.deleted"];
+const USER_EVENTS: string[] = ["user_created", "user_updated", "user_deleted"];
 
 export default function EventSelection({
   field,

@@ -26,6 +26,10 @@ import { z } from "zod";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
+import useUpdateWebhook from "@/hooks/use-update-webhook";
+import { useSearchParams } from "next/navigation";
+import { Loader } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   description: z.string(),
@@ -37,14 +41,27 @@ export default function EditWebhookDescription({
   current: RefObject<HTMLHeadingElement | null>;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
+  const endpoint = searchParams.get("endpoint");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       description: current?.current?.textContent || "",
     },
   });
+
+  const { updateWebhook, isPending } = useUpdateWebhook(
+    endpoint as string,
+  );
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    await updateWebhook(values);
+    setIsDialogOpen(false);
+    form.reset();
+    queryClient.invalidateQueries({
+      queryKey: ["webhooks"],
+    });
   };
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -100,7 +117,14 @@ export default function EditWebhookDescription({
             type="submit"
             form="edit-webhook-desc-form"
           >
-            Submit
+            {isPending ? (
+              <div className="flex items-center gap-2">
+                <Loader className="animate-spin" size={16} />
+                <span>Submitting...</span>
+              </div>
+            ) : (
+              <span>Submit</span>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

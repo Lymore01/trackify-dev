@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
 
 export function useAnalytics(linkId: string) {
-  
   const {
     data: analyticsData,
     isLoading,
@@ -10,7 +8,7 @@ export function useAnalytics(linkId: string) {
   } = useQuery({
     queryKey: ["link-analytics", linkId],
     queryFn: async () => {
-      const response = await fetch(`/api/track?id=${linkId}`, {
+      const response = await fetch(`/api/stats?id=${linkId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

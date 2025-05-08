@@ -32,3 +32,9 @@ GET {{base_url}}/url?shortId=x5z7l
 
 ###
 GET {{base_url}}/url?id=x5z7l
+
+###
+GET {{base_url}}/webhooks/1f818cdb-2964-480c-af2d-0d325077bf49?endpoint=b510fbd4-8186-4011-9e6c-a41a17bc6d40
+
+###
+GET {{base_url}}/users

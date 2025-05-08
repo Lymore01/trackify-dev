@@ -17,15 +17,15 @@ export interface ItemsProp {
 }
 
 export const LINK_EVENTS = [
-  "link.created",
-  "link.updated",
-  "link.deleted",
+  "link_created",
+  "link_updated",
+  "link_deleted",
 ] as const;
 
 export const USER_EVENTS = [
-  "user.created",
-  "user.updated",
-  "user.deleted",
+  "user_created",
+  "user_updated",
+  "user_deleted",
 ] as const;
 
 export type EventType =

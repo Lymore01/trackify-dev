@@ -7,7 +7,7 @@ export async function GET(
   req: Request,
   { params }: { params: { shortId: string } }
 ) {
-  const { shortId } = await params;
+  const { shortId } = params;
   if (!shortId) {
     return NextResponse.redirect("/");
   }
@@ -16,7 +16,7 @@ export async function GET(
   });
 
   const safeUrl = ensureValidUrl(url[0].original || "");
-
+  
   return NextResponse.redirect(new URL(safeUrl), { status: 302 });
 }
 

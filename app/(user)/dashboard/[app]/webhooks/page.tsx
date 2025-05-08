@@ -14,17 +14,37 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Webhooks() {
   const searchParams = useSearchParams();
   const endpoint = searchParams.get("endpoint");
+  const appId = searchParams.get("appId");
   const { app } = useParams();
+
+  const { data: webhook } = useQuery({
+    queryKey: ["webhook", appId, endpoint],
+    queryFn: async () => {
+      const res = await fetch(`/api/webhooks/${appId}?endpoint=${endpoint}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) {
+        throw new Error("Failed to fetch webhooks");
+      }
+      const data = await res.json();
+      return data;
+    },
+  });
+
   return (
-    <div className="flex flex-col h-max w-[60%] mx-auto my-4">
+    <div className="flex flex-col h-max w-[100%] lg:w-[60%] mx-auto my-4 p-2 lg:p-0">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/dashboard/links?app=${app}`}>
+            <BreadcrumbLink href={`/dashboard/${app}/webhooks?appId=${appId}`}>
               {app}
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -36,20 +56,20 @@ export default function Webhooks() {
       </Breadcrumb>
       <h1 className="text-xl my-2">Webhooks</h1>
       <div className="flex items-center">
-        <BookOpen size={16} />
-        <p className="text-sm text-zinc-700 ml-2">
+        <BookOpen size={16} className="hidden lg:block" />
+        <p className="text-sm text-zinc-700 lg:ml-2">
           Learn how to use Webhooks with trackify by reading our webhook
           documentation.
+          <span className="text-sm hover:underline text-blue-600 ml-2 cursor-pointer">
+            View Docs
+          </span>
         </p>
-        <span className="text-sm hover:underline text-blue-600 ml-2 cursor-pointer">
-          View Docs
-        </span>
       </div>
       <Separator className="my-4" />
       {/* table */}
       <div className="mt-4">
         {endpoint ? (
-          <Endpoint endpoint={endpoint} />
+          <Endpoint endpoint={webhook} />
         ) : (
           <>
             <div className="flex items-center justify-between">

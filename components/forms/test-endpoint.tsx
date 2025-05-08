@@ -24,10 +24,21 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { EventType } from "@/types/types";
-import { Loader } from "lucide-react";
+import { Copy, Loader } from "lucide-react";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
-import { generateHMAC } from "@/lib/utils";
+import { generateCurlCommand, generateHMAC } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
+import Tag from "../tag";
 
 const formSchema = z.object({
   event: z.string().min(1, "Event type is required") as z.ZodType<EventType>,
@@ -41,11 +52,10 @@ export default function TestEndpoint({
   secret: string;
 }) {
   const [payload, setPayload] = useState("");
-  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      event: "user.created",
+      event: "user_created",
     },
   });
 
@@ -59,32 +69,41 @@ export default function TestEndpoint({
     }
   }, [event]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const data = {
-      ...values,
-      ...JSON.parse(payload),
-    };
-    console.log(data)
-    try {
-      setLoading(true);
-      const response = await axiosInstance.post(
-        "https://df7b-41-89-16-2.ngrok-free.app/webhook/docx", //! fix: replace it with dynamic url
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-webhook-signature": generateHMAC(secret, JSON.stringify(data)),
-            "x-api-key": "3b0b1b07-aba4-4188-9173-22a887660ac6", //! fix: remove this
-          },
-        }
-      );
-      console.log(response.data)
-      setLoading(false);
-      toast.success("Test Sent Successfully!");
-    } catch (error) {
-      setLoading(false);
+  const {
+    mutateAsync,
+    isPending,
+    data: webhookData,
+  } = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await fetch(`${endpoint}/webhook`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const response = await res.json();
+      return response;
+    },
+    onSuccess: (data) => {
+      if (data.summary.statusCode === 200) {
+        toast.success("Test Passed Successfully!");
+      } else {
+        toast.error("Test Failed!");
+      }
+    },
+    onError: (error) => {
       toast.error("Test Example Failed!");
-    }
+    },
+  });
+
+  // "x-webhook-signature": generateHMAC(secret, JSON.stringify(data)),
+  // "x-api-key": "3b0b1b07-aba4-4188-9173-22a887660ac6",
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const dt = JSON.parse(payload);
+    await mutateAsync(dt.data);
   };
 
   return (
@@ -152,13 +171,61 @@ export default function TestEndpoint({
             type="submit"
             form="test-endpoint-form"
           >
-            {loading ? (
-              <Loader className="animate-spin" size={16} />
+            {isPending ? (
+              <div className="flex gap-2 items-center">
+                <Loader className="animate-spin" size={16} />
+                <span>Sending...</span>
+              </div>
             ) : (
               <span>Send Example</span>
             )}
           </Button>
         </div>
+        <div>
+          <div className="flex justify-between items-center">
+            <p>Or, Use cURL command</p>
+            <Copy className="cursor-pointer" size={16} />
+          </div>
+          <CodeDisplay codeString={generateCurlCommand(endpoint, payload)} />
+        </div>
+      </div>
+      <div className="px-4 py-2">
+        {webhookData?.summary && (
+          <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto">
+            <TableCaption>Test results</TableCaption>
+            <TableHeader className="rounded-tr-lg rounded-tl-lg p-4">
+              <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase ">
+                <TableHead>Request</TableHead>
+                <TableHead>Status Code</TableHead>
+                <TableHead>Time</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow className="hover:bg-gray-50 cursor-pointer">
+                <TableCell className="flex items-center gap-2 my-2">
+                  <p className="truncate max-w-md">
+                    {webhookData?.summary.method}{" "}
+                    {webhookData?.summary.pathName}
+                  </p>
+                </TableCell>
+                <TableCell>
+                  <Tag
+                    variant={
+                      webhookData?.summary.statusCode === 200
+                        ? "default"
+                        : "error"
+                    }
+                  >
+                    {webhookData?.summary.statusCode}
+                  </Tag>
+                </TableCell>
+                <TableCell>
+                  <p>{webhookData?.summary.time}</p>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );

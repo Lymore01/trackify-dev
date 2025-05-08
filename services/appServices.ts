@@ -32,3 +32,23 @@ export async function fetchApplications(userId: string) {
     },
   });
 }
+
+export async function updateApp(appId: string, appName: string) {
+  return prisma.app.update({
+    where: {
+      id: appId,
+    },
+    data: {
+      name: appName,
+    },
+  });
+}
+
+export async function deleteApp(appId: string, userId: string) {
+  return prisma.app.deleteMany({
+    where: {
+      id: appId,
+      userId: userId,
+    },
+  });
+}

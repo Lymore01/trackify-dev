@@ -4,8 +4,9 @@ import { z } from "zod";
 import { formSchema as endpointSchema } from "@/components/forms/add-endpoint";
 import { generateSigningSecret } from "@/auth/webhooks/generateSigningSecret";
 import { getCurrentUser } from "@/auth/core/getCurrentUser";
+import { EventsToSubscribe } from "@prisma/client";
 
-type Endpoint = z.infer<typeof endpointSchema>;
+export type Endpoint = z.infer<typeof endpointSchema>;
 
 // register webhook
 export async function POST(request: Request) {
@@ -15,6 +16,7 @@ export async function POST(request: Request) {
       withFullUser: false,
     });
 
+    console.log("Body", body);
     // check if user exists
     if (user == null) {
       return NextResponse.json(
@@ -32,7 +34,7 @@ export async function POST(request: Request) {
       data: {
         url: body.url,
         description: body.description,
-        subscribedEvents: body.events as any,
+        subscribedEvents: body.events as EventsToSubscribe[],
         user: {
           connect: {
             id: user?.id,

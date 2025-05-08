@@ -18,10 +18,30 @@ import Image from "next/image";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { logOut } from "@/actions/actions";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Settings() {
   const [currentTab, setCurrentTab] = useState("profile");
   const [isPasswordVisible, setPasswordVisible] = useState(false);
+
+  const { data: userData } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const res = await fetch("/api/users", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
+      });
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return res.json();
+    },
+    refetchOnWindowFocus: false,
+  });
+
   return (
     <div className="flex flex-col h-max w-[60%] mx-auto my-4">
       <h1 className="text-xl my-2">Settings</h1>
@@ -60,8 +80,8 @@ export default function Settings() {
                 />
               </div>
               <div className="flex flex-col gap-2 items-start">
-                <h1 className="text-sm">Kelly_Limo</h1>
-                <h1 className="text-sm text-blue-600">lymore90@gmail.com</h1>
+                <h1 className="text-sm">{userData?.data.name}</h1>
+                <h1 className="text-sm text-blue-600">{userData?.data.email}</h1>
               </div>
             </div>
             <Button>Change Image</Button>
@@ -73,7 +93,7 @@ export default function Settings() {
               <label htmlFor="email">Email</label>
               <Input
                 placeholder="Email"
-                value={"lymore90@gmail.com"}
+                value={userData?.data.email}
                 id="email"
                 disabled
               />
@@ -86,7 +106,7 @@ export default function Settings() {
                   <Input
                     type={isPasswordVisible ? "text" : "password"}
                     placeholder="password"
-                    value={"12345678"}
+                    value={userData?.data.password}
                     autoComplete="off"
                     disabled
                   />

@@ -25,8 +25,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+import useUpdateWebhook from "@/hooks/use-update-webhook";
+import { Loader } from "lucide-react";
 
-const formSchema = z.object({
+export const webhookFormSchema = z.object({
   url: z.string().url().nonempty("URL is required"),
 });
 
@@ -36,15 +40,29 @@ export default function EditWebhook({
   current: RefObject<HTMLHeadingElement | null>;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const searchParams = useSearchParams();
+   const queryClient = useQueryClient();
+  const endpoint = searchParams.get("endpoint");
+  const form = useForm<z.infer<typeof webhookFormSchema>>({
+    resolver: zodResolver(webhookFormSchema),
     defaultValues: {
       url: current?.current?.textContent || "",
     },
   });
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+
+  const { updateWebhook, isPending } = useUpdateWebhook(
+    endpoint as string,
+  );
+
+  const onSubmit = async (values: z.infer<typeof webhookFormSchema>) => {
+    await updateWebhook(values);
+    setIsDialogOpen(false);
+    form.reset();
+    queryClient.invalidateQueries({
+      queryKey: ["webhooks"],
+    });
   };
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
@@ -99,7 +117,14 @@ export default function EditWebhook({
             type="submit"
             form="edit-webhook-form"
           >
-            Submit
+            {isPending ? (
+              <div className="flex items-center gap-2">
+                <Loader className="animate-spin" size={16} />
+                <span>Submitting...</span>
+              </div>
+            ) : (
+              <span>Submit</span>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

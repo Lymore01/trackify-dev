@@ -7,10 +7,20 @@ import { useRouter } from "next/navigation";
 import { getDaysDifference } from "@/lib/utils";
 import { AppType } from "@/types/types";
 
-export default function ApplicationCard({ app }: { app: AppType }) {
+export default function ApplicationCard({
+  app,
+  href,
+}: {
+  app: AppType;
+  href?: string;
+}) {
   const router = useRouter();
   const addQueryParameters = (appId: string) => {
-    router.push(`/dashboard/links?app=${appId}&name=${app.name}`); 
+    if (href) {
+      router.push(href);
+    } else {
+      router.push(`/dashboard/links?app=${appId}&name=${app.name}`);
+    }
   };
   return (
     <div className="rounded-lg border">
@@ -33,7 +43,7 @@ export default function ApplicationCard({ app }: { app: AppType }) {
           className="flex gap-1 group items-center text-xs text-zinc-700 cursor-pointer"
           onClick={() => addQueryParameters(app.id)}
         >
-          <span>Go to app</span>
+          <span>View</span>
           <ArrowRight
             size={16}
             className="group-hover:scale-150 transition-all"

@@ -1,5 +1,5 @@
 import { ItemsProp } from "@/types/types";
-import { Home, Key, KeyIcon, Settings, Webhook } from "lucide-react";
+import { File, Home, Key, KeyIcon, Settings, Webhook } from "lucide-react";
 
 export const NAV_ITEMS: ItemsProp[] = [
   {
@@ -9,13 +9,13 @@ export const NAV_ITEMS: ItemsProp[] = [
     type: "application",
   },
   {
-    href: "/dashboard/Docx/webhooks",
+    href: "/dashboard/webhook",
     icon: Webhook,
     title: "Webhooks",
     type: "developers",
   },
   {
-    href: "/dashboard/Docx/api",
+    href: "/dashboard/api",
     icon: KeyIcon,
     title: "Api keys",
     type: "developers",
@@ -24,24 +24,30 @@ export const NAV_ITEMS: ItemsProp[] = [
     href: "/dashboard/settings",
     icon: Settings,
     title: "Settings",
-    type: "application"
+    type: "application",
+  },
+  {
+    href: "/dashboard/docs",
+    icon: File,
+    title: "API docs",
+    type: "developers",
   },
 ];
 
 export const LINK_EVENTS: string[] = [
-  "link.created",
-  "link.updated",
-  "link.deleted",
-  "link.clicked",
+  "link_created",
+  "link_updated",
+  "link_deleted",
+  "link_clicked",
 ];
 export const USER_EVENTS: string[] = [
-  "user.created",
-  "user.updated",
-  "user.deleted",
+  "user_created",
+  "user_updated",
+  "user_deleted",
 ];
 
 export const eventPayloadMap: Record<string, string> = {
-  "user.created": `
+  user_created: `
     {
       "data": {
         "userId": "2uRDtVrgPzD3G04w7sL0CVD5OLh",
@@ -51,7 +57,7 @@ export const eventPayloadMap: Record<string, string> = {
       }
     }
   `,
-  "user.updated": `
+  user_updated: `
     {
       "data": {
         "userId": "2uRDtVrgPzD3G04w7sL0CVD5OLh",
@@ -64,7 +70,7 @@ export const eventPayloadMap: Record<string, string> = {
       }
     }
   `,
-  "user.deleted": `
+  user_deleted: `
     {
       "data": {
         "userId": "2uRDtVrgPzD3G04w7sL0CVD5OLh",
@@ -72,16 +78,16 @@ export const eventPayloadMap: Record<string, string> = {
       }
     }
   `,
-  "link.created": `
+  link_created: `
     {
       "data": {
         "linkId": "ABC123",
-        "url": "https://www.example.com",
-        "callbackUrl": "https://www.example.com/api/webhooks/trackify"
+        "eventType": "link_clicked",
+        "url": "https://www.example.com"
       }
     }
   `,
-  "link.updated": `
+  link_updated: `
     {
       "data": {
         "linkId": "ABC123",
@@ -92,7 +98,7 @@ export const eventPayloadMap: Record<string, string> = {
       }
     }
   `,
-  "link.deleted": `
+  link_deleted: `
     {
       "data": {
         "linkId": "ABC123",
@@ -100,15 +106,15 @@ export const eventPayloadMap: Record<string, string> = {
       }
     }
   `,
-  "link.clicked": `
+  link_clicked: `
     {
       "data": {
         "linkId": "ABC123",
-        "clickTime": "2025-04-19T11:47:00Z",
-        "callbackUrl": "https://www.example.com/api/webhooks/trackify"
+        "eventType": "link_clicked",
+        "clickTime": "2025-05-06T14:30:00Z"
       }
     }
-  `,
+  `
 };
 
 export const mockRequest = {

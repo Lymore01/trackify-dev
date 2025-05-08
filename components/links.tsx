@@ -68,9 +68,6 @@ export default function Links() {
     },
     onSuccess: () => {
       toast.success("Link deleted successfully");
-      queryClient.invalidateQueries({
-        queryKey: ["links"],
-      });
     },
     onError: (error) => {
       if (error instanceof Error) {
@@ -155,11 +152,11 @@ export default function Links() {
           </DropdownMenu>
         </div>
       </div>
-      <div className="mt-4 grid grid-cols-3 gap-4">
+      <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="col-span-2 space-y-4">
           <div className="flex justify-between items-center">
             <h1 ref={linkRef}>
-              {hostName}/{data.shortId}
+              {hostName}/u/{data.shortId}
             </h1>
             <div>
               <Copy size={16} className="cursor-pointer" />
@@ -174,7 +171,7 @@ export default function Links() {
             <div className="p-4 text-sm space-y-4">
               <div className="flex justify-between items-center">
                 <h1>Original URL</h1>
-                <EditLinkURL current={originalLinkRef} linkID={data.id}/>
+                <EditLinkURL current={originalLinkRef} linkID={data.id} />
               </div>
               <div className="p-2 border text-gray-600" ref={originalLinkRef}>
                 {data.original}
@@ -183,7 +180,10 @@ export default function Links() {
             <div className="p-4 text-sm space-y-4">
               <div className="flex justify-between items-center">
                 <h1>Description</h1>
-                <EditLinkDescription current={descriptionRef} linkID={data.id}/>
+                <EditLinkDescription
+                  current={descriptionRef}
+                  linkID={data.id}
+                />
               </div>
               <div className="p-2 border text-gray-600" ref={descriptionRef}>
                 {data.description}

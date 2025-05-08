@@ -108,7 +108,7 @@ export default function AddLink() {
             <form
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6"
-              id="add-endpoint-form"
+              id="add-link-form"
             >
               <FormField
                 control={form.control}
@@ -169,7 +169,7 @@ export default function AddLink() {
             <Button
               className="cursor-pointer"
               type="submit"
-              form="add-endpoint-form"
+              form="add-link-form"
             >
               {isPending ? (
                 <Loader className="animate-spin" size={16} />

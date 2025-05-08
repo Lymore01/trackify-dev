@@ -28,11 +28,6 @@ export default function CoreLayout({
           </div>
         </div>
         {children}
-        <div className="absolute bottom-4 left-4">
-          <p className="text-xs text-gray-500">
-            copyright @ 2025-trackify. All rights recerved
-          </p>
-        </div>
       </main>
       <aside className="hidden lg:flex lg:flex-col h-screen lg:w-[50%] bg-black relative">
         <Image
@@ -43,6 +38,11 @@ export default function CoreLayout({
           objectPosition="center"
         />
       </aside>
+      <div className="absolute bottom-4 left-4">
+        <p className="text-xs text-gray-500">
+          copyright @ 2025-trackify. All rights recerved
+        </p>
+      </div>
     </div>
   );
 }

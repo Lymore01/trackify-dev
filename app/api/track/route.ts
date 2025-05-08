@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { apiResponse } from "@/lib/utils";
 import {
   addClickTracking,
@@ -30,28 +31,47 @@ export async function POST(req: Request) {
       deviceInfo: deviceInfo || null,
     });
 
+    // Trigger a "link_clicked" webhook event if successfull
+    // get the webhook for the link
+    const data = await prisma.urlShort.findUnique({
+      where: {
+        shortId,
+      },
+      include: {
+        App: {
+          select: {
+            endpoint: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const endpointUrl = data?.App?.endpoint?.[0]?.url;
+
+    // send the event
+
+    await fetch(
+      "https://a2fa-2c0f-6300-c05-e800-a1dd-67e5-4ce0-cd01.ngrok-free.app/webhook",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          linkId: "ABC123",
+          eventType: "link_clicked",
+          clickTime: "2025-05-06T14:30:00Z"
+        }),
+      }
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("POST /api/track error:", error);
-    return apiResponse({ error: "Internal Server Error" }, 500);
-  }
-}
-
-export async function GET(req: Request) {
-  try {
-    const url = new URL(req.url);
-    const searchParams = url.searchParams;
-    const linkId = searchParams.get("id");
-    if (!linkId) {
-      return apiResponse({ error: "Missing link ID" }, 400);
-    }
-
-    const clicks = await getClickTrackingPerShortId(linkId);
-
-    return apiResponse({ clicks }, 200);
-  } catch (error) {
-    console.error("GET /api/track?id={id} error:", error);
     return apiResponse({ error: "Internal Server Error" }, 500);
   }
 }

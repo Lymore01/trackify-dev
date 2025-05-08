@@ -3,30 +3,29 @@
 import {
   ChevronDown,
   ChevronRight,
-  DollarSign,
-  Home,
   LucideIcon,
-  Webhook,
 } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { NAV_ITEMS } from "@/lib/constants";
 import { Separator } from "./ui/separator";
 
-export default function CustomSidebar() {
+export default function CustomSidebar({children}:{
+  children?: React.ReactNode
+}) {
   const [open, setOpen] = useState(true);
   const [selected, setSelected] = useState("Dashboard");
 
   return (
     <motion.nav
-      className="fixed top-0 border-r bg-gray-100  h-screen p-2 shrink-0"
+      className="fixed top-0 border-r bg-gray-100 h-screen p-2 shrink-0 z-20"
       style={{
         width: open ? "225px" : "fit-content",
       }}
     >
       <HeaderSection open={open} />
-      <div className="space-y-1">
+      <div className="flex-1 overflow-y-auto p-2 space-y-1">
         <OptionGroup
           selected={selected}
           setSelected={setSelected}
@@ -42,6 +41,7 @@ export default function CustomSidebar() {
         />
       </div>
       <ToggleClose open={open} setOpen={setOpen} />
+      {children}
     </motion.nav>
   );
 }
@@ -160,7 +160,12 @@ const HeaderSection = ({ open }: { open: boolean }) => {
   return (
     <div className="mb-3 pb-3 border-b">
       <div className="flex cursor-pointer items-center justify-between rounded-md transition-colors hover:bg-gray-200">
-        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center gap-2 w-full"
+          style={{
+            justifyContent: open ? "start" : "center",
+          }}
+        >
           <Logo />
           {open && (
             <motion.div
@@ -180,7 +185,7 @@ const HeaderSection = ({ open }: { open: boolean }) => {
   );
 };
 
-const Logo = () => {
+export const Logo = () => {
   return (
     <motion.div
       layout

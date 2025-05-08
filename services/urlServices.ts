@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { urlSchema } from "@/validations/urlValidations";
+import { z } from "zod";
 
 export async function createUrl(
   originalUrl: string,
@@ -59,7 +61,10 @@ export async function deleteUrl(id: string) {
   });
 }
 
-export async function updateUrl(id: string, data: any) {
+export async function updateUrl(
+  id: string,
+  data: Omit<Partial<z.infer<typeof urlSchema>>, "appId">
+) {
   const payload: any = {};
 
   if (data.originalUrl) payload.original = data.originalUrl;

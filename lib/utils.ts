@@ -34,4 +34,27 @@ export function apiResponse(data: any, status = 200) {
 
 export const generateShortId: () => string = () => {
   return Math.random().toString(36).substring(2, 7);
-}
+};
+
+export const generateAPIKey: () => Promise<string> = async () => {
+  const generated = crypto.randomBytes(16).toString("hex");
+  return Promise.resolve("pk_".concat(generated));
+};
+
+// generate curl command
+export const generateCurlCommand = (endpoint: string, payload: string) => {
+  try {
+    if (!payload) throw new Error("Empty payload");
+
+    const parsed = JSON.parse(payload);
+
+    const data = parsed.data ?? parsed;
+
+    const jsonString = JSON.stringify(data);
+    const escaped = jsonString.replace(/"/g, '\\"');
+
+    return `curl -X POST -H "Content-Type:application/json" -d "${escaped}" ${endpoint}`;
+  } catch (error) {
+    return `// Error: Invalid JSON payload\n// ${error}`;
+  }
+};

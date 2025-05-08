@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function ForgotPassword() {
   return (
-    <div className="w-[60%] mx-auto flex flex-col items-center">
+    <div className="w-[100%] lg:w-[60%] mx-auto flex flex-col items-center mt-8 lg:mt-0">
       <Link
         href={"/login"}
         className="w-full flex justify-start items-center gap-2"
