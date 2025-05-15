@@ -1,4 +1,5 @@
 import { getCurrentUser } from "@/auth/core/getCurrentUser";
+import { prisma } from "@/lib/prisma";
 import { apiResponse, generateShortId } from "@/lib/utils";
 import { createUrl, fetchUrl } from "@/services/urlServices";
 import { urlSchema } from "@/validations/urlValidations";
@@ -15,10 +16,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const user = await getCurrentUser({
-      withFullUser: false,
-      redirectIfNotFound: false,
+    const headers = req.headers;
+
+    // get users using api key - for sdk use
+    const user = await prisma.user.findUnique({
+      where: {
+        apiKey: headers.get("x-api-key") ?? "",
+      },
     });
+
+    // const user = await getCurrentUser({
+    //   withFullUser: false,
+    //   redirectIfNotFound: false,
+    // });
 
     if (!user) {
       return apiResponse(
@@ -75,11 +85,21 @@ export async function GET(req: Request) {
     const searchParams = url.searchParams;
     const appId = searchParams.get("appId") ?? undefined;
     const shortId = searchParams.get("shortId") ?? undefined;
+    const headers = req.headers;
 
-    const user = await getCurrentUser({
+    // get users using api key - for sdk use
+    const user = await prisma.user.findUnique({
+      where: {
+        apiKey: headers.get("x-api-key") ?? "",
+      },
+    });
+
+    // Todo: uncomment this (for dashboard login) - testing purposes
+    /* const user = await getCurrentUser({
       withFullUser: false,
       redirectIfNotFound: false,
     });
+*/
 
     if (!user) {
       return apiResponse(
@@ -91,12 +111,14 @@ export async function GET(req: Request) {
       );
     }
 
+    // todo: user.id
     const urls = await fetchUrl({
       userId: user.id,
       appId: appId,
       shortId: shortId ?? undefined,
     });
 
+    console.log("Headers: ", typeof headers);
     return apiResponse(
       {
         success: true,
@@ -111,5 +133,3 @@ export async function GET(req: Request) {
     return apiResponse({ error: "Internal Server Error" }, 500);
   }
 }
-
-

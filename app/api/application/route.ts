@@ -1,4 +1,5 @@
 import { getCurrentUser } from "@/auth/core/getCurrentUser";
+import { prisma } from "@/lib/prisma";
 import { apiResponse } from "@/lib/utils";
 import { createApp, fetchApplications } from "@/services/appServices";
 import { createAppSchema } from "@/validations/appValidations";
@@ -6,6 +7,7 @@ import { createAppSchema } from "@/validations/appValidations";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    const headers = req.headers;
 
     const { data: app, success } = createAppSchema.safeParse(body);
 
@@ -16,6 +18,14 @@ export async function POST(req: Request) {
       );
     }
 
+    // get users using api key - for sdk use
+    // const user = await prisma.user.findUnique({
+    //   where: {
+    //     apiKey: headers.get("x-api-key") ?? "",
+    //   },
+    // });
+
+    // todo: uncomment this
     const user = await getCurrentUser({
       withFullUser: false,
       redirectIfNotFound: false,
@@ -42,15 +52,26 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    const headers = req.headers;
+
+    // get users using api key - for sdk use
+    // const user = await prisma.user.findUnique({
+    //   where: {
+    //     apiKey: headers.get("x-api-key") ?? "",
+    //   },
+    // });
+    // !fix: uncomment this (for dashboard login)
     const user = await getCurrentUser({
       withFullUser: false,
       redirectIfNotFound: false,
     });
 
+    // todo also check by api key
     if (!user) {
       return apiResponse({ error: "User not found" }, 401);
     }
 
+    // todo: pass user.id instead
     const applications = await fetchApplications(user.id);
 
     return apiResponse(applications, 200);
