@@ -88,18 +88,18 @@ export async function GET(req: Request) {
     const headers = req.headers;
 
     // get users using api key - for sdk use
-    const user = await prisma.user.findUnique({
-      where: {
-        apiKey: headers.get("x-api-key") ?? "",
-      },
-    });
+    // const user = await prisma.user.findUnique({
+    //   where: {
+    //     apiKey: headers.get("x-api-key") ?? "",
+    //   },
+    // });
 
     // Todo: uncomment this (for dashboard login) - testing purposes
-    /* const user = await getCurrentUser({
+    const user = await getCurrentUser({
       withFullUser: false,
       redirectIfNotFound: false,
     });
-*/
+
 
     if (!user) {
       return apiResponse(

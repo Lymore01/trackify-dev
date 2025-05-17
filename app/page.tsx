@@ -1,89 +1,93 @@
+"use client";
+
+import CodeDisplay from "@/components/code-display";
 import { Logo } from "@/components/custom-sidebar";
 import Tag from "@/components/tag";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { TESTIMONIALS, STATS, howItWorksSection } from "@/lib/constants";
 import {
-  ArrowRight,
+  ChartArea,
   File,
   Heart,
+  Instagram,
+  Linkedin,
+  Map,
   Menu,
+  MessageCircleHeart,
+  MessageSquareWarning,
+  Minus,
   Plus,
   ShoppingBag,
+  Twitter,
   Webhook,
+  X,
 } from "lucide-react";
 import Image from "next/image";
-
-const STATS: CardProps[] = [
-  {
-    stat: "10K",
-    value: "Apps Managed",
-  },
-  {
-    stat: "2.5M",
-    value: "API req / month",
-  },
-  {
-    stat: "100",
-    value: "SDK downloads",
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    name: "Jane Doe",
-    image: "/images/aside.jpg",
-    text: "Trackify made it so easy to monitor my shop links and see what’s working. The analytics are a game changer!",
-  },
-  {
-    name: "Samuel Lee",
-    image: "/images/aside.jpg",
-    text: "Integration was seamless. As a developer, I love the SDK and API flexibility. Highly recommended!",
-  },
-  {
-    name: "Amina Yusuf",
-    image: "/images/aside.jpg",
-    text: "I use Trackify for all my marketing campaigns. The insights helped me double my conversion rate.",
-  },
-  {
-    name: "Carlos Rivera",
-    image: "/images/aside.jpg",
-    text: "Shortening and sharing docs with Trackify is so smooth. My team always knows what’s most useful.",
-  },
-  
-];
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 // min-h-[220px]
-const Testimonials = () => (
-  <div className="grid lg:grid-cols-4 lg:grid-rows-3 grid-cols-1 gap-4 w-full max-w-6xl mx-auto mt-8">
-    {TESTIMONIALS.map((t, i) => (
-      <div
-        key={i}
-        className={`rounded-lg p-6 flex flex-col items-start bg-white border relative`}
-      >
-        <div className="flex items-center gap-3 mb-4">
-          <Image
-            src={t.image}
-            alt={t.name}
-            width={100}
-            height={100}
-            className="size-12 rounded-full object-cover border-2 border-indigo-200"
-          />
-          <span className="font-semibold text-slate-900">{t.name}</span>
-        </div>
-        <p className="text-slate-700 text-base text-start">{t.text}</p>
-      </div>
-    ))}
-  </div>
-);
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
+
+const fadeInLeft = {
+  hidden: { opacity: 0, x: -50 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.7, ease: "easeOut" },
+  },
+};
+
+const fadeInRight = {
+  hidden: { opacity: 0, x: 50 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.7, ease: "easeOut" },
+  },
+};
 
 export default function Home() {
   return (
     <div className="flex flex-col relative bg-white">
       <div className="flex flex-col">
         <NavBar />
-        <main className="grid px-4 py-2 grid-cols-1 lg:grid-cols-2 grid-rows-1 items-start w-full z-20 bg-white mt-8 ">
-          <HeroSection />
-          {/* screenshot */}
-          <div className="mt-8 bg-[#222527] w-full h-[300px] lg:h-[400px] items-end justify-end flex text-white rounded-tl-lg">
+        <main className="grid px-4 py-2 grid-cols-1 lg:grid-cols-2 grid-rows-1 items-start w-full z-20 bg-white mt-20">
+          <motion.div
+            variants={fadeInLeft}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.4 }}
+          >
+            <HeroSection />
+          </motion.div>
+
+          <motion.div
+            className="mt-8 bg-[#222527] w-full h-[300px] lg:h-[400px] items-end justify-end flex text-white rounded-tl-lg"
+            variants={fadeInRight}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.4 }}
+          >
             <div className="flex relative w-[90%] h-[90%]">
               <Image
                 src="/images/Screenshot-dark.png"
@@ -94,7 +98,7 @@ export default function Home() {
                 className="rounded-tl-lg"
               />
             </div>
-          </div>
+          </motion.div>
         </main>
         {/* stats */}
         <div className="text-center z-20 bg-white px-4 py-8">
@@ -105,28 +109,56 @@ export default function Home() {
           </div>
         </div>
 
+        {/* how it works */}
+        <div className="bg-white z-20 py-24 px-4 text-center">
+          <Tag variant={"info"}>
+            <Map /> Steps
+          </Tag>
+
+          <h1 className="text-3xl text-slate-900 ">How It Works</h1>
+          <p className="text-md text-slate-600 mt-2">
+            From adding your first link to catching live events via webhooks{" "}
+            <br className="hidden lg:block" />
+            see how easy it is to bring your app to life ✨
+          </p>
+          <div className="flex flex-col gap-4 mt-8">
+            {/* create app */}
+            <HowItWorksSection2 />
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full mx-auto">
+              {howItWorksSection.map((sec) => (
+                <HowItWorksSection key={sec.step} {...sec} />
+              ))}
+            </div> */}
+          </div>
+        </div>
+
         {/* use cases */}
-        <div className="bg-white z-20 py-24 flex items-center justify-center flex-col text-center px-4">
-          <h1 className="text-3xl text-slate-900">Use Cases</h1>
-          <p className="text-md text-slate-600">
-            There are millions of ways to agitate a problem and drive action.
-            Here are <br className="hidden lg:block" /> examples of 3 products:
+        <div className="bg-[#1B1B1B] z-20 py-24 flex items-center justify-center flex-col text-center px-4">
+          <h1 className="text-3xl text-white">Use Cases</h1>
+          <p className="text-md text-slate-200 mt-4">
+            See Trackify in action—3 use cases that deliver impact.
           </p>
           <UseCases />
         </div>
 
         {/* testimonials */}
-        <div className="bg-white z-20 flex items-center justify-center flex-col text-center px-4">
+        <div className="bg-white z-20 flex items-center justify-center flex-col text-center px-4 py-24">
+          <Tag variant={"info"}>
+            <MessageCircleHeart /> Testimonials
+          </Tag>
           <h1 className="text-3xl text-slate-900">What our users are saying</h1>
+          <p className="text-md text-slate-600 mt-4">
+            Trackify is the go-to tool for link shortening and tracking
+          </p>
           <Testimonials />
         </div>
 
         {/* CTA */}
-        <div className="h-[50vh] bg-white z-20 rounded-b-4xl px-4 py-8 grid place-content-center w-full">
-          <div className="grid place-content-center px-8 py-6 rounded-2xl text-slate-900 text-center space-y-4">
-            <h1 className="text-3xl text-slate-900">Add Value To Your site</h1>
+        <div className="bg-white z-20 rounded-b-4xl px-4 py-24 grid place-content-center w-full">
+          <div className={`grid place-content-center px-12 py-8 lg:px-36 lg:py-16 rounded-2xl text-slate-900 text-center space-y-4 bg-white border border-l-indigo-500 border-r-emerald-500 border-t-rose-500 border-b-yellow-500 mx-auto`}>
+            <h1 className="text-3xl text-slate-900">Shorten. Track. Grow.</h1>
             <p className="text-md text-slate-600">
-              all in one secure, powerful platform.
+              Smart links that power your business.
             </p>
 
             <div className="w-full flex items-center justify-center">
@@ -134,7 +166,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="h-[60vh] "></div>
+        <div className="h-[60vh]"></div>
       </div>
       {/* footer */}
       <div className="fixed bottom-0 w-full z-10 mt-8">
@@ -144,41 +176,291 @@ export default function Home() {
   );
 }
 
-const NavBar = () => {
+
+const contentVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+  exit: { opacity: 0, y: 10, transition: { duration: 0.2 } },
+};
+
+const HowItWorksSection2 = () => {
+  const [selected, setSelected] = useState<number | null>(0);
+
   return (
-    <header className="flex w-full items-center justify-between py-2 px-4">
+    <div className="w-ull lg:w-[90%] lg:mx-auto bg-white min-h-[500px] grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="h-full w-full lg:p-6">
+        {howItWorksSection.map((item, i) => {
+          const isOpen = selected === i;
+
+          return (
+            <motion.div
+              key={i}
+              initial={{ borderRadius: 8 }}
+              className="mb-4 overflow-hidden rounded-lg bg-gray-50 shadow-sm transition-transform text-start"
+            >
+              <div
+                onClick={() => setSelected(isOpen ? null : i)}
+                className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+              >
+                <div className="flex gap-4 items-center">
+                  <div className="size-10 shrink-0 grid place-content-center bg-black rounded-full text-white font-semibold text-sm">
+                    {i + 1}
+                  </div>
+                  <p className="text-lg font-medium text-slate-800">
+                    {item.title}
+                  </p>
+                </div>
+                {isOpen ? (
+                  <Minus className="text-slate-600" />
+                ) : (
+                  <Plus className="text-slate-600" />
+                )}
+              </div>
+
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div
+                    key="content"
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    variants={contentVariants}
+                    className="p-4 text-slate-600 text-base text-start"
+                  >
+                    {item.content}
+
+                    <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-md flex lg:hidden mt-4">
+                      <Image
+                        src={
+                          item.image ??
+                          "/images/default.png"
+                        }
+                        alt={`Step ${selected} image`}
+                        layout="fill"
+                        objectFit="top left"
+                        className="rounded-lg"
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
+      </div>
+      {/* image */}
+      {howItWorksSection[selected ?? 0].image ? (
+        <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-md hidden lg:flex mt-6">
+          <Image
+            src={
+              howItWorksSection[selected ?? 0].image ?? "/images/default.png"
+            }
+            alt={`Step ${selected} image`}
+            layout="fill"
+            objectFit="top left"
+            className="rounded-lg"
+          />
+        </div>
+      ) : (
+        <CodeDisplay codeString="npm i @trackify-sdk" />
+      )}
+    </div>
+  );
+};
+
+const HowItWorksSection = ({
+  step,
+  text,
+  image,
+}: {
+  step: number;
+  text: string;
+  image?: string;
+}) => {
+  return (
+    <motion.div
+      className="flex flex-col gap-6 w-full border p-2 rounded-lg"
+      variants={fadeInUp}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+    >
+      {/* Step Description */}
+      <div className="flex gap-4 text-start items-center">
+        <div className="size-10 shrink-0 grid place-content-center bg-black rounded-full text-white font-semibold text-sm">
+          {step}
+        </div>
+        <p className="text-lg text-slate-800">{text}</p>
+      </div>
+
+      {/* Image or Code */}
+      <motion.div
+        className="w-full"
+        variants={fadeInUp}
+        transition={{ delay: 0.2 }}
+      >
+        {image ? (
+          <div className="relative w-full h-[200px] lg:h-[300px] rounded-lg overflow-hidden shadow-md">
+            <Image
+              src={image}
+              alt={`Step ${step} image`}
+              layout="fill"
+              objectFit="cover"
+              className="rounded-lg"
+            />
+          </div>
+        ) : (
+          <CodeDisplay codeString="npm i @trackify-sdk" />
+        )}
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const borderColors = [
+  "border-l-indigo-500",
+  "border-l-emerald-500",
+  "border-l-rose-500",
+  "border-l-yellow-500",
+];
+
+const Testimonials = () => (
+  <div className="grid lg:grid-cols-2 xl:grid-cols-2 grid-cols-1 gap-6 w-full max-w-6xl mx-auto mt-8 px-4">
+    {TESTIMONIALS.map((t, i) => (
+      <div
+        key={i}
+        className={`rounded-lg p-6 flex gap-4 bg-white border-l-4 shadow-sm ${
+          borderColors[i % borderColors.length]
+        }`}
+      >
+        <Image
+          src={t.image}
+          alt={t.name}
+          width={48}
+          height={48}
+          className="rounded-full object-cover size-12 border-2 border-indigo-200"
+        />
+
+        {/* Content */}
+        <div className="flex flex-col text-start">
+          <div className="mb-1">
+            <p className="text-slate-900 font-semibold text-base leading-tight">
+              {t.name}
+            </p>
+            {t.company && <p className="text-slate-500 text-sm">{t.company}</p>}
+          </div>
+          <p className="text-slate-700 text-base mt-2 italic">"{t.text}"</p>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+const NavBar = () => {
+  const [open, setIsOpen] = useState(false);
+  const handleMenuOpen = () => {
+    setIsOpen((pv: any) => !pv);
+  };
+  return (
+    <header className="fixed top-0 flex w-full items-center justify-between py-2 px-4 z-30 bg-white">
       <Logo />
       <div className="flex gap-2">
         <div className="hidden lg:flex gap-2 items-center">
-          <Button>Login</Button>
-          <Button>Register</Button>
+          <Button className="w-full">Get Started</Button>
         </div>
         {/* mobile */}
-        <div className="size-10 shrink-0 grid place-content-center bg-indigo-600 rounded-full cursor-pointer text-white lg:hidden">
-          <Menu />
+        <div
+          className="size-10 shrink-0 grid place-content-center bg-black rounded-full cursor-pointer text-white lg:hidden transition-transform duration-700"
+          onClick={handleMenuOpen}
+        >
+          {open ? <X /> : <Menu />}
         </div>
       </div>
+      <AnimatePresence>{open && <MobileMenu />}</AnimatePresence>
     </header>
+  );
+};
+
+const menuVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: "easeOut" },
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    transition: { duration: 0.2, ease: "easeIn" },
+  },
+};
+
+const MobileMenu = () => {
+  return (
+    <motion.div
+      variants={menuVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className="w-full z-30 fixed top-14 left-0 h-auto px-2 block lg:hidden"
+    >
+      <div className="flex h-full w-full bg-white rounded-b-2xl shadow-lg px-2 py-4 flex-col justify-between">
+        <ul className="space-y-4 text-lg">
+          <li>Products</li>
+          <Separator />
+          <li>Docs</li>
+          <Separator />
+          <li>Pricing</li>
+          <Separator />
+          <li>Company</li>
+          <Separator />
+        </ul>
+        {/* CTA */}
+        <div className="mt-4 justify-between flex items-center">
+          <Button className="w-full">Get Started</Button>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 
 const HeroSection = () => {
   return (
-    <div className="text-wrap w-3/4 space-y-4">
-      <Tag className="mx-0">With SDK available! 😊</Tag>
-      <h1 className="text-5xl text-slate-900 leading-14">
+    <motion.div
+      className="text-wrap w-3/4 space-y-4"
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+    >
+      <motion.div variants={fadeInUp}>
+        <Tag className="mx-0">SDK coming soon! 🎉</Tag>
+      </motion.div>
+
+      <motion.h1
+        className="text-5xl text-slate-900 leading-14"
+        variants={fadeInUp}
+      >
         Track, Connect, and Power Your Apps with Ease.
-      </h1>
-      <p className="text-md text-slate-600">
+      </motion.h1>
+
+      <motion.p className="text-md text-slate-600" variants={fadeInUp}>
         Build faster with our developer-friendly SDKs and APIs. Connect, manage,
         and track your apps and links—all in one secure, powerful platform.
-      </p>
-      <CTA />
-    </div>
+      </motion.p>
+
+      <motion.div variants={fadeInUp}>
+        <CTA />
+      </motion.div>
+    </motion.div>
   );
 };
 
-interface CardProps {
+export interface CardProps {
   stat: string;
   value: string;
 }
@@ -199,7 +481,7 @@ const StatsCard = ({ stat, value }: CardProps) => {
 const Footer = () => {
   return (
     <footer className="flex bg-[#222527] h-[80vh] w-full">
-      <div className="w-[80vw] mx-auto grid grid-cols-1 lg:grid-cols-2 mt-[30vh]">
+      <div className="w-[80vw] mx-auto grid grid-cols-1 lg:grid-cols-2 mt-[30vh] relative">
         <div className="flex flex-col justify-between items-start pb-4 text-sm text-zinc-300">
           <div className="space-y-4">
             <Logo />
@@ -210,14 +492,14 @@ const Footer = () => {
             </div>
           </div>
           {/*copyright  */}
-          <div>
+          <div className="absolute bottom-4">
             <p className="text-zinc-400">
               @Trackify 2025 - All rights reserved.
             </p>
           </div>
         </div>
         {/* legal */}
-        <div className="grid lg:grid-cols-2 gap-4">
+        <div className="grid lg:grid-cols-2 gap-4 mb-12">
           <div className="space-y-4 text-sm text-zinc-300 flex flex-col">
             <div className="flex flex-col">
               <h1 className="text-zinc-400">Legal</h1>
@@ -238,9 +520,10 @@ const Footer = () => {
           <div className="space-y-4 text-sm text-zinc-300 flex flex-col">
             <div className="flex flex-col">
               <h1 className="text-zinc-400">Social</h1>
-              <ul className="mt-3 space-y-1">
-                <li>Instagram</li>
-                <li>Twitter</li>
+              <ul className="mt-3 flex gap-4 lg:flex-col">
+                <Instagram size={16} />
+                <Linkedin size={16} />
+                <Twitter size={16} />
               </ul>
             </div>
           </div>
@@ -251,11 +534,16 @@ const Footer = () => {
 };
 
 const CTA = () => {
+  const router = useRouter();
   return (
     <div className="flex gap-2">
-      <Button className="bg-black capitalize cursor-pointer flex py-4 rounded-full">
+      <Button
+        className="bg-black capitalize cursor-pointer flex py-4 rounded-full"
+        onClick={() => {
+          router.push("/dashboard");
+        }}
+      >
         Join for free
-        {/* <ArrowRight size={16} className="ml-2" /> */}
       </Button>
       <Button
         className="cursor-pointer capitalize rounded-full"
@@ -283,7 +571,7 @@ const UseCases = () => {
           alt="Ecommerce"
           width={120}
           height={120}
-          className="absolute right-2 bottom-2 w-[180px] h-auto opacity-80 pointer-events-none drop-shadow-lg"
+          className="absolute right-2 bottom-2 w-[70px] lg:w-[180px] h-auto opacity-80 pointer-events-none drop-shadow-lg hidden"
         />
       </div>
       {/* Developer APIs */}
@@ -299,12 +587,12 @@ const UseCases = () => {
           alt="API Integration"
           width={80}
           height={80}
-          className="absolute right-2 bottom-2 w-[70px] h-auto opacity-80 pointer-events-none"
+          className="absolute right-2 bottom-2 w-[70px] h-auto opacity-80 pointer-events-none hidden"
         />
       </div>
 
       {/* Documentation Sharing */}
-      <div className="col-span-2 rounded-2xl bg-[#222527] border p-6 space-y-4 text-white flex flex-col items-start relative overflow-hidden min-h-[180px]">
+      <div className="col-span-2 rounded-2xl bg-[#222527] p-6 space-y-4 text-white flex flex-col items-start relative overflow-hidden min-h-[180px]">
         <File size={40} className="z-10" />
         <h1 className="text-lg font-semibold mt-2 z-10">
           Documentation Sharing
@@ -318,7 +606,7 @@ const UseCases = () => {
           alt="Docs"
           width={80}
           height={80}
-          className="absolute right-2 bottom-2 w-[70px] h-auto opacity-80 pointer-events-none"
+          className="absolute right-2 bottom-2 w-[70px] h-auto opacity-80 pointer-events-none hidden"
         />
       </div>
     </div>
