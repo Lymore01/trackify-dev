@@ -34,7 +34,7 @@ export default function ViewRequestDetails() {
         <DialogHeader>
           <DialogTitle>POST /webhook/docx</DialogTitle>
           <DialogDescription>
-            Overview of webhook request summary.
+             webhook request summary.
           </DialogDescription>
         </DialogHeader>
         <Separator />

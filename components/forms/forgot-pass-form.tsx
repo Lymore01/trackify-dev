@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { Loader } from "lucide-react";
 
 const formschema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -29,9 +31,30 @@ export default function ForgotPasswordForm() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formschema>) => {
-    console.log(values);
-    toast.success("Email has been sent");
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (data: z.infer<typeof formschema>) => {
+      const response = await fetch(`/api/users/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to send email");
+      }
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to send email");
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formschema>) => {
+    await mutateAsync(values);
   };
   return (
     <Form {...form}>
@@ -56,15 +79,28 @@ export default function ForgotPasswordForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Submit
+        <Button type="submit" className="w-full cursor-pointer">
+          {isPending ? (
+            <div className="flex gap-2 items-center">
+              <Loader className="animate-spin" size={16} /> Submitting...
+            </div>
+          ) : (
+            <span>Submit</span>
+          )}
         </Button>
         <div className="w-full items-center justify-center flex">
           <p className="font-medium text-zinc-700 text-sm">
-            Didn't recieve email?{" "}
-            <a className="text-blue-600 font-semibold text-sm hover:underline cursor-pointer">
-              Re-send
-            </a>
+            Didn't receive email?{" "}
+            {isPending ? (
+              <span className="ml-2 text-blue-600">Resending...</span>
+            ) : (
+              <a
+                className="text-blue-600 font-semibold text-sm hover:underline cursor-pointer"
+                onClick={() => onSubmit(form.getValues())}
+              >
+                Re-send
+              </a>
+            )}
           </p>
         </div>
       </form>

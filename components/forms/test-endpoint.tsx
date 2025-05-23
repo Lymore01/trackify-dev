@@ -55,7 +55,7 @@ export default function TestEndpoint({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      event: "user_created",
+      event: "link_created",
     },
   });
 
@@ -130,7 +130,7 @@ export default function TestEndpoint({
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder={USER_EVENTS[0]} />
+                        <SelectValue placeholder={LINK_EVENTS[0]} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
@@ -142,14 +142,14 @@ export default function TestEndpoint({
                           ))}
                         </SelectGroup>
 
-                        <SelectGroup>
+                        {/* <SelectGroup>
                           <SelectLabel>Users</SelectLabel>
                           {USER_EVENTS.map((userEvt, idx) => (
                             <SelectItem value={userEvt} key={`user-${idx}`}>
                               {userEvt}
                             </SelectItem>
                           ))}
-                        </SelectGroup>
+                        </SelectGroup> */}
                       </SelectContent>
                     </Select>
                   </FormControl>

@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 
     return apiResponse({ clicks }, 200);
   } catch (error) {
-    console.error("GET /api/track?id={id} error:", error);
+    console.error("GET /api/stats?id={id} error:", error);
     return apiResponse({ error: "Internal Server Error" }, 500);
   }
 }

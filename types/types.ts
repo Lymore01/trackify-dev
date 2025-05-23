@@ -1,5 +1,4 @@
 import { LucideIcon } from "lucide-react";
-import { z } from "zod";
 
 type User = {
   name: string;
@@ -43,8 +42,10 @@ export interface UserJSON {
 export interface LinkJSON {
   shortId: string;
   ip: string;
-  country: string | "unknown";
-  userAgent: string | "unknown";
+  country?: string | "unknown";
+  userAgent?: string | "unknown";
+  geo?: any;
+  deviceInfo?: Pick<UAParser.IDevice, "type">;
 }
 
 type Webhook<EvtType, Data> = {
@@ -58,7 +59,7 @@ export type UserWebhookEvent = Webhook<
 >;
 
 export type LinkWebhookEvent = Webhook<
-  "link.clicked" | "link.deleted",
+  "link_clicked" | "link_created" | "link_deleted" | "link_updated",
   LinkJSON
 >;
 export type WebhookEvent = UserWebhookEvent | LinkWebhookEvent;

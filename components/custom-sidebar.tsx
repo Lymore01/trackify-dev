@@ -1,21 +1,22 @@
 "use client";
 
-import {
-  ChevronDown,
-  ChevronRight,
-  LucideIcon,
-} from "lucide-react";
-import React, { useState } from "react";
+import { ChevronDown, ChevronRight, LucideIcon } from "lucide-react";
+import React, { startTransition, useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { NAV_ITEMS } from "@/lib/constants";
 import { Separator } from "./ui/separator";
+import { useAuth } from "@/hooks/use-auth";
+import { SidebarContext, useCustomSidebar } from "@/contexts/useSidebar";
 
-export default function CustomSidebar({children}:{
-  children?: React.ReactNode
+export default function CustomSidebar({
+  children,
+}: {
+  children?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(true);
-  const [selected, setSelected] = useState("Dashboard");
+  const [selected, setSelected] = useState<string | null>(null);
+  const { isMobile } = useCustomSidebar();
 
   return (
     <motion.nav
@@ -41,7 +42,7 @@ export default function CustomSidebar({children}:{
         />
       </div>
       <ToggleClose open={open} setOpen={setOpen} />
-      {children}
+      {isMobile && children}
     </motion.nav>
   );
 }
@@ -57,21 +58,27 @@ const Option = ({
 }: {
   Icon: LucideIcon;
   title: string;
-  selected: string;
-  setSelected: (value: string) => void;
+  selected: string | null;
+  setSelected: (value: string | null) => void;
   open: boolean;
   notifs?: number;
   href: string;
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const currentTab = NAV_ITEMS.find((item) => item.href === pathname);
+
   return (
     <motion.button
       onClick={() => {
-        setSelected(title);
+        startTransition(() => {
+          setSelected(title);
+        });
         router.push(href);
       }}
       className={`relative flex h-10 w-full items-center rounded-md transition-colors cursor-pointer ${
-        selected === title
+        currentTab?.title === title || selected === title
           ? "bg-indigo-100 text-blue-600"
           : "text-slate-500 hover:bg-slate-100"
       }`}
@@ -117,8 +124,8 @@ const OptionGroup = ({
   open,
   type,
 }: {
-  selected: string;
-  setSelected: (value: string) => void;
+  selected: string | null;
+  setSelected: (value: string | null) => void;
   open: boolean;
   type: "application" | "developers";
 }) => {
@@ -157,6 +164,8 @@ const OptionGroup = ({
 };
 
 const HeaderSection = ({ open }: { open: boolean }) => {
+  const user = useAuth();
+
   return (
     <div className="mb-3 pb-3 border-b">
       <div className="flex cursor-pointer items-center justify-between rounded-md transition-colors hover:bg-gray-200">
@@ -174,8 +183,8 @@ const HeaderSection = ({ open }: { open: boolean }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.125 }}
             >
-              <span className="block text-xs font-semibold">Kelly Limo</span>
-              <span className="block text-xs text-gray-600">Pro Plan</span>
+              <span className="block text-xs font-semibold">{user.name}</span>
+              <span className="block text-xs text-gray-600">{user.plan}</span>
             </motion.div>
           )}
         </div>

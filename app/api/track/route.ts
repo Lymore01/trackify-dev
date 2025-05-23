@@ -1,73 +1,83 @@
-import { prisma } from "@/lib/prisma";
+import { sendEvents } from "@/auth/webhooks/webhook";
 import { apiResponse } from "@/lib/utils";
+import { fetchApplicationByShortId } from "@/services/appServices";
 import {
   addClickTracking,
-  getClickTrackingPerShortId,
+  hasAlreadyTracked,
 } from "@/services/trackingServices";
-import { updateUrl } from "@/services/urlServices";
 import { NextResponse } from "next/server";
-// import geoip from "geoip-lite";
 import { UAParser } from "ua-parser-js";
+
+export async function fetchGeoLocationInfo() {
+  try {
+    const response = await fetch(`https://ipinfo.io/?token=${process.env.IPINFO_TOKEN}`);
+    if (!response.ok) {
+      throw new Error(`Geo fetch failed with status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.error("Error fetching geolocation info:", err);
+    return null;
+  }
+}
 
 export async function POST(req: Request) {
   try {
     const { shortId, ip, userAgent } = await req.json();
 
-    // todo: add geolocation tracking
-    //   const geo = ip ? geoip.lookup(ip) : null;
-    const deviceInfo = new UAParser(userAgent).getResult();
+    if (!shortId) {
+      return apiResponse(
+        { success: false, message: "shortId is required" },
+        400
+      );
+    }
 
-    //   todo: uncomment this later
-    /* const existing = await getClickTracking(ip);
+    const deviceInfo = new UAParser(userAgent || "").getResult();
 
-  if (existing.length > 0) {
-    return NextResponse.json({ success: false, message: "Already tracked" });
-  } */
+    const geo = await fetchGeoLocationInfo();
 
-    await addClickTracking({
+    // todo: uncomment
+    // const alreadyTracked = await hasAlreadyTracked(ip, shortId);
+    // if (alreadyTracked) {
+    //   return apiResponse(
+    //     {
+    //       success: false,
+    //       message: "This link has already been tracked from this IP",
+    //     },
+    //     200
+    //   );
+    // }
+
+    const payload = {
       shortId,
-      ip: ip || "unknown",
-      geo: null,
-      deviceInfo: deviceInfo || null,
+      ip: geo.ip || ip || "unknown",
+      geo: geo,
+      deviceInfo: { type: deviceInfo.device.type as UAParser.IDevice['type'] },
+    };
+
+    console.log("deviceInfo: ", deviceInfo);
+
+    // Track the click
+    await addClickTracking(payload);
+
+    // Fetch app info and send webhook
+    const appData = await fetchApplicationByShortId(shortId);
+
+    if (!appData) {
+      return apiResponse(
+        { success: false, message: "Application not found" },
+        404
+      );
+    }
+
+    await sendEvents({
+      appId: appData.appId ?? "",
+      evt: "link_clicked",
+      data: payload,
+      endpoints: appData.App?.endpoint ?? [],
     });
-
-    // Trigger a "link_clicked" webhook event if successfull
-    // get the webhook for the link
-    const data = await prisma.urlShort.findUnique({
-      where: {
-        shortId,
-      },
-      include: {
-        App: {
-          select: {
-            endpoint: {
-              select: {
-                url: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    const endpointUrl = data?.App?.endpoint?.[0]?.url;
-
-    // send the event
-
-    await fetch(
-      "https://a2fa-2c0f-6300-c05-e800-a1dd-67e5-4ce0-cd01.ngrok-free.app/webhook",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          linkId: "ABC123",
-          eventType: "link_clicked",
-          clickTime: "2025-05-06T14:30:00Z"
-        }),
-      }
-    );
 
     return NextResponse.json({ success: true });
   } catch (error) {

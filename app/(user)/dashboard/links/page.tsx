@@ -97,10 +97,12 @@ export default function Link() {
           </div>
         </div>
       </div>
-      <div className="flex gap-2 items-center">
-        <Info size={16} />
-        <p className="text-zinc-700 text-sm">
-          Overview of {appName} shortened links
+
+      <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-50 border border-blue-200">
+        <Info size={16} className="text-blue-600" />
+        <p className="text-sm text-zinc-700">
+          <span className="text-blue-700 font-medium">Overview:</span> Shortened
+          links for <span className="font-medium">{appName}</span>
         </p>
       </div>
       <Separator className="my-4" />

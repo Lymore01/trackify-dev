@@ -54,6 +54,9 @@ export default function ViewLinkAnalyticsDetails() {
                     <p>{dataItem.country}</p>
                   </TableCell>
                   <TableCell>
+                    <p>{dataItem.region ?? "Unknown"}</p>
+                  </TableCell>
+                  <TableCell>
                     <p>{dataItem.userAgent}</p>
                   </TableCell>
                 </TableRow>

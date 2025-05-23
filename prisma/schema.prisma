@@ -83,6 +83,17 @@ model ClickTracker {
   urlId     String
   ip        String?
   country   String?
+  region    String?
   userAgent String?
   createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }

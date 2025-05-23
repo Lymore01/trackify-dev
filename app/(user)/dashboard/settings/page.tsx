@@ -19,28 +19,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { logOut } from "@/actions/actions";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Settings() {
   const [currentTab, setCurrentTab] = useState("profile");
   const [isPasswordVisible, setPasswordVisible] = useState(false);
-
-  const { data: userData } = useQuery({
-    queryKey: ["user"],
-    queryFn: async () => {
-      const res = await fetch("/api/users", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-        },
-      });
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return res.json();
-    },
-    refetchOnWindowFocus: false,
-  });
+  const user = useAuth();
 
   return (
     <div className="flex flex-col h-max w-[60%] mx-auto my-4">
@@ -80,8 +64,8 @@ export default function Settings() {
                 />
               </div>
               <div className="flex flex-col gap-2 items-start">
-                <h1 className="text-sm">{userData?.data.name}</h1>
-                <h1 className="text-sm text-blue-600">{userData?.data.email}</h1>
+                <h1 className="text-sm">{user.name}</h1>
+                <h1 className="text-sm text-blue-600">{user.email}</h1>
               </div>
             </div>
             <Button>Change Image</Button>
@@ -93,7 +77,7 @@ export default function Settings() {
               <label htmlFor="email">Email</label>
               <Input
                 placeholder="Email"
-                value={userData?.data.email}
+                value={user.email}
                 id="email"
                 disabled
               />
@@ -106,7 +90,7 @@ export default function Settings() {
                   <Input
                     type={isPasswordVisible ? "text" : "password"}
                     placeholder="password"
-                    value={userData?.data.password}
+                    value={user.password}
                     autoComplete="off"
                     disabled
                   />
@@ -140,7 +124,7 @@ export default function Settings() {
   );
 }
 
-const TabButton = ({
+export const TabButton = ({
   currentTab,
   setCurrentTab,
   tab,
@@ -181,7 +165,7 @@ const TabButton = ({
   );
 };
 
-const LogoutButton = () => {
+export const LogoutButton = () => {
   const handleLogout = async () => {
     await logOut();
   };

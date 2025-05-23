@@ -100,7 +100,7 @@ export default function AddMoreEvents() {
             </form>
           </Form>
           <Separator />
-          <DialogFooter className="flex justify-between items-center">
+           <DialogFooter className="flex justify-between w-full lg:items-center">
             <Button
               variant={"outline"}
               className="cursor-pointer"

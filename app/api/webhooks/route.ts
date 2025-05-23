@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       }
     );
   } catch (error) {
-    console.error("Error registering enpoint", (error as Error).message);
+    console.error("Error registering endpoint", (error as Error).message);
     return NextResponse.json(
       {
         error: "Internal Server Error!",

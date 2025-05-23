@@ -9,11 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useRouter } from "next/navigation";
 import ViewLinkAnalyticsDetails from "../forms/view-link-analytics";
 
 export default function AnalyticsTable() {
-  const router = useRouter();
   return (
     <>
       <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto">
@@ -24,6 +22,7 @@ export default function AnalyticsTable() {
             {/* <TableHead>No. of clicks</TableHead> */}
             <TableHead>IP</TableHead>
             <TableHead>Country</TableHead>
+            <TableHead>Region</TableHead>
             <TableHead>Device</TableHead>
           </TableRow>
         </TableHeader>

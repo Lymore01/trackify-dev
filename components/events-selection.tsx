@@ -107,7 +107,7 @@ export default function EventSelection({
       )}
 
       {/* Users Section */}
-      {filteredUsers.length > 0 && (
+      {/* {filteredUsers.length > 0 && (
         <div className="my-4">
           <div className="flex gap-2 items-center mb-2">
             <Checkbox
@@ -136,7 +136,7 @@ export default function EventSelection({
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

@@ -21,18 +21,7 @@ export const NAV_ITEMS: ItemsProp[] = [
     title: "Api keys",
     type: "developers",
   },
-  {
-    href: "/dashboard/settings",
-    icon: Settings,
-    title: "Settings",
-    type: "application",
-  },
-  {
-    href: "/dashboard/docs",
-    icon: File,
-    title: "API docs",
-    type: "developers",
-  },
+
 ];
 
 export const LINK_EVENTS: string[] = [
@@ -41,6 +30,8 @@ export const LINK_EVENTS: string[] = [
   "link_deleted",
   "link_clicked",
 ];
+
+//! Deprecated
 export const USER_EVENTS: string[] = [
   "user_created",
   "user_updated",
@@ -160,28 +151,28 @@ interface Testimonials {
 
 export const TESTIMONIALS: Testimonials[] = [
   {
-    name: "Jane Doe",
+    name: "Jane Maina",
     image: "/images/aside.jpg",
     text: "Trackify made it so easy to monitor my shop links and see what’s working. The analytics are a game changer!",
-    company: "CTO, AlphaCode",
+    company: "Web Developer",
   },
   {
-    name: "Samuel Lee",
+    name: "Samuel Kiptoo",
     image: "/images/aside.jpg",
     text: "Integration was seamless. As a developer, I love the SDK and API flexibility. Highly recommended!",
-     company: "Product Manager at NovaTech",
+     company: "Product Manager",
   },
   {
     name: "Amina Yusuf",
     image: "/images/aside.jpg",
     text: "I use Trackify for all my marketing campaigns. The insights helped me double my conversion rate.",
-     company: "Software Engineer at Mpesa",
+     company: "Software Engineer",
   },
   {
-    name: "Carlos Rivera",
+    name: "Chris Nekesa",
     image: "/images/aside.jpg",
     text: "Shortening and sharing docs with Trackify is so smooth. My team always knows what’s most useful.",
-     company: "Product Manager at Pesapal",
+     company: "Product Manager",
   },
 ];
 

@@ -33,7 +33,7 @@ export default function ApplicationCard({
       <Separator />
       <div className="flex items-center justify-between p-4">
         <p className="text-gray-600 text-xs">
-          Updated {""}
+          Created {""}
           <span className="font-semibold">
             {getDaysDifference(app.updatedAt.toLocaleString())}
           </span>{" "}

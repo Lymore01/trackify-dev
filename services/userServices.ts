@@ -9,7 +9,10 @@ export async function fetchUser(email: string) {
   });
 }
 
-export async function fetchUserById(id: string, select?: Partial<Record<keyof User, boolean>>) {
+export async function fetchUserById(
+  id: string,
+  select?: Partial<Record<keyof User, boolean>>
+) {
   return prisma.user.findUnique({
     where: {
       id,
@@ -43,5 +46,20 @@ export async function updateApiKey({
     data: {
       apiKey: apiKey,
     },
+  });
+}
+
+export async function updateUserPassword({
+  email,
+  password,
+  salt,
+}: {
+  email: string;
+  password: string;
+  salt: string;
+}) {
+  return await prisma.user.update({
+    where: { email },
+    data: { password, salt },
   });
 }

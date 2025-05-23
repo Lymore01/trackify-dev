@@ -40,7 +40,7 @@ export default function Webhooks() {
   });
 
   return (
-    <div className="flex flex-col h-max w-[100%] lg:w-[60%] mx-auto my-4 p-2 lg:p-0">
+    <div className="flex flex-col h-max w-[100%] lg:w-[60%] mx-auto my-4 p-2 lg:p-0 ">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -55,14 +55,20 @@ export default function Webhooks() {
         </BreadcrumbList>
       </Breadcrumb>
       <h1 className="text-xl my-2">Webhooks</h1>
-      <div className="flex items-center">
-        <BookOpen size={16} className="hidden lg:block" />
-        <p className="text-sm text-zinc-700 lg:ml-2">
-          Learn how to use Webhooks with trackify by reading our webhook
-          documentation.
-          <span className="text-sm hover:underline text-blue-600 ml-2 cursor-pointer">
-            View Docs
-          </span>
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200">
+        <BookOpen size={18} className="text-blue-600 mt-1 hidden lg:block" />
+        <p className="text-sm text-zinc-700">
+          Learn how to use{" "}
+          <span className="font-medium text-blue-700">Webhooks</span> with
+          Trackify by reading our
+          <a
+            href="/docs/webhooks"
+            className="text-blue-600 font-medium ml-1 hover:underline transition-colors"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            documentation.
+          </a>
         </p>
       </div>
       <Separator className="my-4" />

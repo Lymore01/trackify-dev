@@ -47,7 +47,7 @@ export default function ApiTable({ apiKey }: { apiKey: string }) {
             <p className="inline-flex ">
               TRACKIFY_WEBHOOK_SIGNING_SECRET:{" "}
               <span className="ml-4  transition text-sm text-gray-600">
-                whsec_8{" "}
+                your-app-secret-key{" "}
               </span>
             </p>
           </TableCell>

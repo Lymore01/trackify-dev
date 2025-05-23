@@ -8,9 +8,12 @@ export default function CoreLayout({
 }>) {
   return (
     <div className="flex flex-col lg:flex-row max-w-full max-h-screen overflow-auto relative">
-      <main className="flex-1 px-4 py-16 lg:px-8 lg:py-16 flex justify-start items-center relative">
+      <main className="flex-1 px-4 py-16 lg:px-8 lg:py-16 flex justify-center lg:justify-start items-center relative">
         <div className="absolute top-4 left-4">
-          <Link href={"/"} className="grid size-10 shrink-0 place-content-center rounded-md bg-indigo-600">
+          <Link
+            href={"/"}
+            className="grid size-10 shrink-0 place-content-center rounded-md bg-indigo-600"
+          >
             <svg
               width="24"
               height="auto"
@@ -28,6 +31,7 @@ export default function CoreLayout({
             </svg>
           </Link>
         </div>
+
         {children}
       </main>
       <aside className="hidden lg:flex lg:flex-col h-screen lg:w-[50%] bg-black relative">

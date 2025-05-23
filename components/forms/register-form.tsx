@@ -150,14 +150,14 @@ export default function RegistrationForm() {
                   </div>
                 </FormControl>
                 <FormDescription>
-                  Password should be atleast 8 characters long.
+                  Password should be at least 8 characters long.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
             );
           }}
         />
-        <Button type="submit" className="w-full shrink-0">
+        <Button type="submit" className="w-full shrink-0 cursor-pointer">
           {isPending ? (
             <Loader size={16} className="animate-spin" />
           ) : (

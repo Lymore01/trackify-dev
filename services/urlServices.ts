@@ -50,6 +50,7 @@ export async function fetchUrl({
     return prisma.urlShort.findFirst({ where });
   }
 
+
   return prisma.urlShort.findMany({ where, include: { clicks: true } });
 }
 

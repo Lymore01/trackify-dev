@@ -52,3 +52,19 @@ export async function deleteApp(appId: string, userId: string) {
     },
   });
 }
+
+export async function fetchApplicationByShortId(shortId: string) {
+  return await prisma.urlShort.findUnique({
+    where: {
+      shortId,
+    },
+    include: {
+      App: {
+        select: {
+          endpoint: true,
+          name: true,
+        },
+      },
+    },
+  });
+}

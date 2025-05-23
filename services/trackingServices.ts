@@ -9,14 +9,15 @@ export async function addClickTracking({
   shortId: string;
   ip: string | null;
   geo: any | null;
-  deviceInfo: any;
+  deviceInfo: Pick<UAParser.IDevice, "type">;
 }) {
   return prisma.clickTracker.create({
     data: {
       url: { connect: { shortId } },
       ip: ip || "unknown",
       country: geo?.country || "unknown",
-      userAgent: deviceInfo.ua || "unknown",
+      region: geo?.region,
+      userAgent: deviceInfo.type || "unknown",
     },
   });
 }
@@ -47,10 +48,19 @@ export async function getClickTrackingPerShortId(shortId: string) {
           id: true,
           ip: true,
           country: true,
+          region: true,
           userAgent: true,
           createdAt: true,
         },
       },
+    },
+  });
+}
+
+export async function hasAlreadyTracked(ip: string, shortId: string) {
+  return await prisma.clickTracker.findFirst({
+    where: {
+      ip,
     },
   });
 }

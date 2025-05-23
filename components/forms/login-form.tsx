@@ -175,7 +175,7 @@ export default function LoginForm() {
           }}
         />
 
-        <Button type="submit" className="w-full shrink-0">
+        <Button type="submit" className="w-full shrink-0 cursor-pointer">
           {isPending ? (
             <Loader size={16} className="animate-spin" />
           ) : (

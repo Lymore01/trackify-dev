@@ -28,8 +28,6 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
-// min-h-[220px]
-
 const containerVariants = {
   hidden: {},
   visible: {
@@ -63,6 +61,30 @@ const fadeInRight = {
     opacity: 1,
     x: 0,
     transition: { duration: 0.7, ease: "easeOut" },
+  },
+};
+
+const contentVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+  exit: { opacity: 0, y: 10, transition: { duration: 0.2 } },
+};
+
+const menuVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: "easeOut" },
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    transition: { duration: 0.2, ease: "easeIn" },
   },
 };
 
@@ -155,7 +177,9 @@ export default function Home() {
 
         {/* CTA */}
         <div className="bg-white z-20 rounded-b-4xl px-4 py-24 grid place-content-center w-full">
-          <div className={`grid place-content-center px-12 py-8 lg:px-36 lg:py-16 rounded-2xl text-slate-900 text-center space-y-4 bg-white border border-l-indigo-500 border-r-emerald-500 border-t-rose-500 border-b-yellow-500 mx-auto`}>
+          <div
+            className={`grid place-content-center px-12 py-8 lg:px-36 lg:py-16 rounded-2xl text-slate-900 text-center space-y-4 bg-white border border-l-indigo-500 border-r-emerald-500 border-t-rose-500 border-b-yellow-500 mx-auto`}
+          >
             <h1 className="text-3xl text-slate-900">Shorten. Track. Grow.</h1>
             <p className="text-md text-slate-600">
               Smart links that power your business.
@@ -175,17 +199,6 @@ export default function Home() {
     </div>
   );
 }
-
-
-const contentVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: "easeOut" },
-  },
-  exit: { opacity: 0, y: 10, transition: { duration: 0.2 } },
-};
 
 const HowItWorksSection2 = () => {
   const [selected, setSelected] = useState<number | null>(0);
@@ -234,16 +247,19 @@ const HowItWorksSection2 = () => {
                     {item.content}
 
                     <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-md flex lg:hidden mt-4">
-                      <Image
-                        src={
-                          item.image ??
-                          "/images/default.png"
-                        }
-                        alt={`Step ${selected} image`}
-                        layout="fill"
-                        objectFit="top left"
-                        className="rounded-lg"
-                      />
+                      {item.image ? (
+                        <Image
+                          src={item.image}
+                          alt={`Step ${selected} image`}
+                          layout="fill"
+                          objectFit="top left"
+                          className="rounded-lg"
+                        />
+                      ) : (
+                        <CodeDisplay
+                          codeString={"npm i @trackify-sdk"}
+                        ></CodeDisplay>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -266,7 +282,9 @@ const HowItWorksSection2 = () => {
           />
         </div>
       ) : (
-        <CodeDisplay codeString="npm i @trackify-sdk" />
+        <div className="hidden lg:block">
+          <CodeDisplay codeString="npm i @trackify-sdk" />
+        </div>
       )}
     </div>
   );
@@ -360,7 +378,7 @@ const Testimonials = () => (
   </div>
 );
 
-const NavBar = () => {
+export const NavBar = () => {
   const [open, setIsOpen] = useState(false);
   const handleMenuOpen = () => {
     setIsOpen((pv: any) => !pv);
@@ -383,20 +401,6 @@ const NavBar = () => {
       <AnimatePresence>{open && <MobileMenu />}</AnimatePresence>
     </header>
   );
-};
-
-const menuVariants = {
-  hidden: { opacity: 0, y: -20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, ease: "easeOut" },
-  },
-  exit: {
-    opacity: 0,
-    y: -10,
-    transition: { duration: 0.2, ease: "easeIn" },
-  },
 };
 
 const MobileMenu = () => {

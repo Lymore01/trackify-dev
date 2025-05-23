@@ -99,7 +99,7 @@ export default function AddLink() {
           <DialogHeader>
             <DialogTitle className="font-medium">Add URL</DialogTitle>
             <DialogDescription>
-              Please add a valid URL to be shortend
+              Please add a valid URL to be shorted
             </DialogDescription>
           </DialogHeader>
           <Separator />
@@ -155,7 +155,7 @@ export default function AddLink() {
             </form>
           </Form>
           <Separator />
-          <DialogFooter className="flex justify-between items-center">
+           <DialogFooter className="flex justify-between w-full lg:items-center">
             <Button
               variant={"outline"}
               className="cursor-pointer"

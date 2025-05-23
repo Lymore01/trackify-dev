@@ -1,4 +1,4 @@
-import geoip from "geoip-lite";
+
 import { UAParser } from "ua-parser-js";
 import { NextRequest } from "next/server";
 
@@ -15,6 +15,7 @@ export async function trackClick(req: NextRequest) {
   const shortId = pathname.split("/")[2];
   const ip = getClientIp(req);
   const userAgent = req.headers.get("user-agent") || "unknown";
+
 
   await fetch(`http://localhost:3000/api/track`, {
     method: "POST",

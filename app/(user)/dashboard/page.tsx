@@ -2,16 +2,21 @@
 
 import ApplicationCard from "@/components/cards/applications-card";
 import CreateApplication from "@/components/forms/create-application";
+import SearchModal from "@/components/modals/search";
 import ApplicationCardSkelton from "@/components/skeletons/application-card-skelton";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApplications } from "@/hooks/use-applications";
+import { useAuth } from "@/hooks/use-auth";
 import { AppType } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
-import { Info } from "lucide-react";
+import { Info, Search } from "lucide-react";
+import { useState } from "react";
 
 export default function Dashboard() {
   const { apps, isError, isLoading } = useApplications();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const user = useAuth();
 
   if (isError) return <div>Error fetching applications</div>;
   return (
@@ -22,20 +27,33 @@ export default function Dashboard() {
           {isLoading ? (
             <Skeleton className="w-24 h-6" />
           ) : (
-            <span>{apps[0]?.user?.name}</span>
+            <span>{user.name}</span>
           )}
         </span>
       </h1>
-      <div className="flex gap-2 items-center ml-2 lg:ml-0">
-        <Info size={16} />
-        <p className="text-zinc-700 text-sm">Overview of your applications.</p>
+
+      <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-50 border border-blue-200 ml-2 lg:ml-0">
+        <Info size={16} className="text-blue-600" />
+        <p className="text-sm text-zinc-700">
+          <span className="text-blue-700 font-medium">Overview:</span> Your
+          current apps at a glance.
+        </p>
       </div>
       <Separator className="my-4" />
       {/* applications */}
       <div className="mt-4 space-y-4 p-2 lg:p-0">
         <div className="flex items-center justify-between">
           <h1>Applications</h1>
-          <CreateApplication />
+          <div className="flex items-center gap-4">
+            <Search
+              size={16}
+              className="cursor-pointer"
+              onClick={() => {
+                setSearchOpen(true);
+              }}
+            />
+            <CreateApplication />
+          </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {isLoading ? (
@@ -51,6 +69,13 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+      {searchOpen && (
+        <SearchModal
+          open={searchOpen}
+          openChange={setSearchOpen}
+          applications={apps}
+        />
+      )}
     </div>
   );
 }

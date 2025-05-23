@@ -4,7 +4,7 @@ import ApiTable from "@/components/tables/api-table";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { BookOpen, Copy, Loader } from "lucide-react";
+import { BookOpen, Copy, Info, Loader, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -73,7 +73,21 @@ export default function Api() {
 
   return (
     <div className="flex flex-col h-max w-[100%] lg:w-[60%] mx-auto my-4 p-2 lg:p-0">
-      <h1 className="text-xl my-2">Api Keys</h1>
+      <div className="flex flex-col">
+        <h1 className="text-xl my-2">Api Keys</h1>
+        <div className="flex items-start gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200">
+          <ShieldCheck size={18} className="text-blue-600 mt-1" />
+          <p className="text-sm text-zinc-700">
+            Your{" "}
+            <span className="font-medium text-blue-700">API credentials</span>{" "}
+            for interacting with Trackify’s services. Keep them{" "}
+            <span className="font-medium text-blue-700">
+              secure and private
+            </span>{" "}
+            to prevent unauthorized access.
+          </p>
+        </div>
+      </div>
       <Separator className="my-4" />
       <ApiTable apiKey={apiData?.data} />
       <div className="mt-4 space-y-4">
@@ -86,8 +100,7 @@ export default function Api() {
             <div className="text-sm space-y-4">
               <p className="text-gray-600">
                 Your publishable secret key ensures secure integration with
-                Trackify's services; keep it safe and avoid client-side
-                exposure.
+                Trackify's SDK; keep it safe and avoid client-side exposure.
               </p>
             </div>
             <div className="flex gap-4 items-center w-full mt-4">
@@ -128,12 +141,13 @@ export default function Api() {
               </p>
             </div>
             <div className="flex gap-4 items-center w-full mt-4">
-              <p className="ml-4  transition border p-2 text-sm text-gray-600">
-                whsec_8{" "}
-              </p>
-              <Button variant={"outline"} className="cursor-pointer">
-                <Copy size={16} />
-              </Button>
+              <div className="flex items-start gap-3 p-4 w-full rounded-lg bg-green-100 border border-green-300">
+                <Info className="text-green-700 mt-1" size={18} />
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  Each app has its own unique signing secret. Use it to verify
+                  the integrity of incoming webhook requests.
+                </p>
+              </div>
             </div>
           </div>
         </div>

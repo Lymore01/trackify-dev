@@ -62,6 +62,7 @@ export async function getUserFromSession(cookies: Pick<Cookie, "get">): Promise<
 
 export async function getSessionById(sessionId: string) {
   const rawUser = await redisClient.get(`Session:${sessionId}`);
+
   const { success, data: user } = sessionSchema.safeParse(rawUser);
 
   return success ? user : null;
