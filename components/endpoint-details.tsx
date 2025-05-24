@@ -1,9 +1,9 @@
-import { Info } from "lucide-react";
+import { Eye, EyeOff, Info } from "lucide-react";
 
 import { Separator } from "./ui/separator";
 import Tag from "./tag";
 import AddMoreEvents from "./forms/add-events";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export default function EndpointDetails({
   createdAt,
@@ -54,14 +54,35 @@ export default function EndpointDetails({
             <Info size={12} /> Hover
           </Tag>
         </div>
-        <div className="relative">
-          <div className="absolute inset-0 bg-white/30  pointer-events-none"></div>
-          <p
-            className="relative text-black  transition max-w-full overflow-x-auto whitespace-nowrap"
-            ref={secretRef}
-          >
-            {signingSecret}
-          </p>
+        <SecretDisplay signingSecret={signingSecret} />
+      </div>
+    </div>
+  );
+}
+function SecretDisplay({ signingSecret }: { signingSecret: string }) {
+  const [showSecret, setShowSecret] = useState(false);
+  const secretRef = useRef<HTMLParagraphElement>(null);
+
+  return (
+    <div className="relative">
+      {!showSecret && (
+        <div className="absolute inset-0 bg-white/30 blur-sm pointer-events-none transition-all duration-300 rounded" />
+      )}
+
+      <div className="flex items-center">
+        <p
+          ref={secretRef}
+          className={`relative text-black transition-all max-w-full overflow-x-auto whitespace-nowrap ${
+            showSecret ? "blur-none" : "blur-xs"
+          }`}
+        >
+          {signingSecret}
+        </p>
+        <div
+          className="ml-2 flex items-start cursor-pointer h-full mt-[-16]"
+          onClick={() => setShowSecret(!showSecret)}
+        >
+          {showSecret ? <EyeOff size={16} /> : <Eye size={16} />}
         </div>
       </div>
     </div>

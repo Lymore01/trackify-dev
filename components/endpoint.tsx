@@ -120,7 +120,7 @@ export default function Endpoint({
             <DropdownMenuContent>
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Disable Endpoint</DropdownMenuItem>
+              {/* <DropdownMenuItem>Disable Endpoint</DropdownMenuItem> */}
               <DropdownMenuItem
                 className="text-red-600 hover:text-red-600"
                 onClick={handleDeleteEndpoint}

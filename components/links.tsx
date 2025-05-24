@@ -133,7 +133,7 @@ export default function Links() {
             <DropdownMenuContent>
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Disable link</DropdownMenuItem>
+              {/* <DropdownMenuItem>Disable link</DropdownMenuItem> */}
               <DropdownMenuItem
                 className="text-red-600 hover:text-red-600"
                 onClick={handleUrlDelete}

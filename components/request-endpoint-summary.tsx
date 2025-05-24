@@ -2,26 +2,41 @@ import CodeDisplay from "./code-display";
 import Tag from "./tag";
 
 export default function RequestEndpointSummary({ request }: { request: any }) {
-  const { headers, body, status } = request;
+  const {
+    headers = {
+      "Content-Type": "application/json",
+    },
+    payload,
+    response,
+    statusCode = 200,
+    durationMs,
+    eventType,
+    createdAt,
+  } = request || {};
+
+  const isSuccess = statusCode >= 200 && statusCode < 300;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="space-y-4">
-        <h1>POST /webhook/docx</h1>
-        <CodeDisplay codeString={JSON.stringify(body, null, 2)} />
+    <div className="flex flex-col gap-6 text-sm text-gray-800">
+      {/* General Info */}
+      <div className="space-y-2">
+        <h2 className="text-lg font-semibold">Webhook Summary</h2>
+        <div className="flex items-center gap-4">
+          {createdAt && (
+            <p className="font-mono">
+              <strong>Timestamp:</strong> {new Date(createdAt).toLocaleString()}
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center">
-          <h1>{status} OK</h1>
-          <Tag>Success</Tag>
-        </div>
+      <div className="space-y-2">
+        <h2 className="text-md font-semibold">Request Payload</h2>
         <CodeDisplay
           codeString={JSON.stringify(
             {
-              success: true,
-              message: "Request successful",
-              details: body,
+              data: "",
+              type: eventType,
             },
             null,
             2
@@ -29,9 +44,23 @@ export default function RequestEndpointSummary({ request }: { request: any }) {
         />
       </div>
 
-      {/* Headers Section */}
-      <div className="space-y-4">
-        <h1>Headers</h1>
+      <div className="space-y-2">
+        <h2 className="text-md font-semibold">Simulated Response</h2>
+        <CodeDisplay
+          codeString={JSON.stringify(
+            {
+              success: isSuccess,
+              message: isSuccess ? "Request successful" : "Request failed",
+            },
+            null,
+            2
+          )}
+        />
+      </div>
+
+      {/* Headers */}
+      <div className="space-y-2">
+        <h2 className="text-md font-semibold">Request Headers</h2>
         <CodeDisplay codeString={JSON.stringify(headers, null, 2)} />
       </div>
     </div>

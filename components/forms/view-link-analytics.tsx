@@ -44,7 +44,7 @@ export default function ViewLinkAnalyticsDetails() {
                   className="hover:bg-gray-50 cursor-pointer"
                 >
                   <TableCell>
-                    <p>{new Date(dataItem.createdAt).toUTCString()}</p>
+                    <p>{new Date(dataItem.createdAt).toLocaleString()}</p>
                   </TableCell>
                   {/* <TableCell className="flex items-center gap-2 my-2">
                       <p className="truncate max-w-md">{data.length}</p>

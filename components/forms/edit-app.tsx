@@ -34,8 +34,11 @@ const formSchema = z.object({
     .min(2, "Application name should be at least 2 characters long")
     .nonempty("Application name is required"),
 });
-
-export default function EditAppDialogTrigger() {
+export default function EditAppDialogTrigger({
+  currentAppName,
+}: {
+  currentAppName: string;
+}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
@@ -51,7 +54,11 @@ export default function EditAppDialogTrigger() {
       </DropdownMenuItem>
 
       {isDialogOpen && (
-        <EditAppDialog isOpen={isDialogOpen} setIsOpen={setIsDialogOpen} />
+        <EditAppDialog
+          isOpen={isDialogOpen}
+          setIsOpen={setIsDialogOpen}
+          currentAppName={currentAppName}
+        />
       )}
     </>
   );
@@ -60,14 +67,16 @@ export default function EditAppDialogTrigger() {
 function EditAppDialog({
   isOpen,
   setIsOpen,
+  currentAppName,
 }: {
   isOpen: boolean;
   setIsOpen: (val: boolean) => void;
+  currentAppName: string;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      appName: "",
+      appName: currentAppName,
     },
   });
 
@@ -109,7 +118,7 @@ function EditAppDialog({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            id="edit-app-name-form"
+            id="edit-app-name-forms"
           >
             <FormField
               control={form.control}
@@ -118,7 +127,7 @@ function EditAppDialog({
                 <FormItem>
                   <FormLabel>App Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter new app name" />
+                    <Input placeholder="Enter new app name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -130,7 +139,7 @@ function EditAppDialog({
           <Button variant="outline" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
-          <Button type="submit" form="edit-app-name-form">
+          <Button type="submit" form="edit-app-name-forms">
             {isPending ? (
               <Loader size={16} className="animate-spin" />
             ) : (

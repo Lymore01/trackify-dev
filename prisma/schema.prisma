@@ -61,6 +61,7 @@ model Endpoint {
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
   appId            String
+  WebhookRequest   WebhookRequest[]
 }
 
 model UrlShort {
@@ -96,4 +97,17 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   @@index([email])
+}
+
+model WebhookRequest {
+  id         String   @id @default(uuid())
+  appId      String
+  endpoint   Endpoint @relation(fields: [endpointId], references: [id])
+  statusCode Int
+  response   String?
+  payload    Json
+  eventType  String
+  durationMs Int
+  createdAt  DateTime @default(now())
+  endpointId String
 }

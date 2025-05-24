@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { webhookSchema } from "@/validations/webhooksValidation";
+import {
+  webhookRequestSchema,
+  webhookSchema,
+} from "@/validations/webhooksValidation";
 import { EventsToSubscribe } from "@prisma/client";
 import { z } from "zod";
 
@@ -50,6 +53,26 @@ export async function deleteWebhook({
     where: {
       appId,
       id: endpointId,
+    },
+  });
+}
+
+export async function createWebhookRequest(
+  parsedData: z.infer<typeof webhookRequestSchema>
+) {
+  return await prisma.webhookRequest.create({
+    data: {
+      ...parsedData,
+      payload: parsedData.payload || {},
+      durationMs: parsedData.durationMs || 0,
+    },
+  });
+}
+
+export async function fetchWebhookSummary(endpointId: string) {
+  return await prisma.webhookRequest.findMany({
+    where: {
+      endpointId,
     },
   });
 }

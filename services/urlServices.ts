@@ -28,6 +28,14 @@ export async function createUrl(
   });
 }
 
+export async function fetchUrlByShortId(id: string) {
+  return await prisma.urlShort.findUnique({
+    where: {
+      shortId: id,
+    },
+  });
+}
+
 export async function fetchUrl({
   userId,
   appId,
@@ -49,7 +57,6 @@ export async function fetchUrl({
   if (originalUrl) {
     return prisma.urlShort.findFirst({ where });
   }
-
 
   return prisma.urlShort.findMany({ where, include: { clicks: true } });
 }

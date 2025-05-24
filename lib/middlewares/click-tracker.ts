@@ -1,5 +1,4 @@
-
-import { UAParser } from "ua-parser-js";
+import { fetchUrlByShortId } from "@/services/urlServices";
 import { NextRequest } from "next/server";
 
 export function getClientIp(req: NextRequest) {
@@ -16,6 +15,9 @@ export async function trackClick(req: NextRequest) {
   const ip = getClientIp(req);
   const userAgent = req.headers.get("user-agent") || "unknown";
 
+  const url = fetchUrlByShortId(shortId);
+
+  if (!url) return;
 
   await fetch(`http://localhost:3000/api/track`, {
     method: "POST",

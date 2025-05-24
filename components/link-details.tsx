@@ -18,7 +18,7 @@ export default function LinkDetails({
       <Separator />
       <div className="space-y-4 text-sm">
         <h1 className="text-zinc-700 ">Last Updated</h1>
-        <p>{new Date(createdAt).toUTCString()}</p>
+        <p>{new Date(updatedAt).toUTCString()}</p>
       </div>
       <Separator />
       <div className="space-y-4 text-sm">
