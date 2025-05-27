@@ -54,17 +54,22 @@ export default function ViewRequestDetails() {
     <>
       {Array.isArray(requestData?.data) && requestData.data.length > 0 ? (
         requestData.data.map(
-          (data: z.infer<typeof webhookRequestSchema> & {createdAt: string}, idx: number) => (
+          (
+            data: z.infer<typeof webhookRequestSchema> & { createdAt: string },
+            idx: number
+          ) => (
             <TableRow
               key={idx}
-              className="hover:bg-gray-50 cursor-pointer"
+              className="bg-blue-50 text-gray-600 text-sm dark:text-foreground dark:bg-background cursor-pointer hover:bg-gray-50"
               onClick={() => handleRowClick(data)}
             >
               <TableCell className="flex items-center gap-2 my-2">
                 <p className="truncate max-w-md">{data.eventType}</p>
               </TableCell>
               <TableCell>
-                <Tag variant={data.statusCode === 200 ? "default" : "error"}>
+                <Tag
+                  variant={data.statusCode === 200 ? "default" : "error"}
+                >
                   {data.statusCode}
                   {data.statusCode === 200 ? " OK" : " Fail"}
                 </Tag>
@@ -79,9 +84,13 @@ export default function ViewRequestDetails() {
           )
         )
       ) : (
-        <div className="text-gray-500 text-sm p-2">
-          Request summary not found!
-        </div>
+        <TableRow>
+          <TableCell colSpan={4} className="text-center p-4">
+            <div className="text-gray-500 text-sm p-2">
+              Request summary not found!
+            </div>
+          </TableCell>
+        </TableRow>
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>

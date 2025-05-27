@@ -34,17 +34,20 @@ export default function SearchModal({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
+          onClick={() => openChange(false)}
+          aria-modal="true"
         >
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="w-[90vw] max-w-xl bg-white rounded-2xl shadow-lg p-6 relative"
+            className="w-[90vw] max-w-xl bg-background rounded-2xl shadow-lg p-6 relative"
+            onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => openChange(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-black transition"
+              className="absolute top-4 right-4 text-gray-600 hover:text-black dark:hover:text-foreground transition"
               aria-label="Close search modal"
             >
               <X size={20} />
@@ -76,7 +79,7 @@ export default function SearchModal({
                         transition={{ duration: 0.15 }}
                       >
                         <button
-                          className="w-full text-left px-2 py-3 rounded-md hover:bg-gray-100 transition text-sm"
+                          className="w-full text-left px-2 py-3 rounded-md hover:bg-gray-100 dark:hover:bg-accent cursor-pointer transition text-sm"
                           onClick={() => {
                             if (type === "webhook") {
                               router.push(

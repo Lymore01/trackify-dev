@@ -20,9 +20,9 @@ export async function PUT(
     }
     const { data: app } = payload;
 
-    await updateApp(id, app.appName);
+    const appData = await updateApp(id, app.appName);
     return apiResponse(
-      { success: true, name: app.appName, message: "Application updated" },
+      { success: true, name: appData.name, message: "Application updated" },
       200
     );
   } catch (error) {

@@ -19,7 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RefObject, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -37,17 +37,23 @@ export default function EditLinkURL({
   current,
   linkID,
 }: {
-  current: RefObject<HTMLHeadingElement | null>;
+  current: string;
   linkID: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      originalUrl: current?.current?.textContent || "",
+      originalUrl: current,
     },
   });
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (isDialogOpen) {
+      form.reset({ originalUrl: current });
+    }
+  }, [isDialogOpen, current, form]);
 
   const { mutateAsync: updateOriginalLink, isPending } = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
@@ -103,7 +109,7 @@ export default function EditLinkURL({
                   <FormLabel>Original URL</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={current?.current?.textContent || ""}
+                      placeholder={"Edit original URL..."}
                       autoComplete="off"
                       {...field}
                     />
@@ -115,7 +121,7 @@ export default function EditLinkURL({
             />
           </form>
         </Form>
-         <DialogFooter className="flex justify-between w-full lg:items-center">
+        <DialogFooter className="flex justify-between w-full lg:items-center">
           <Button
             variant={"outline"}
             className="cursor-pointer"

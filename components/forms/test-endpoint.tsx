@@ -39,6 +39,7 @@ import {
   TableRow,
 } from "../ui/table";
 import Tag from "../tag";
+import { sendEvents } from "@/auth/webhooks/webhook";
 
 const formSchema = z.object({
   event: z.string().min(1, "Event type is required") as z.ZodType<EventType>,
@@ -55,7 +56,7 @@ export default function TestEndpoint({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      event: "link_created",
+      event: "link_clicked" as EventType, 
     },
   });
 
@@ -75,26 +76,34 @@ export default function TestEndpoint({
     data: webhookData,
   } = useMutation({
     mutationFn: async (data: any) => {
-      const res = await fetch(`${endpoint}/webhook`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const response = await res.json();
-      return response;
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "trackify-webhook-signature": generateHMAC(
+              secret,
+              JSON.stringify(data)
+            ),
+          },
+          body: JSON.stringify(data),
+        });
+        const responseData = await response.json();
+        console.log(data);
+        return responseData;
+      } catch (error) {
+        console.error("Error sending webhook request:", error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
-      if (data.summary.statusCode === 200) {
-        toast.success("Test Passed Successfully!");
-      } else {
-        toast.error("Test Failed!");
-      }
+      toast.success("Test Passed Successfully!");
+      console.log("Webhook Test Success:", data);
+      // Log the webhook request
     },
     onError: (error) => {
       toast.error("Test Example Failed!");
+      console.log("Webhook Test Error:", error);
     },
   });
 
@@ -108,12 +117,12 @@ export default function TestEndpoint({
 
   return (
     <div className="rounded-lg border">
-      <div className="bg-slate-200 p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600">
+      <div className="bg-slate-200 dark:bg-accent dark:text-accent-foreground p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600">
         <h1>Testing</h1>
       </div>
       <Separator />
       <div className="p-4 text-sm space-y-4">
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-foreground">
           Use this tool to validate your webhook endpoints and ensure they're
           ready to receive real-time event notifications. Enter your details
           below to simulate events and analyze responses.
@@ -167,7 +176,7 @@ export default function TestEndpoint({
         </div>
         <div className="mt-4">
           <Button
-            className="cursor-pointer"
+            className="cursor-pointer dark:bg-accent dark:text-accent-foreground"
             type="submit"
             form="test-endpoint-form"
           >
@@ -184,7 +193,16 @@ export default function TestEndpoint({
         <div>
           <div className="flex justify-between items-center">
             <p>Or, Use cURL command</p>
-            <Copy className="cursor-pointer" size={16} />
+            <Copy
+              className="cursor-pointer"
+              size={16}
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  generateCurlCommand(endpoint, payload)
+                );
+                toast.success("cURL command copied to clipboard");
+              }}
+            />
           </div>
           <CodeDisplay codeString={generateCurlCommand(endpoint, payload)} />
         </div>

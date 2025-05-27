@@ -20,36 +20,47 @@ export default function EndpointDetails({
   return (
     <div className="mt-2 ml-4 space-y-4">
       <div className="space-y-4 text-sm">
-        <h1 className="text-zinc-700 ">Creation Date</h1>
-        <p>{new Date(createdAt).toUTCString()}</p>
+        <h1 className="text-zinc-700 dark:text-foreground">Creation Date</h1>
+        <p className="text-muted-foreground">
+          {new Date(createdAt).toUTCString()}
+        </p>
       </div>
       <Separator />
       <div className="space-y-4 text-sm">
-        <h1 className="text-zinc-700 ">Last Updated</h1>
-        <p>{new Date(updatedAt).toUTCString()}</p>
+        <h1 className="text-zinc-700 dark:text-foreground">Last Updated</h1>
+        <p className="text-muted-foreground">
+          {new Date(updatedAt).toUTCString()}
+        </p>
       </div>
       <Separator />
       <div className="space-y-4 text-sm">
         <div className="flex justify-between items-center">
-          <h1 className="text-zinc-700 ">Subscribed Events</h1>
+          <h1 className="text-zinc-700 dark:text-foreground">
+            Subscribed Events
+          </h1>
           <AddMoreEvents />
         </div>
         <ul className="space-y-2">
           {subscribedEvents?.length > 0 ? (
             subscribedEvents.map((event) => (
-              <li key={event} className="flex items-center gap-2">
+              <li
+                key={event}
+                className="flex items-center gap-2 text-muted-foreground"
+              >
                 {event}
               </li>
             ))
           ) : (
-            <li className="text-sm text-zinc-500">No events subscribed</li>
+            <li className="text-sm text-zinc-500  dark:text-muted-foreground">
+              No events subscribed
+            </li>
           )}
         </ul>
       </div>
       <Separator />
       <div className="space-y-4 text-sm">
         <div className="flex justify-between items-center">
-          <h1 className="text-zinc-700 ">Signing Secret</h1>
+          <h1 className="text-zinc-700 dark:text-foreground">Signing Secret</h1>
           <Tag variant={"info"}>
             <Info size={12} /> Hover
           </Tag>
@@ -66,13 +77,13 @@ function SecretDisplay({ signingSecret }: { signingSecret: string }) {
   return (
     <div className="relative">
       {!showSecret && (
-        <div className="absolute inset-0 bg-white/30 blur-sm pointer-events-none transition-all duration-300 rounded" />
+        <div className="absolute inset-0 bg-white/30 dark:bg-zinc-800/50 blur-sm pointer-events-none transition-all duration-300 rounded" />
       )}
 
       <div className="flex items-center">
         <p
           ref={secretRef}
-          className={`relative text-black transition-all max-w-full overflow-x-auto whitespace-nowrap ${
+          className={`relative text-zinc-800 dark:text-zinc-200 transition-all max-w-full overflow-x-auto whitespace-nowrap ${
             showSecret ? "blur-none" : "blur-xs"
           }`}
         >

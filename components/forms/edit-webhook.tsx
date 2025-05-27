@@ -19,7 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RefObject, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -37,22 +37,26 @@ export const webhookFormSchema = z.object({
 export default function EditWebhook({
   current,
 }: {
-  current: RefObject<HTMLHeadingElement | null>;
+  current: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const searchParams = useSearchParams();
-   const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const endpoint = searchParams.get("endpoint");
   const form = useForm<z.infer<typeof webhookFormSchema>>({
     resolver: zodResolver(webhookFormSchema),
     defaultValues: {
-      url: current?.current?.textContent || "",
+      url: current,
     },
   });
 
-  const { updateWebhook, isPending } = useUpdateWebhook(
-    endpoint as string,
-  );
+  const { updateWebhook, isPending } = useUpdateWebhook(endpoint as string);
+
+  useEffect(() => {
+    if (isDialogOpen) {
+      form.reset({ url: current });
+    }
+  }, [isDialogOpen, current, form]);
 
   const onSubmit = async (values: z.infer<typeof webhookFormSchema>) => {
     await updateWebhook(values);
@@ -87,7 +91,7 @@ export default function EditWebhook({
                   <FormLabel>Endpoint URL</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={current?.current?.textContent || ""}
+                      placeholder={"Enter endpoint url..."}
                       autoComplete="off"
                       {...field}
                     />
@@ -101,7 +105,7 @@ export default function EditWebhook({
             />
           </form>
         </Form>
-         <DialogFooter className="flex justify-between w-full lg:items-center">
+        <DialogFooter className="flex justify-between w-full lg:items-center">
           <Button
             variant={"outline"}
             className="cursor-pointer"

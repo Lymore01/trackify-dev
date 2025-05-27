@@ -32,7 +32,6 @@ function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [openMobile, setOpenMobile] = React.useState(false);
   const user = useAuth();
 
-  // prevent re-renders
   const contextValue = React.useMemo<SidebarContextProps>(
     () => ({
       user,

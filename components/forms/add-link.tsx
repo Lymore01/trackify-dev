@@ -88,7 +88,8 @@ export default function AddLink() {
     <div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button className="cursor-pointer">
+          <Button className="cursor-pointer dark:bg-accent dark:text-accent-foreground hover:dark:bg-sidebar-accent-hover">
+            <span className="sr-only">Create Link</span>
             <Plus />
             Add URL
           </Button>
@@ -155,7 +156,7 @@ export default function AddLink() {
             </form>
           </Form>
           <Separator />
-           <DialogFooter className="flex justify-between w-full lg:items-center">
+          <DialogFooter className="flex justify-between w-full lg:items-center">
             <Button
               variant={"outline"}
               className="cursor-pointer"

@@ -24,7 +24,7 @@ export default function ApplicationCard({
   };
   return (
     <div className="rounded-lg border">
-      <div className="bg-slate-200 p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600 flex justify-between items-center">
+      <div className="bg-slate-200 dark:bg-accent p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600 dark:text-accent-foreground flex justify-between items-center">
         <h1>{app.name}</h1>
         <Tag variant={app.plan === "Free Plan" ? "warning" : "default"}>
           {app.plan}
@@ -32,7 +32,7 @@ export default function ApplicationCard({
       </div>
       <Separator />
       <div className="flex items-center justify-between p-4">
-        <p className="text-gray-600 text-xs">
+        <p className="text-gray-600 dark:text-accent-foreground text-xs">
           Created {""}
           <span className="font-semibold">
             {getDaysDifference(app.updatedAt.toLocaleString())}
@@ -40,7 +40,7 @@ export default function ApplicationCard({
           days ago
         </p>
         <div
-          className="flex gap-1 group items-center text-xs text-zinc-700 cursor-pointer"
+          className="flex gap-1 group items-center text-xs text-zinc-700 dark:text-accent-foreground cursor-pointer"
           onClick={() => addQueryParameters(app.id)}
         >
           <span>View</span>

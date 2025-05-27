@@ -19,7 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RefObject, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -38,7 +38,7 @@ const formSchema = z.object({
 export default function EditWebhookDescription({
   current,
 }: {
-  current: RefObject<HTMLHeadingElement | null>;
+  current: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const searchParams = useSearchParams();
@@ -47,13 +47,17 @@ export default function EditWebhookDescription({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: current?.current?.textContent || "",
+      description: current,
     },
   });
 
-  const { updateWebhook, isPending } = useUpdateWebhook(
-    endpoint as string,
-  );
+  const { updateWebhook, isPending } = useUpdateWebhook(endpoint as string);
+
+  useEffect(() => {
+    if (isDialogOpen) {
+      form.reset({ description: current });
+    }
+  }, [isDialogOpen, current, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     await updateWebhook(values);
@@ -90,7 +94,7 @@ export default function EditWebhookDescription({
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={current?.current?.textContent || ""}
+                      placeholder={"Enter endpoint description..."}
                       autoComplete="off"
                       {...field}
                     />
@@ -101,7 +105,7 @@ export default function EditWebhookDescription({
             />
           </form>
         </Form>
-         <DialogFooter className="flex justify-between w-full lg:items-center">
+        <DialogFooter className="flex justify-between w-full lg:items-center">
           <Button
             variant={"outline"}
             className="cursor-pointer"

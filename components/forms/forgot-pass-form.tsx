@@ -89,7 +89,7 @@ export default function ForgotPasswordForm() {
           )}
         </Button>
         <div className="w-full items-center justify-center flex">
-          <p className="font-medium text-zinc-700 text-sm">
+          <p className="font-medium text-zinc-700 dark:text-muted-foreground text-sm">
             Didn't receive email?{" "}
             {isPending ? (
               <span className="ml-2 text-blue-600">Resending...</span>

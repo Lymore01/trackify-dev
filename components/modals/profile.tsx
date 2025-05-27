@@ -57,14 +57,17 @@ export default function ProfileModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="grid place-content-center w-full h-screen fixed top-0 left-0 bg-[rgba(0,0,0,0.4)] z-50"
+        className="grid place-content-center w-full h-screen fixed top-0 left-0 bg-black/50 z-50"
+        onClick={() => openChange(false)}
+        aria-modal="true"
       >
         <motion.div
           initial={{ y: 100, opacity: 0, scale: 0.95 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 100, opacity: 0, scale: 0.95 }}
           transition={{ type: "spring", damping: 20, stiffness: 200 }}
-          className="bg-white dark:bg-slate-900 rounded-2xl w-[90vw] lg:w-[50vw] h-[85vh] flex flex-col relative overflow-auto shadow-xl"
+          className="bg-background rounded-2xl w-[90vw] lg:w-[50vw] h-[85vh] flex flex-col relative overflow-auto shadow-xl"
+           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex justify-between items-center p-4">
@@ -85,7 +88,7 @@ export default function ProfileModal({
               <h1 className="text-lg font-medium text-slate-800 dark:text-white">
                 Profile Information
               </h1>
-              <div className="bg-gray-100 dark:bg-slate-800 grid grid-cols-1 lg:grid-cols-2 rounded-xl w-full p-4 gap-6">
+              <div className="bg-gray-100 dark:bg-accent grid grid-cols-1 lg:grid-cols-2 rounded-xl w-full p-4 gap-6">
                 <div className="flex flex-col items-start gap-4">
                   <Image
                     src={"/images/profile.jpg"}
@@ -97,7 +100,7 @@ export default function ProfileModal({
                       alert("Image Clicked");
                     }}
                   />
-                  <Button className="bg-black hover:bg-indigo-700 transition cursor-pointer">
+                  <Button className="bg-black dark:bg-background dark:text-foreground hover:bg-indigo-700 transition cursor-pointer">
                     Change Image
                   </Button>
                 </div>
@@ -122,7 +125,7 @@ export default function ProfileModal({
               <div className="flex flex-col gap-4 mt-2">
                 <Button
                   variant="outline"
-                  className="flex items-center gap-2 text-red-600 border-red-200 hover:border-red-400 hover:bg-red-50 dark:hover:bg-slate-800 cursor-pointer"
+                  className="flex items-center gap-2 text-red-600 border-red-200 hover:border-red-400 hover:bg-red-50 dark:hover:bg-accent dark:hover:text-red-600 cursor-pointer"
                   onClick={handleLogout}
                 >
                   <LogOut size={16} />
@@ -158,7 +161,7 @@ export default function ProfileModal({
 
               {/* Password Form */}
               {showPasswordForm && (
-                <div className="space-y-4 mt-2 bg-slate-50 dark:bg-slate-800 p-4 rounded-md">
+                <div className="space-y-4 mt-2 bg-slate-50 dark:bg-background p-4 rounded-md">
                   <ChangePassForm />
                 </div>
               )}

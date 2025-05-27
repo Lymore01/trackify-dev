@@ -31,6 +31,7 @@ import { useUrl } from "@/hooks/use-url";
 import { LinkType } from "@/types/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import ConfirmDeletion from "./modals/confirm-deletion";
 
 export default function Links() {
   const searchParams = useSearchParams();
@@ -47,8 +48,12 @@ export default function Links() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [confirmDeletionOpen, setConfirmDeletionOpen] = useState(false);
+  let hostName: string = "";
 
-  const hostName = window.location.origin;
+  if (typeof window !== "undefined") {
+    hostName = window.location.origin;
+  }
   const data: LinkType = links?.data[0];
 
   const { mutateAsync: deleteUrl, isPending } = useMutation({
@@ -136,17 +141,13 @@ export default function Links() {
               {/* <DropdownMenuItem>Disable link</DropdownMenuItem> */}
               <DropdownMenuItem
                 className="text-red-600 hover:text-red-600"
-                onClick={handleUrlDelete}
-                disabled={isPending}
+                onClick={() => {
+                  startTransition(() => {
+                    setConfirmDeletionOpen(true);
+                  });
+                }}
               >
-                {isPending ? (
-                  <div className="flex gap-2 items-center">
-                    <Loader className="animate-spin" size={16} />
-                    <span>deleting...</span>
-                  </div>
-                ) : (
-                  <span>Delete</span>
-                )}
+                Delete Link
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -158,20 +159,26 @@ export default function Links() {
             <h1 ref={linkRef}>
               {hostName}/u/{data.shortId}
             </h1>
-            <div>
+            <div
+              className=""
+              onClick={() => {
+                navigator.clipboard.writeText(`${hostName}/u/${data.shortId}`);
+                toast.success("Link copied to clipboard");
+              }}
+            >
               <Copy size={16} className="cursor-pointer" />
             </div>
           </div>
           {/* overview */}
           <div className="rounded-lg border">
-            <div className="bg-slate-200 p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600">
+            <div className="bg-slate-200 dark:bg-accent dark:text-accent-foreground p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600">
               <h1>Overview</h1>
             </div>
             <Separator />
             <div className="p-4 text-sm space-y-4">
               <div className="flex justify-between items-center">
                 <h1>Original URL</h1>
-                <EditLinkURL current={originalLinkRef} linkID={data.id} />
+                <EditLinkURL current={data.original} linkID={data.id} />
               </div>
               <div className="p-2 border text-gray-600" ref={originalLinkRef}>
                 {data.original}
@@ -181,7 +188,7 @@ export default function Links() {
               <div className="flex justify-between items-center">
                 <h1>Description</h1>
                 <EditLinkDescription
-                  current={descriptionRef}
+                  current={data.description}
                   linkID={data.id}
                 />
               </div>
@@ -199,6 +206,13 @@ export default function Links() {
       </div>
       {/* anlaytics */}
       <LinkAnalytics />
+      {confirmDeletionOpen && (
+        <ConfirmDeletion
+          onCancel={() => setConfirmDeletionOpen(false)}
+          onDelete={handleUrlDelete}
+          isPending={isPending}
+        />
+      )}
     </div>
   );
 }

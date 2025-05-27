@@ -14,10 +14,10 @@ import ViewLinkAnalyticsDetails from "../forms/view-link-analytics";
 export default function AnalyticsTable() {
   return (
     <>
-      <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto bg-blue-50">
-        <TableCaption>A list of your links analytics.</TableCaption>
-        <TableHeader className="rounded-tr-lg rounded-tl-lg p-4">
-          <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase ">
+      <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto bg-blue-50 dark:bg-background">
+        {/* <TableCaption>A list of your links analytics.</TableCaption> */}
+        <TableHeader className="rounded-tr-lg rounded-tl-lg p-4 dark:bg-accent">
+          <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase dark:bg-accent">
             <TableHead>Date</TableHead>
             {/* <TableHead>No. of clicks</TableHead> */}
             <TableHead>IP</TableHead>

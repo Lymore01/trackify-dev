@@ -165,7 +165,7 @@ export default function RegistrationForm() {
           )}
         </Button>
         <div className="w-full items-center justify-center flex">
-          <p className="font-medium text-zinc-700 text-sm">
+          <p className="font-medium text-zinc-700 dark:text-muted-foreground text-sm">
             Have an account?{" "}
             <Link
               href={"/login"}

@@ -9,7 +9,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useApplications } from "@/hooks/use-applications";
 import { useAuth } from "@/hooks/use-auth";
 import { AppType } from "@/types/types";
-import { useQuery } from "@tanstack/react-query";
 import { Info, Search } from "lucide-react";
 import { useState } from "react";
 
@@ -32,11 +31,13 @@ export default function Dashboard() {
         </span>
       </h1>
 
-      <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-50 border border-blue-200 ml-2 lg:ml-0">
-        <Info size={16} className="text-blue-600" />
-        <p className="text-sm text-zinc-700">
-          <span className="text-blue-700 font-medium">Overview:</span> Your
-          current apps at a glance.
+      <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 ml-2 lg:ml-0">
+        <Info size={16} className="text-blue-600 dark:text-blue-400" />
+        <p className="text-sm text-zinc-700 dark:text-zinc-300 gap-2 flex">
+          <span className="text-blue-700 dark:text-blue-300 font-medium">
+            Overview:
+          </span>
+          Your current apps at a glance.
         </p>
       </div>
       <Separator className="my-4" />

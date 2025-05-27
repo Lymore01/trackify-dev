@@ -2,7 +2,7 @@ import { generateSalt, hashPassword } from "@/auth/core/password-hash";
 import { createSession } from "@/auth/core/session";
 import { cookies } from "next/headers";
 import { registerSchema } from "@/validations/authValidations";
-import { apiResponse } from "@/lib/utils";
+import { apiResponse, generateAPIKey } from "@/lib/utils";
 import { createUser, fetchUser } from "@/services/userServices";
 
 export async function POST(request: Request) {
@@ -35,10 +35,13 @@ export async function POST(request: Request) {
       salt
     )) as string;
 
+    const api_key = await generateAPIKey()
+
     const user = await createUser({
       ...userData,
       password: hashedPassword,
       salt: salt,
+      apiKey: api_key,
     });
 
     if (!user) {

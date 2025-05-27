@@ -22,7 +22,7 @@ export default function Webhooks() {
   const appId = searchParams.get("appId");
   const { app } = useParams();
 
-  const { data: webhook } = useQuery({
+  const { data: webhook,isLoading } = useQuery({
     queryKey: ["webhook", appId, endpoint],
     queryFn: async () => {
       const res = await fetch(`/api/webhooks/${appId}?endpoint=${endpoint}`, {
@@ -55,9 +55,9 @@ export default function Webhooks() {
         </BreadcrumbList>
       </Breadcrumb>
       <h1 className="text-xl my-2">Webhooks</h1>
-      <div className="flex items-start gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200">
-        <BookOpen size={18} className="text-blue-600 mt-1 hidden lg:block" />
-        <p className="text-sm text-zinc-700">
+      <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 ml-2 lg:ml-0">
+        <BookOpen size={18} className="text-blue-600 dark:text-blue-400 mt-1 hidden lg:block" />
+        <p className="text-sm text-zinc-700 dark:text-zinc-300 gap-2 flex">
           Learn how to use{" "}
           <span className="font-medium text-blue-700">Webhooks</span> with
           Trackify by reading our
@@ -75,7 +75,7 @@ export default function Webhooks() {
       {/* table */}
       <div className="mt-4">
         {endpoint ? (
-          <Endpoint endpoint={webhook} />
+          <Endpoint endpoint={webhook} isLoading={isLoading}/>
         ) : (
           <>
             <div className="flex items-center justify-between">

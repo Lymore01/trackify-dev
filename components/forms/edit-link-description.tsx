@@ -19,7 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RefObject, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -38,17 +38,23 @@ export default function EditLinkDescription({
   current,
   linkID,
 }: {
-  current: RefObject<HTMLHeadingElement | null>;
+  current: string ;
   linkID: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: current?.current?.textContent || "",
+      description: current,
     },
   });
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (isDialogOpen) {
+      form.reset({ description: current });
+    }
+  }, [isDialogOpen, current, form]);
 
   const { mutateAsync: updateLinkDescription, isPending } = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
@@ -103,8 +109,9 @@ export default function EditLinkDescription({
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={current?.current?.textContent || ""}
-                      autoComplete="off"
+                      placeholder={"Enter link description..."}
+                      className="resize-none"
+                      // autoComplete="off"
                       {...field}
                     />
                   </FormControl>

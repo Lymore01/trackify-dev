@@ -12,6 +12,7 @@ type WebhookPayload = {
 
 const useUpdateWebhook = (endpoint: string) => {
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const appId = searchParams.get("appId");
   const { mutateAsync: updateWebhook, isPending } = useMutation({
     mutationFn: async (payload: WebhookPayload) => {
@@ -30,6 +31,9 @@ const useUpdateWebhook = (endpoint: string) => {
     },
     onSuccess: (data) => {
       if (data.success) {
+        queryClient.invalidateQueries({
+          queryKey: ["webhook"],
+        });
         toast.success(data.message);
       } else {
         toast.error(data.message);

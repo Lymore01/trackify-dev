@@ -12,6 +12,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { WebhookIcon } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import Tag from "../tag";
 
 export type WebhookType = {
   id: string;
@@ -44,10 +45,10 @@ export default function EndpointsTable() {
     },
   });
   return (
-    <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto">
+    <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto bg-blue-50 dark:bg-background">
       <TableCaption>A list of your webhooks endpoints.</TableCaption>
-      <TableHeader className="rounded-tr-lg rounded-tl-lg p-4">
-        <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase ">
+      <TableHeader className="rounded-tr-lg rounded-tl-lg p-4 dark:bg-accent">
+        <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase dark:bg-accent">
           <TableHead>URL</TableHead>
           <TableHead>Error Rate</TableHead>
         </TableRow>
@@ -65,16 +66,16 @@ export default function EndpointsTable() {
                 <p className="truncate max-w-md">{webhook.url}</p>
               </TableCell>
               <TableCell>
-                <div className="bg-green-100 max-w-[60px] text-green-800 rounded-full px-3 py-1 text-xs font-medium mx-4 my-2">
-                  0.00%
-                </div>
+               <Tag>
+                0.00%
+               </Tag>
               </TableCell>
             </TableRow>
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={2}>
-              <p className="text-start text-gray-500 my-4 mx-4">
+            <TableCell colSpan={2} className="text-center">
+              <p className=" text-gray-500 my-4 mx-4">
                 No webhooks found. Please add a webhook to get started.
               </p>
             </TableCell>

@@ -18,9 +18,9 @@ export default function Webhook() {
       <h1 className="text-xl my-2 flex gap-2 items-center ml-2 lg:ml-0">
         Webhooks
       </h1>
-      <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-50 border border-blue-200 ml-2 lg:ml-0">
+      <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-50 border border-blue-200 ml-2 lg:ml-0 dark:bg-blue-900/20 dark:border-blue-700 ">
         <Info size={16} className="text-blue-600" />
-        <p className="text-sm text-zinc-700">
+        <p className="text-sm text-zinc-700 dark:text-zinc-300 gap-2 flex">
           <span className="font-medium text-blue-700">Select an App</span> to
           continue.
         </p>

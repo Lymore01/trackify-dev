@@ -15,6 +15,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import LinksSkeleton from "../skeletons/links-skeleton";
 import { useAnalytics } from "@/hooks/use-analytics";
+import { Table } from "lucide-react";
 
 export default function ViewLinkAnalyticsDetails() {
   const searchParmas = useSearchParams();
@@ -31,54 +32,41 @@ export default function ViewLinkAnalyticsDetails() {
   const data = analyticsData?.clicks[0]?.clicks;
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <>
-          {isLoading ? (
-            [...Array(4)].map((_, idx) => <LinksSkeleton key={idx} />)
-          ) : data?.length > 0 ? (
-            data.map((dataItem: any) => {
-              return (
-                <TableRow
-                  key={dataItem.id}
-                  className="hover:bg-gray-50 cursor-pointer"
-                >
-                  <TableCell>
-                    <p>{new Date(dataItem.createdAt).toLocaleString()}</p>
-                  </TableCell>
-                  {/* <TableCell className="flex items-center gap-2 my-2">
-                      <p className="truncate max-w-md">{data.length}</p>
-                    </TableCell> */}
-                  <TableCell>{dataItem.ip}</TableCell>
-                  <TableCell>
-                    <p>{dataItem.country}</p>
-                  </TableCell>
-                  <TableCell>
-                    <p>{dataItem.region ?? "Unknown"}</p>
-                  </TableCell>
-                  <TableCell>
-                    <p>{dataItem.userAgent}</p>
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          ) : (
+    <>
+      {isLoading ? (
+        [...Array(4)].map((_, idx) => <LinksSkeleton key={idx} />)
+      ) : data?.length > 0 ? (
+        data.map((dataItem: any) => {
+          return (
+            <TableRow
+              key={dataItem.id}
+              className="hover:bg-gray-50 dark:bg-background cursor-pointer"
+            >
+              <TableCell>
+                <p>{new Date(dataItem.createdAt).toLocaleString()}</p>
+              </TableCell>
+              <TableCell>{dataItem.ip}</TableCell>
+              <TableCell>
+                <p>{dataItem.country}</p>
+              </TableCell>
+              <TableCell>
+                <p>{dataItem.region ?? "Unknown"}</p>
+              </TableCell>
+              <TableCell>
+                <p>{dataItem.userAgent}</p>
+              </TableCell>
+            </TableRow>
+          );
+        })
+      ) : (
+        <TableRow>
+          <TableCell colSpan={5} className="text-center">
             <div className="text-gray-500 text-sm p-4">
               No clicks found for this link yet
             </div>
-          )}
-        </>
-      </DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-auto">
-        <DialogHeader>
-          <DialogTitle>https://trackify/shortid/cmdkss</DialogTitle>
-        </DialogHeader>
-        <Separator />
-        <div className="p-2 max-w-full max-h-[70vh] overflow-auto">graph</div>
-        <DialogFooter>
-          <Button>Close</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </TableCell>
+        </TableRow>
+      )}
+    </>
   );
 }

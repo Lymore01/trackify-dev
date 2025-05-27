@@ -29,7 +29,7 @@ export default function ProfileInfoCard({ name, email, plan }: Props) {
   };
 
   return (
-    <div className="space-y-6 w-full rounded-xl p-4 bg-white shadow-sm dark:bg-slate-900">
+    <div className="space-y-6 w-full rounded-xl p-4 bg-background shadow-sm">
       <FieldBlock
         label="Name"
         field="name"
@@ -52,10 +52,10 @@ export default function ProfileInfoCard({ name, email, plan }: Props) {
       />
 
       <div className="space-y-1">
-        <label htmlFor="plan" className="block text-sm font-medium text-black">
+        <label htmlFor="plan" className="block text-sm font-medium text-black dark:text-foreground">
           Current Plan
         </label>
-        <div className="flex items-center justify-between px-3 py-2 rounded-md bg-slate-50 dark:bg-slate-800">
+        <div className="flex items-center justify-between px-3 py-2 rounded-md bg-slate-50 dark:bg-accent">
           <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
             <Tag className="ml-[-4] flex">Free Plan</Tag>
           </span>
@@ -87,10 +87,10 @@ function FieldBlock({
 }) {
   return (
     <div className="space-y-1">
-      <label htmlFor={field} className="block text-sm font-medium text-black">
+      <label htmlFor={field} className="block text-sm font-medium text-black dark:text-foreground">
         {label}
       </label>
-      <div className="flex items-center justify-between px-3 py-2 rounded-md bg-slate-50 dark:bg-slate-800">
+      <div className="flex items-center justify-between px-3 py-2 rounded-md dark:bg-accent">
         {isEditing ? (
           <div className="flex w-full items-center justify-between gap-2">
             <input
@@ -116,7 +116,7 @@ function FieldBlock({
             <span id={field} className="text-sm text-slate-800 dark:text-slate-200">{value}</span>
             <Edit2
               onClick={onEdit}
-              className="text-black cursor-pointer hover:text-indigo-800 transition"
+              className="text-black dark:text-foreground cursor-pointer hover:text-indigo-800 transition"
               size={16}
             />
           </>

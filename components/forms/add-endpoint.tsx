@@ -88,7 +88,7 @@ export default function AddEndpoint() {
     <div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button className="cursor-pointer">
+          <Button className="cursor-pointer dark:bg-accent dark:text-accent-foreground">
             <Plus />
             Add Endpoint
           </Button>

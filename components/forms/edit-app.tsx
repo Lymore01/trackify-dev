@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,7 +26,6 @@ import { Loader } from "lucide-react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const formSchema = z.object({
   appName: z
@@ -34,44 +33,17 @@ const formSchema = z.object({
     .min(2, "Application name should be at least 2 characters long")
     .nonempty("Application name is required"),
 });
-export default function EditAppDialogTrigger({
-  currentAppName,
-}: {
-  currentAppName: string;
-}) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  return (
-    <>
-      <DropdownMenuItem
-        className="cursor-pointer"
-        onSelect={(e) => {
-          e.preventDefault();
-          setIsDialogOpen(true);
-        }}
-      >
-        Edit App
-      </DropdownMenuItem>
-
-      {isDialogOpen && (
-        <EditAppDialog
-          isOpen={isDialogOpen}
-          setIsOpen={setIsDialogOpen}
-          currentAppName={currentAppName}
-        />
-      )}
-    </>
-  );
-}
-
-function EditAppDialog({
+export default function EditAppDialog({
   isOpen,
   setIsOpen,
   currentAppName,
+  setDropdownOpen,
 }: {
   isOpen: boolean;
   setIsOpen: (val: boolean) => void;
   currentAppName: string;
+  setDropdownOpen: (val: boolean) => void;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,6 +51,12 @@ function EditAppDialog({
       appName: currentAppName,
     },
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({ appName: currentAppName });
+    }
+  }, [isOpen, currentAppName, form]);
 
   const searchParams = useSearchParams();
   const appId = searchParams.get("app");
@@ -95,11 +73,10 @@ function EditAppDialog({
       return await response.json();
     },
     onSuccess: (data) => {
-      toast.success("App name updated");
-      router.push(`/dashboard/links?app=${appId}&name=${data.name}`);
-      setIsOpen(false);
-      form.reset();
-      router.refresh();
+      toast.success(data.message);
+      setIsOpen(false); // ✅ manually close
+      form.reset({ appName: data.name }); // ✅ safely reset
+      router.replace(`/dashboard/links?app=${appId}&name=${data.name}`);
     },
     onError: (err: any) => toast.error(err.message),
   });
@@ -109,7 +86,13 @@ function EditAppDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setDropdownOpen(false);
+        setIsOpen(open);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit App Name</DialogTitle>
@@ -118,7 +101,7 @@ function EditAppDialog({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            id="edit-app-name-forms"
+            id="edit-app-name-form"
           >
             <FormField
               control={form.control}
@@ -136,12 +119,21 @@ function EditAppDialog({
           </form>
         </Form>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsOpen(false);
+              setDropdownOpen(false)
+            }}
+          >
             Cancel
           </Button>
-          <Button type="submit" form="edit-app-name-forms">
+          <Button type="submit" form="edit-app-name-form">
             {isPending ? (
-              <Loader size={16} className="animate-spin" />
+              <div className="flex items-center gap-2">
+                <Loader size={16} className="animate-spin" />
+                <span>Submitting...</span>
+              </div>
             ) : (
               "Submit"
             )}

@@ -86,12 +86,13 @@ export default function CreateApplication() {
     <div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button className="cursor-pointer">
+          <Button className="cursor-pointer dark:bg-accent dark:text-accent-foreground hover:dark:bg-sidebar-accent-hover">
+            <span className="sr-only">Create Application</span>
             <Plus />
             Create Application
           </Button>
         </DialogTrigger>
-        <Separator />
+    
 
         <DialogContent className="max-h-[90vh] w-[80vw] md:w-[60vw] lg:w-[50vw] overflow-auto">
           <DialogHeader>

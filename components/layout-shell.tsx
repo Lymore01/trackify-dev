@@ -23,8 +23,31 @@ import { Button } from "./ui/button";
 import Tag from "./tag";
 import ProfileInfoCard from "./profile-info-card";
 import ProfileModal from "./modals/profile";
+import { ModeToggle } from "./mode-toggle";
 
 const pathsWithTopNav = ["/dashboard/links"];
+
+export function ProfileTrigger({
+  setProfileOpen,
+}: {
+  setProfileOpen: (open: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center flex-row-reverse gap-2 mt-4">
+      <Image
+        src={"/images/profile.jpg"}
+        alt={"profile picture"}
+        width={28}
+        height={28}
+        className="rounded-full object-cover size-8 border-2 border-indigo-200 cursor-pointer"
+        onClick={() => {
+          setProfileOpen(true);
+        }}
+      />
+      <ModeToggle />
+    </div>
+  );
+}
 
 export default function LayoutShell({
   children,
@@ -51,16 +74,7 @@ export default function LayoutShell({
             <Menu onClick={handleOpenMenu} />
             <Logo />
           </div>
-          <Image
-            src={"/images/profile.jpg"}
-            alt={"profile picture"}
-            width={28}
-            height={28}
-            className="rounded-full object-cover size-8 border-2 border-indigo-200 cursor-pointer"
-            onClick={() => {
-              setProfileOpen(true);
-            }}
-          />
+          <ProfileTrigger setProfileOpen={setProfileOpen} />
         </div>
         {/* mobile menu */}
         {open && (
@@ -94,16 +108,7 @@ export default function LayoutShell({
         )}
         <div className="w-full relative">
           <div className="fixed top-0 w-full h-[40px] hidden lg:flex items-center justify-end px-4">
-            <Image
-              src={"/images/profile.jpg"}
-              alt={"profile picture"}
-              width={28}
-              height={28}
-              className="rounded-full object-cover size-8 border-2 border-indigo-200 cursor-pointer"
-              onClick={() => {
-                setProfileOpen(true);
-              }}
-            />
+            <ProfileTrigger setProfileOpen={setProfileOpen} />
           </div>
 
           {profileOpen && (

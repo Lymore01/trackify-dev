@@ -33,15 +33,15 @@ export default function LinksTable() {
   }
 
   return (
-    <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto">
+    <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto bg-blue-50 dark:bg-background">
       <TableCaption>A list of your shortened links.</TableCaption>
-      <TableHeader className="rounded-tr-lg rounded-tl-lg p-4">
-        <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase ">
+      <TableHeader className="rounded-tr-lg rounded-tl-lg p-4 dark:bg-accent ">
+        <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase dark:bg-accent">
           <TableHead>URL</TableHead>
           <TableHead>Total Clicks</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className="">
         {isLoading ? (
           [...Array(3)].map((_, idx) => <LinksSkeleton key={idx} />)
         ) : links.data?.length > 0 ? (
@@ -62,9 +62,13 @@ export default function LinksTable() {
             )
           )
         ) : (
-          <div className="text-gray-500 text-sm p-4">
-            Links not found! Create one.
-          </div>
+          <TableRow>
+            <TableCell colSpan={2} className="text-center">
+              <div className="text-gray-500 text-sm p-4">
+                No links found for this app.
+              </div>
+            </TableCell>
+          </TableRow>
         )}
       </TableBody>
     </Table>

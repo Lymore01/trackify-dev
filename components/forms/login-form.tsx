@@ -152,7 +152,7 @@ export default function LoginForm() {
                       <div className="leading-none">
                         <label
                           htmlFor="terms1"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-zinc-700"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-zinc-700 dark:text-muted-foreground"
                         >
                           Remember me for{" "}
                           <span className="text-blue-600 font-semibold">
@@ -183,7 +183,7 @@ export default function LoginForm() {
           )}
         </Button>
         <div className="w-full items-center justify-center flex">
-          <p className="font-medium text-zinc-700 text-sm">
+          <p className="font-medium text-zinc-700 dark:text-muted-foreground text-sm">
             Don't have an account?{" "}
             <Link
               href={"/signup"}

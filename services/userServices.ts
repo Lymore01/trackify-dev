@@ -26,6 +26,7 @@ export async function createUser(_data: {
   email: string;
   password: string;
   salt: string;
+  apiKey?: string;
 }) {
   return prisma.user.create({
     data: _data,
