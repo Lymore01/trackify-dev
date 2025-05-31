@@ -91,7 +91,7 @@ export default function AddLink() {
           <Button className="cursor-pointer dark:bg-accent dark:text-accent-foreground hover:dark:bg-sidebar-accent-hover">
             <span className="sr-only">Create Link</span>
             <Plus />
-            Add URL
+            Add Link
           </Button>
         </DialogTrigger>
         <Separator />

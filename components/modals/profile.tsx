@@ -100,7 +100,7 @@ export default function ProfileModal({
                       alert("Image Clicked");
                     }}
                   />
-                  <Button className="bg-black dark:bg-background dark:text-foreground hover:bg-indigo-700 transition cursor-pointer">
+                  <Button className="bg-black dark:bg-background dark:text-foreground hover:bg-indigo-700 transition cursor-pointer" disabled={user.name === "Test User"}>
                     Change Image
                   </Button>
                 </div>
@@ -135,6 +135,7 @@ export default function ProfileModal({
                 <Button
                   variant="destructive"
                   className="flex items-center gap-2 cursor-pointer"
+                  disabled={user.name === "Test User"}
                   onClick={() => {
                     const confirmDelete = confirm(
                       "Are you sure you want to delete your account? This action is irreversible."
@@ -162,7 +163,7 @@ export default function ProfileModal({
               {/* Password Form */}
               {showPasswordForm && (
                 <div className="space-y-4 mt-2 bg-slate-50 dark:bg-background p-4 rounded-md">
-                  <ChangePassForm />
+                  <ChangePassForm username={user.name}/>
                 </div>
               )}
             </div>

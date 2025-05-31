@@ -104,7 +104,7 @@ export default function Links() {
   if (!data) {
     return (
       <div className="flex items-center w-full text-gray-500 text-sm">
-        No link found
+        No link found or has been deleted
       </div>
     );
   }

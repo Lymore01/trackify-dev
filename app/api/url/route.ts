@@ -18,17 +18,20 @@ export async function POST(req: Request) {
 
     const headers = req.headers;
 
-    // get users using api key - for sdk use
-    // const user = await prisma.user.findUnique({
-    //   where: {
-    //     apiKey: headers.get("x-api-key") ?? "",
-    //   },
-    // });
-
-    const user = await getCurrentUser({
-      withFullUser: false,
-      redirectIfNotFound: false,
-    });
+    // SDK use: check for API key
+    let user = null;
+    const apiKey = headers.get("x-api-key");
+    if (apiKey) {
+      user = await prisma.user.findUnique({
+        where: { apiKey },
+      });
+    } else {
+      // Dashboard use: get current user
+      user = await getCurrentUser({
+        withFullUser: false,
+        redirectIfNotFound: false,
+      });
+    }
 
     if (!user) {
       return apiResponse(

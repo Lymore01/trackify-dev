@@ -1,24 +1,35 @@
 import { getCurrentUser } from "@/auth/core/getCurrentUser";
 import axiosInstance from "@/lib/axios";
+import { prisma } from "@/lib/prisma";
 import { apiResponse } from "@/lib/utils";
 import { fetchUserById } from "@/services/userServices";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   try {
-    const user = await getCurrentUser({
-      withFullUser: false,
-      redirectIfNotFound: false,
-    });
+    const headers = request.headers;
+    // SDK use: check for API key
+    let user = null;
+    const apiKey = headers.get("x-api-key");
+    if (apiKey) {
+      user = await prisma.user.findUnique({
+        where: { apiKey },
+      });
+    } else {
+      // Dashboard use: get current user
+      user = await getCurrentUser({
+        withFullUser: false,
+        redirectIfNotFound: false,
+      });
+    }
 
     if (!user) {
-      return NextResponse.json(
+      return apiResponse(
         {
-          error: "User not found",
+          success: false,
+          message: "User not found",
         },
-        {
-          status: 401,
-        }
+        401
       );
     }
 

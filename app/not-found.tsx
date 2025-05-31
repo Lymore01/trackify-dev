@@ -1,13 +1,22 @@
+"use client";
+
+import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function NotFound() {
+  const router = useRouter();
   return (
     <div className="flex flex-col lg:flex-row max-w-full max-h-screen overflow-auto relative">
-      <main className="flex-1 px-4 py-16 lg:px-8 lg:py-16 flex justify-start items-center relative">
-        <div className="absolute top-4 left-4">
-          <div className="grid size-10 shrink-0 place-content-center rounded-md bg-indigo-600">
+      <main className="flex-1 px-4 py-32 lg:px-8 lg:py-16 flex justify-start items-center relative">
+        <div className="absolute top-4 left-4 w-full flex justify-end lg:justify-between items-center">
+          <Link
+            href={"/"}
+            className="hidden lg:grid size-10 shrink-0 place-content-center rounded-md bg-indigo-600 "
+          >
             <svg
               width="24"
               height="auto"
@@ -20,17 +29,33 @@ export default function NotFound() {
                 fillRule="evenodd"
                 clipRule="evenodd"
                 d="M0 15V31H5C5.52527 31 6.04541 31.1035 6.53076 31.3045C7.01599 31.5055 7.45703 31.8001 7.82837 32.1716C8.19983 32.543 8.49451 32.984 8.69556 33.4693C8.89648 33.9546 9 34.4747 9 35V40H21L36 25V9H31C30.4747 9 29.9546 8.89655 29.4692 8.69553C28.984 8.49451 28.543 8.19986 28.1716 7.82843C27.8002 7.457 27.5055 7.01602 27.3044 6.53073C27.1035 6.04544 27 5.5253 27 5V0H15L0 15ZM17 30H10V19L19 10H26V21L17 30Z"
-                fill="#0004E8"
+                fill="#FFFFF"
               ></path>
             </svg>
+          </Link>
+          <div className="mr-8">
+            <ModeToggle />
           </div>
         </div>
-        <div className="space-y-4">
-          <h1 className="text-2xl text-zinc-700">Something's, missing...</h1>
-          <p className="text-sm text-gray-500">
+        <div className="flex flex-col space-y-4 text-center lg:text-start w-full max-w-md mx-auto items-center lg:items-start">
+          <Image
+            src="/images/not-found.png"
+            alt="not found image"
+            width={300}
+            height={300}
+            className="rounded-lg shadow-lg mb-4"
+            priority
+          />
+          <h1 className="text-2xl text-zinc-700 dark:text-foreground">
+            Something's, missing...
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-muted-foreground">
             This page is missing or you assembled <br></br>the wrong link
           </p>
-          <Button className="items-center flex gap-2 cursor-pointer group">
+          <Button
+            className="items-center flex gap-2 cursor-pointer group"
+            onClick={() => router.push("/")}
+          >
             <ArrowLeft
               size={16}
               className="hidden group-hover:block transition-all"
@@ -38,7 +63,7 @@ export default function NotFound() {
             <span>Go back home</span>
           </Button>
         </div>
-        <div className="absolute bottom-4 left-4">
+        <div className="fixed bottom-6 left-4">
           <p className="text-xs text-gray-500">
             copyright @ 2025-trackify. All rights recerved
           </p>

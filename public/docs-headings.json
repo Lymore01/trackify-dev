@@ -1,0 +1,203 @@
+[
+  {
+    "title": "Introduction",
+    "slug": "/docs",
+    "headings": [
+      {
+        "text": "Introduction",
+        "id": "introduction",
+        "level": 1
+      },
+      {
+        "text": "What is Trackify?",
+        "id": "what-is-trackify",
+        "level": 2
+      },
+      {
+        "text": "How to use Trackify",
+        "id": "how-to-use-trackify",
+        "level": 2
+      },
+      {
+        "text": "TL;DR;",
+        "id": "tl-dr",
+        "level": 2
+      },
+      {
+        "text": "Next Steps",
+        "id": "next-steps",
+        "level": 1
+      }
+    ]
+  },
+  {
+    "title": "Getting Started",
+    "slug": "/docs/getting-started",
+    "headings": [
+      {
+        "text": "Getting Started",
+        "id": "getting-started",
+        "level": 1
+      },
+      {
+        "text": "1. Create Your Account",
+        "id": "1-create-your-account",
+        "level": 2
+      },
+      {
+        "text": "2. Create Your First Link",
+        "id": "2-create-your-first-link",
+        "level": 2
+      },
+      {
+        "text": "3. Explore Analytics",
+        "id": "3-explore-analytics",
+        "level": 2
+      },
+      {
+        "text": "4. Integrate with Your App or Website",
+        "id": "4-integrate-with-your-app-or-website",
+        "level": 2
+      },
+      {
+        "text": "Next steps",
+        "id": "next-steps",
+        "level": 1
+      }
+    ]
+  },
+  {
+    "title": "Webhooks",
+    "slug": "/docs/getting-started/webhooks",
+    "headings": [
+      {
+        "text": "Webhooks",
+        "id": "webhooks",
+        "level": 1
+      }
+    ]
+  },
+  {
+    "title": "Sync Trackify Data to Your Apps Using Webhooks",
+    "slug": "/docs/getting-started/webhooks/sync-data",
+    "headings": [
+      {
+        "text": "Sync Trackify Data to Your Apps Using Webhooks",
+        "id": "sync-trackify-data-to-your-apps-using-webhooks",
+        "level": 1
+      },
+      {
+        "text": "1. Set Up Your Webhook Endpoint",
+        "id": "1-set-up-your-webhook-endpoint",
+        "level": 2
+      },
+      {
+        "text": "2. Expose Your Local Server with ngrok",
+        "id": "2-expose-your-local-server-with-ngrok",
+        "level": 2
+      },
+      {
+        "text": "3. Register Your Webhook Endpoint in Trackify",
+        "id": "3-register-your-webhook-endpoint-in-trackify",
+        "level": 2
+      },
+      {
+        "text": "4. Add Your Signing Secret to Your Environment",
+        "id": "4-add-your-signing-secret-to-your-environment",
+        "level": 2
+      },
+      {
+        "text": "5. Test Your Webhook Integration",
+        "id": "5-test-your-webhook-integration",
+        "level": 2
+      },
+      {
+        "text": "6. Triggering the Endpoint",
+        "id": "6-triggering-the-endpoint",
+        "level": 2
+      },
+      {
+        "text": "7. Securing and Configuring for Production",
+        "id": "7-securing-and-configuring-for-production",
+        "level": 2
+      },
+      {
+        "text": "Next Steps",
+        "id": "next-steps",
+        "level": 2
+      }
+    ]
+  },
+  {
+    "title": "Webhooks Overview",
+    "slug": "/docs/getting-started/webhooks/overview",
+    "headings": [
+      {
+        "text": "Webhooks Overview",
+        "id": "webhooks-overview",
+        "level": 1
+      },
+      {
+        "text": "How Webhooks Work",
+        "id": "how-webhooks-work",
+        "level": 2
+      },
+      {
+        "text": "Supported Events",
+        "id": "supported-events",
+        "level": 2
+      },
+      {
+        "text": "Example Payload: `link_clicked`",
+        "id": "example-payload-link_clicked",
+        "level": 2
+      },
+      {
+        "text": "Securing Your Webhook Endpoint",
+        "id": "securing-your-webhook-endpoint",
+        "level": 2
+      },
+      {
+        "text": "Next Steps",
+        "id": "next-steps",
+        "level": 1
+      }
+    ]
+  },
+  {
+    "title": "Installation",
+    "slug": "/docs/getting-started/installation",
+    "headings": [
+      {
+        "text": "Installation",
+        "id": "installation",
+        "level": 1
+      },
+      {
+        "text": "1. Install the SDK",
+        "id": "1-install-the-sdk",
+        "level": 2
+      },
+      {
+        "text": "or",
+        "id": "or",
+        "level": 1
+      },
+      {
+        "text": "2. Import and Initialize the Client",
+        "id": "2-import-and-initialize-the-client",
+        "level": 2
+      },
+      {
+        "text": "3. Usage Examples",
+        "id": "3-usage-examples",
+        "level": 2
+      },
+      {
+        "text": "Next Steps",
+        "id": "next-steps",
+        "level": 1
+      }
+    ]
+  }
+]

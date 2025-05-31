@@ -25,7 +25,8 @@ const formschema = z
   .object({
     currentPass: z
       .string()
-      .min(8, { message: "Password should be at least 8 characters long" }).optional(),
+      .min(8, { message: "Password should be at least 8 characters long" })
+      .optional(),
     newPass: z
       .string()
       .min(8, { message: "Password should be at least 8 characters long" }),
@@ -40,7 +41,7 @@ const formschema = z
 
 export type FormType = z.infer<typeof formschema>;
 
-export default function ChangePassForm() {
+export default function ChangePassForm({ username }: { username?: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
@@ -127,7 +128,11 @@ export default function ChangePassForm() {
           placeholder="Re-enter new password"
         />
 
-        <Button type="submit" className="w-full cursor-pointer">
+        <Button
+          type="submit"
+          className="w-full cursor-pointer"
+          disabled={username === "Test User"}
+        >
           {isPending ? (
             <Loader size={16} className="animate-spin" />
           ) : (

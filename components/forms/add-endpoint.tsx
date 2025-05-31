@@ -188,7 +188,7 @@ export default function AddEndpoint() {
             >
               {isPending ? (
                 <div className="flex gap-2 items-center">
-                  <Loader className="animate-spin" size-16 />
+                  <Loader className="animate-spin" size={16} />
                   <span>Creating...</span>
                 </div>
               ) : (

@@ -16,7 +16,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
-import { Eye, EyeClosed, EyeClosedIcon, Loader } from "lucide-react";
+import {
+  Building,
+  Eye,
+  EyeClosed,
+  EyeClosedIcon,
+  FlaskConical,
+  Loader,
+  TestTube2,
+  TestTubesIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
@@ -73,7 +82,6 @@ export default function LoginForm() {
   const onSubmit = async (values: FormType) => {
     await mutateAsync(values);
   };
-
 
   return (
     <Form {...form}>
@@ -181,6 +189,24 @@ export default function LoginForm() {
           ) : (
             <span>Login</span>
           )}
+        </Button>
+        <Button
+          className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white w-full flex items-center justify-center gap-2"
+          type="button"
+          onClick={async () => {
+            await mutateAsync({
+              email: "test@trackify.dev",
+              password: "testpassword",
+              rememberMe: true,
+            });
+          }}
+        >
+          {isPending && form.getValues("email") === "test@trackify.dev" ? (
+            <Loader size={16} className="animate-spin" />
+          ) : (
+            <FlaskConical />
+          )}
+          Testing (No need to provide credentials)
         </Button>
         <div className="w-full items-center justify-center flex">
           <p className="font-medium text-zinc-700 dark:text-muted-foreground text-sm">

@@ -28,6 +28,8 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ModeToggle } from "@/components/mode-toggle";
+import SearchDialog from "@/components/search-dialog";
+import Link from "next/link";
 
 const containerVariants = {
   hidden: {},
@@ -405,7 +407,20 @@ export const NavBar = () => {
         shadow-sm"
     >
       <Logo />
-      <div className="flex gap-2">
+      {/* menu options */}
+      <div className="hidden lg:flex items-center gap-8">
+        <ul className="flex items-center gap-8 text-slate-900 dark:text-muted-foreground text-sm">
+          <li className="cursor-pointer hover:text-foreground">Products</li>
+          <Link href={"/docs"} className="cursor-pointer hover:text-foreground">Docs</Link>
+          <li className="cursor-pointer hover:text-foreground">Pricing</li>
+          <li className="cursor-pointer hover:text-foreground">Company</li>
+        </ul>
+      </div>
+      <div className="flex gap-2 items-center">
+        {/* search dialog */}
+        <div className="flex items-center">
+          <SearchDialog />
+        </div>
         <ModeToggle />
         <div className="hidden lg:flex gap-2 items-center">
           <Button

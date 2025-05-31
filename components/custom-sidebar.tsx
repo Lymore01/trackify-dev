@@ -9,6 +9,7 @@ import { Separator } from "./ui/separator";
 import { useAuth } from "@/hooks/use-auth";
 import { SidebarContext, useCustomSidebar } from "@/contexts/useSidebar";
 import { useApplications } from "@/hooks/use-applications";
+import Tag from "./tag";
 
 export default function CustomSidebar({
   children,
@@ -160,7 +161,7 @@ const OptionGroup = ({
           setSelected={setSelected}
           open={open}
           notifs={
-            item.title === "Dashboard" && Array.isArray(apps)
+            item.title === "Dashboard" && Array.isArray(apps) && apps.length > 0
               ? apps.length
               : undefined
           }
@@ -190,8 +191,25 @@ const HeaderSection = ({ open }: { open: boolean }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.125 }}
             >
-              <span className="block text-sm font-semibold capitalize">{user.name}</span>
-              <span className="block text-xs text-gray-600">{user.plan}</span>
+              <span className="block text-sm font-semibold capitalize">
+                {user.name}
+              </span>
+              <span className="block text-xs">
+                {user.name === "Test User" ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold shadow-sm border border-indigo-600 animate-pulse">
+                    <svg
+                      className="w-3 h-3 mr-1 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 16 16"
+                    >
+                      <circle cx="8" cy="8" r="8" />
+                    </svg>
+                    Test Mode
+                  </span>
+                ) : (
+                  user.plan
+                )}
+              </span>
             </motion.div>
           )}
         </div>
@@ -202,10 +220,12 @@ const HeaderSection = ({ open }: { open: boolean }) => {
 };
 
 export const Logo = () => {
+  const router = useRouter();
   return (
     <motion.div
       layout
-      className="grid size-10 shrink-0 place-content-center rounded-md bg-indigo-600"
+      className="grid size-10 shrink-0 place-content-center rounded-md bg-indigo-600 cursor-pointer"
+      onClick={() => router.push("/")}
     >
       <svg
         width="24"

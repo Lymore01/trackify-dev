@@ -22,6 +22,7 @@ import { EllipsisVertical, Info, Loader, RefreshCcw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useApplications } from "@/hooks/use-applications";
 
 export default function Link() {
   const searchParams = useSearchParams();
@@ -30,6 +31,7 @@ export default function Link() {
   const appId = searchParams.get("app");
   const appName = searchParams.get("name");
   const queryClient = useQueryClient();
+  const { apps } = useApplications();
 
   const [confirmDeletionOpen, setConfirmDeletionOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -60,6 +62,19 @@ export default function Link() {
       }
     }
   };
+
+  const app = apps?.find((app: { id: string }) => app.id === appId);
+
+  if (!app) {
+    return (
+      <div className="flex flex-col h-max w-[100%] lg:w-[60%] mx-auto my-4 p-2 lg:p-0">
+        <h1 className="text-xl my-2">App not found</h1>
+        <p className="text-muted-foreground">
+          The requested app does not exist or has been deleted.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-max w-[100%] lg:w-[60%] mx-auto my-4 p-2 lg:p-0">

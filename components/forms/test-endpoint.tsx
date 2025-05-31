@@ -107,8 +107,6 @@ export default function TestEndpoint({
     },
   });
 
-  // "x-webhook-signature": generateHMAC(secret, JSON.stringify(data)),
-  // "x-api-key": "3b0b1b07-aba4-4188-9173-22a887660ac6",
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const dt = JSON.parse(payload);

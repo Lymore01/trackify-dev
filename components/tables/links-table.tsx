@@ -65,7 +65,7 @@ export default function LinksTable() {
           <TableRow>
             <TableCell colSpan={2} className="text-center">
               <div className="text-gray-500 text-sm p-4">
-                No links found for this app.
+                No links found for this app. add one
               </div>
             </TableCell>
           </TableRow>

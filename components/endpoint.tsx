@@ -94,9 +94,17 @@ export default function Endpoint({
 
   const handleDeleteEndpoint = async () => {
     await mutateAsync();
-    router.push(`/dashboard/${app}/webhooks?app=${appId}`);
+    router.push(`/dashboard/${app}/webhooks?appId=${appId}`);
     router.refresh();
   };
+
+  if (!endpoint || !endpoint.webhooks || endpoint.webhooks.length === 0) {
+    return (
+      <div className="flex items-center w-full text-gray-500 text-sm">
+        No endpoint found or has been deleted.
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col">
@@ -108,7 +116,7 @@ export default function Endpoint({
                 <BreadcrumbLink href={`/dashboard/${app}/webhooks?appId=${appId}`}>
                   Endpoints
                 </BreadcrumbLink>
-              </BreadcrumbItem>
+              </BreadcrumbItem> 
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 {isLoading ? (

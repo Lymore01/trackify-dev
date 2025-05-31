@@ -2,6 +2,8 @@ import { ControllerRenderProps } from "react-hook-form";
 import { Checkbox } from "./ui/checkbox";
 import { Input } from "./ui/input";
 import { useState } from "react";
+import { formSchema } from "./forms/add-endpoint";
+import { z } from "zod";
 
 const LINK_EVENTS: string[] = [
   "link_created",
@@ -11,18 +13,20 @@ const LINK_EVENTS: string[] = [
 ];
 const USER_EVENTS: string[] = ["user_created", "user_updated", "user_deleted"];
 
-export default function EventSelection({
-  field,
-}: {
-  field: ControllerRenderProps<
-    {
-      url?: string;
-      description?: string;
-      events: string[];
-    },
-    "events"
-  >;
-}) {
+type FormData = {
+  url?: string;
+  description: string;
+  events: string[];
+  app: string;
+};
+
+interface Props {
+  field: ControllerRenderProps<z.infer<typeof formSchema>, "events">;
+}
+
+export default function EventSelection(
+  { field }: Props
+) {
   const [searchValue, setSearchValue] = useState("");
   // Ensure field.value is always an array
   const selectedEvents = Array.isArray(field.value) ? field.value : [];
