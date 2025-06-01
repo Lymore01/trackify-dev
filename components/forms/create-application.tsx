@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,10 +28,17 @@ import { Input } from "../ui/input";
 import EventSelection from "../events-selection";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  applicationName: z.string().min(5, "Application name should be atleast 5 characters long").nonempty("Application name is required"),
+  applicationName: z
+    .string()
+    .min(2, "Application name should be atleast 2 characters long")
+    .nonempty("Application name is required"),
 });
+
+type ApplicationType = z.infer<typeof formSchema>;
 
 export default function CreateApplication() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -41,20 +48,51 @@ export default function CreateApplication() {
       applicationName: "",
     },
   });
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast.success("Application Created Successfully!");
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (data: ApplicationType) => {
+      const response = await fetch("/api/application", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          appName: data.applicationName,
+        }),
+      });
+      if (!response.ok) {
+        const res = await response.json();
+        throw new Error(res.message);
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+      setIsDialogOpen(false);
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const onSubmit = async (values: ApplicationType) => {
+    await mutateAsync(values);
   };
+
   return (
     <div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button className="cursor-pointer">
+          <Button className="cursor-pointer dark:bg-accent dark:text-accent-foreground hover:dark:bg-sidebar-accent-hover">
+            <span className="sr-only">Create Application</span>
             <Plus />
             Create Application
           </Button>
         </DialogTrigger>
-        <Separator />
+    
 
         <DialogContent className="max-h-[90vh] w-[80vw] md:w-[60vw] lg:w-[50vw] overflow-auto">
           <DialogHeader>
@@ -97,7 +135,7 @@ export default function CreateApplication() {
             </form>
           </Form>
           <Separator />
-          <DialogFooter className="flex justify-between items-center">
+          <DialogFooter className="flex justify-between w-full lg:items-center">
             <Button
               variant={"outline"}
               className="cursor-pointer"
@@ -113,7 +151,11 @@ export default function CreateApplication() {
               type="submit"
               form="create-app-form"
             >
-              Create
+              {isPending ? (
+                <Loader size={16} className="animate-spin" />
+              ) : (
+                <span>Create</span>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

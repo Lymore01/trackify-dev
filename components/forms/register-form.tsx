@@ -16,9 +16,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
-import { Eye, EyeClosed, EyeClosedIcon } from "lucide-react";
+import { Eye, EyeClosed, EyeClosedIcon, Loader } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 const formschema = z.object({
   name: z
@@ -31,7 +33,10 @@ const formschema = z.object({
     .min(8, { message: "Password should be at least 8 characters long" }),
 });
 
+type FormType = z.infer<typeof formschema>;
+
 export default function RegistrationForm() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formschema>>({
     resolver: zodResolver(formschema),
     defaultValues: {
@@ -41,9 +46,36 @@ export default function RegistrationForm() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formschema>) => {
-    console.log(values);
-    toast.success("User Registered in Successfully");
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (data: FormType) => {
+      const response = await fetch("/api/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        }),
+      });
+      if (!response.ok) {
+        const res = await response.json();
+        throw new Error(res.message);
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+      router.push(data.redirectUrl);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const onSubmit = async (values: FormType) => {
+    await mutateAsync(values);
   };
 
   return (
@@ -118,18 +150,22 @@ export default function RegistrationForm() {
                   </div>
                 </FormControl>
                 <FormDescription>
-                  Password should be atleast 8 characters long.
+                  Password should be at least 8 characters long.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
             );
           }}
         />
-        <Button type="submit" className="w-full">
-          Register
+        <Button type="submit" className="w-full shrink-0 cursor-pointer">
+          {isPending ? (
+            <Loader size={16} className="animate-spin" />
+          ) : (
+            <span>Register</span>
+          )}
         </Button>
         <div className="w-full items-center justify-center flex">
-          <p className="font-medium text-zinc-700 text-sm">
+          <p className="font-medium text-zinc-700 dark:text-muted-foreground text-sm">
             Have an account?{" "}
             <Link
               href={"/login"}

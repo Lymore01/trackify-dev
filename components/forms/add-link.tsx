@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,17 +25,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "../ui/input";
-import EventSelection from "../events-selection";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 
 const formSchema = z.object({
   originalUrl: z.string().url().nonempty("Original URL is required"),
-  description: z.string().min(5, "Description must be at least 5 characters").optional(),
+  description: z.string().optional(),
+  appId: z.string().optional(),
 });
 
 export default function AddLink() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const searchParams = useSearchParams();
+  const app = searchParams.get("app");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,17 +48,50 @@ export default function AddLink() {
       description: "",
     },
   });
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch("/api/url", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error(await response.json().then((res) => res.message));
+      }
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast.success("URL added successfully");
+      setIsDialogOpen(false);
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["links"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to add URL");
+    },
+  });
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast.success("URL added Successfully!");
+    const data = {
+      ...values,
+      appId: app ?? "",
+    };
+
+    await mutateAsync(data);
   };
+
   return (
     <div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button className="cursor-pointer">
+          <Button className="cursor-pointer dark:bg-accent dark:text-accent-foreground hover:dark:bg-sidebar-accent-hover">
+            <span className="sr-only">Create Link</span>
             <Plus />
-            Add URL
+            Add Link
           </Button>
         </DialogTrigger>
         <Separator />
@@ -62,7 +100,7 @@ export default function AddLink() {
           <DialogHeader>
             <DialogTitle className="font-medium">Add URL</DialogTitle>
             <DialogDescription>
-              Please add a valid URL to be shortend
+              Please add a valid URL to be shorted
             </DialogDescription>
           </DialogHeader>
           <Separator />
@@ -71,18 +109,16 @@ export default function AddLink() {
             <form
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6"
-              id="add-endpoint-form"
+              id="add-link-form"
             >
               <FormField
                 control={form.control}
                 name="originalUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="relative flex gap-1"> 
-                    <FormLabel>Original URL</FormLabel>
-                    <div className="h-full text-red-400 font-bold">
-                      *
-                    </div>  
+                    <div className="relative flex gap-1">
+                      <FormLabel>Original URL</FormLabel>
+                      <div className="h-full text-red-400 font-bold">*</div>
                     </div>
                     <FormControl>
                       <Input
@@ -120,7 +156,7 @@ export default function AddLink() {
             </form>
           </Form>
           <Separator />
-          <DialogFooter className="flex justify-between items-center">
+          <DialogFooter className="flex justify-between w-full lg:items-center">
             <Button
               variant={"outline"}
               className="cursor-pointer"
@@ -134,9 +170,13 @@ export default function AddLink() {
             <Button
               className="cursor-pointer"
               type="submit"
-              form="add-endpoint-form"
+              form="add-link-form"
             >
-              Add
+              {isPending ? (
+                <Loader className="animate-spin" size={16} />
+              ) : (
+                <span>Add</span>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

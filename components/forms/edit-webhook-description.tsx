@@ -19,13 +19,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RefObject, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
+import useUpdateWebhook from "@/hooks/use-update-webhook";
+import { useSearchParams } from "next/navigation";
+import { Loader } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   description: z.string(),
@@ -34,17 +38,34 @@ const formSchema = z.object({
 export default function EditWebhookDescription({
   current,
 }: {
-  current: RefObject<HTMLHeadingElement | null>;
+  current: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
+  const endpoint = searchParams.get("endpoint");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: current?.current?.textContent || "",
+      description: current,
     },
   });
+
+  const { updateWebhook, isPending } = useUpdateWebhook(endpoint as string);
+
+  useEffect(() => {
+    if (isDialogOpen) {
+      form.reset({ description: current });
+    }
+  }, [isDialogOpen, current, form]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    await updateWebhook(values);
+    setIsDialogOpen(false);
+    form.reset();
+    queryClient.invalidateQueries({
+      queryKey: ["webhooks"],
+    });
   };
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -73,7 +94,7 @@ export default function EditWebhookDescription({
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={current?.current?.textContent || ""}
+                      placeholder={"Enter endpoint description..."}
                       autoComplete="off"
                       {...field}
                     />
@@ -84,7 +105,7 @@ export default function EditWebhookDescription({
             />
           </form>
         </Form>
-        <DialogFooter className="flex justify-between items-center">
+        <DialogFooter className="flex justify-between w-full lg:items-center">
           <Button
             variant={"outline"}
             className="cursor-pointer"
@@ -100,7 +121,14 @@ export default function EditWebhookDescription({
             type="submit"
             form="edit-webhook-desc-form"
           >
-            Submit
+            {isPending ? (
+              <div className="flex items-center gap-2">
+                <Loader className="animate-spin" size={16} />
+                <span>Submitting...</span>
+              </div>
+            ) : (
+              <span>Submit</span>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

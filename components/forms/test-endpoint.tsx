@@ -24,10 +24,22 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { EventType } from "@/types/types";
-import { Loader } from "lucide-react";
+import { Copy, Loader } from "lucide-react";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
-import { generateHMAC } from "@/lib/utils";
+import { generateCurlCommand, generateHMAC } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
+import Tag from "../tag";
+import { sendEvents } from "@/auth/webhooks/webhook";
 
 const formSchema = z.object({
   event: z.string().min(1, "Event type is required") as z.ZodType<EventType>,
@@ -41,11 +53,10 @@ export default function TestEndpoint({
   secret: string;
 }) {
   const [payload, setPayload] = useState("");
-  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      event: "user.created",
+      event: "link_clicked" as EventType, 
     },
   });
 
@@ -59,42 +70,57 @@ export default function TestEndpoint({
     }
   }, [event]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const data = {
-      ...values,
-      ...JSON.parse(payload),
-    };
-    console.log(data)
-    try {
-      setLoading(true);
-      const response = await axiosInstance.post(
-        "https://df7b-41-89-16-2.ngrok-free.app/webhook/docx", //! fix: replace it with dynamic url
-        data,
-        {
+  const {
+    mutateAsync,
+    isPending,
+    data: webhookData,
+  } = useMutation({
+    mutationFn: async (data: any) => {
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-webhook-signature": generateHMAC(secret, JSON.stringify(data)),
-            "x-api-key": "3b0b1b07-aba4-4188-9173-22a887660ac6", //! fix: remove this
+            "trackify-webhook-signature": generateHMAC(
+              secret,
+              JSON.stringify(data)
+            ),
           },
-        }
-      );
-      console.log(response.data)
-      setLoading(false);
-      toast.success("Test Sent Successfully!");
-    } catch (error) {
-      setLoading(false);
+          body: JSON.stringify(data),
+        });
+        const responseData = await response.json();
+        console.log(data);
+        return responseData;
+      } catch (error) {
+        console.error("Error sending webhook request:", error);
+        throw error;
+      }
+    },
+    onSuccess: (data) => {
+      toast.success("Test Passed Successfully!");
+      console.log("Webhook Test Success:", data);
+      // Log the webhook request
+    },
+    onError: (error) => {
       toast.error("Test Example Failed!");
-    }
+      console.log("Webhook Test Error:", error);
+    },
+  });
+
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const dt = JSON.parse(payload);
+    await mutateAsync(dt.data);
   };
 
   return (
     <div className="rounded-lg border">
-      <div className="bg-slate-200 p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600">
+      <div className="bg-slate-200 dark:bg-accent dark:text-accent-foreground p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600">
         <h1>Testing</h1>
       </div>
       <Separator />
       <div className="p-4 text-sm space-y-4">
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-foreground">
           Use this tool to validate your webhook endpoints and ensure they're
           ready to receive real-time event notifications. Enter your details
           below to simulate events and analyze responses.
@@ -111,7 +137,7 @@ export default function TestEndpoint({
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder={USER_EVENTS[0]} />
+                        <SelectValue placeholder={LINK_EVENTS[0]} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
@@ -123,14 +149,14 @@ export default function TestEndpoint({
                           ))}
                         </SelectGroup>
 
-                        <SelectGroup>
+                        {/* <SelectGroup>
                           <SelectLabel>Users</SelectLabel>
                           {USER_EVENTS.map((userEvt, idx) => (
                             <SelectItem value={userEvt} key={`user-${idx}`}>
                               {userEvt}
                             </SelectItem>
                           ))}
-                        </SelectGroup>
+                        </SelectGroup> */}
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -148,17 +174,75 @@ export default function TestEndpoint({
         </div>
         <div className="mt-4">
           <Button
-            className="cursor-pointer"
+            className="cursor-pointer dark:bg-accent dark:text-accent-foreground"
             type="submit"
             form="test-endpoint-form"
           >
-            {loading ? (
-              <Loader className="animate-spin" size={16} />
+            {isPending ? (
+              <div className="flex gap-2 items-center">
+                <Loader className="animate-spin" size={16} />
+                <span>Sending...</span>
+              </div>
             ) : (
               <span>Send Example</span>
             )}
           </Button>
         </div>
+        <div>
+          <div className="flex justify-between items-center">
+            <p>Or, Use cURL command</p>
+            <Copy
+              className="cursor-pointer"
+              size={16}
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  generateCurlCommand(endpoint, payload)
+                );
+                toast.success("cURL command copied to clipboard");
+              }}
+            />
+          </div>
+          <CodeDisplay codeString={generateCurlCommand(endpoint, payload)} />
+        </div>
+      </div>
+      <div className="px-4 py-2">
+        {/* tests */}
+        {webhookData?.summary && (
+          <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto">
+            <TableCaption>Test results</TableCaption>
+            <TableHeader className="rounded-tr-lg rounded-tl-lg p-4">
+              <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase ">
+                <TableHead>Request</TableHead>
+                <TableHead>Status Code</TableHead>
+                <TableHead>Time</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow className="hover:bg-gray-50 cursor-pointer">
+                <TableCell className="flex items-center gap-2 my-2">
+                  <p className="truncate max-w-md">
+                    {webhookData?.summary.method}{" "}
+                    {webhookData?.summary.pathName}
+                  </p>
+                </TableCell>
+                <TableCell>
+                  <Tag
+                    variant={
+                      webhookData?.summary.statusCode === 200
+                        ? "default"
+                        : "error"
+                    }
+                  >
+                    {webhookData?.summary.statusCode}
+                  </Tag>
+                </TableCell>
+                <TableCell>
+                  <p>{webhookData?.summary.time}</p>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );

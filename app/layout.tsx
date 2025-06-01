@@ -4,6 +4,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import CustomSidebar from "@/components/custom-sidebar";
 import TopNav from "@/components/top-nav";
+import { ReactQueryProvider } from "../lib/react-query-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const lexend = localFont({
   src: [
@@ -30,16 +32,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${lexend.className} antialiased font-sans flex`}>
-        <CustomSidebar />
-        <div className="w-full">
-          <div className="flex w-[60%] mx-auto py-2">
-            <TopNav />
-          </div>
-          {children}
-        </div>
-        <Toaster richColors />
+        <ReactQueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="w-full">{children}</div>
+            <Toaster richColors />
+          </ThemeProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

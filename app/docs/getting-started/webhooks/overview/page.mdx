@@ -1,0 +1,116 @@
+import Spacer from "@/components/docs/spacer"
+import CodeDisplay from "@/components/code-display"
+import NextSteps from "@/components/docs/next-steps-card";
+
+# Webhooks Overview
+
+<Spacer />
+
+Trackify webhooks allow your application to receive real-time notifications about important events, such as when a link is clicked, created, updated, or deleted. This enables you to automate workflows, update analytics, or trigger custom logic in your own systems.
+
+<Spacer />
+
+## How Webhooks Work
+
+<Spacer />
+
+A webhook is an event-driven way for Trackify to notify your application when something happens such as a link being clicked or created. 
+
+<Spacer />
+
+Instead of constantly polling the Trackify API for updates, your server simply listens for incoming HTTP POST requests from Trackify when relevant events occur.
+
+Webhooks are **asynchronous**: Trackify will send the event as soon as possible, but delivery is not guaranteed to be instant or even successful (for example, if your server is down).  
+**Do not** use webhooks for critical, synchronous flows where you must confirm delivery before proceeding. Instead, use webhooks for tasks like updating analytics, sending notifications, or triggering background jobs. For real-time, guaranteed flows (like onboarding), use direct API calls and treat webhooks as a supplement for automation and monitoring.
+
+<Spacer />
+
+## Supported Events
+
+<Spacer />
+
+Trackify currently supports the following webhook events:
+
+- `link_created`
+- `link_updated`
+- `link_deleted`
+- `link_clicked`
+
+<Spacer />
+
+## Example Payload: `link_clicked`
+
+<Spacer />
+
+When a user clicks a Trackify link, a `link_clicked` event is sent to your webhook endpoint with the following payload structure:
+
+<CodeDisplay
+  language="json"
+  codeString={`{
+  "type": "link_clicked",
+  "data": {
+    "shortId": "abc123",
+    "ip": "102.123.45.67",
+    "country": "Kenya",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/113.0.0.0 Safari/537.36",
+    "geo": {
+      "city": "Nairobi",
+      "region": "Nairobi County",
+      "lat": -1.2921,
+      "lon": 36.8219
+    },
+    "deviceInfo": {
+      "type": "desktop"
+    }
+  }
+}`}
+/>
+
+<Spacer />
+
+## Securing Your Webhook Endpoint
+
+<Spacer />
+
+To ensure that incoming webhook requests are genuinely from Trackify and have not been tampered with, each webhook request includes a signature header:  
+`x-webhook-signature`
+
+You should verify this signature in your backend before processing the event.
+
+<Spacer />
+
+### Example: Verifying the Webhook Signature (Node.js)
+
+<CodeDisplay
+  language="typescript"
+  codeString={`import Webhook from "trackify-sdk/webhook";
+
+const secret = process.env.TRACKIFY_WEBHOOK_SECRET!;
+
+const webhook = new Webhook(secret);
+
+try {
+  const event = webhook.verify(
+    req.body, // raw request body as string or Buffer
+    { "webhook-signature": req.headers["x-webhook-signature"] as string }
+  );
+  // Process the event
+} catch (err) {
+  // Invalid signature or malformed payload
+  res.status(400).send("Invalid webhook signature");
+}
+`}
+/>
+
+<Spacer />
+
+> 💡 **Tip:**  
+> Always keep your webhook secret safe and never expose it in client-side code. Only accept POST requests from trusted sources, and validate the signature for every incoming webhook.
+
+<Spacer />
+
+# Next Steps
+
+<Spacer />
+<NextSteps title={"Sync Data"} description=" Sync Trackify data to your app with webhooks " href="/docs/getting-started/webhooks/sync-data"/>
+

@@ -1,0 +1,111 @@
+import Spacer from "@/components/docs/spacer"
+import CodeDisplay from "@/components/code-display"
+
+# Installation
+
+<Spacer />
+
+To get started with the Trackify SDK, follow these steps to install and configure it in your project.
+
+<Spacer />
+
+## 1. Install the SDK
+
+<Spacer />
+
+You can install the Trackify SDK from npm:
+
+<CodeDisplay codeString={`npm install trackify-sdk
+# or
+yarn add trackify-sdk`} language="bash"/>
+
+<Spacer />
+
+## 2. Import and Initialize the Client
+
+<Spacer />
+
+Import the `createClient` function from the SDK and initialize it with your Trackify API key and API URL:
+
+<CodeDisplay codeString={`
+import { createClient } from "trackify-sdk";
+
+const client = createClient(
+  "YOUR_TRACKIFY_API_KEY", // Replace with your API key
+  "https://api.trackify.dev" // Replace with your Trackify API URL
+);
+`}/>
+
+<Spacer />
+
+## 3. Usage Examples
+
+<Spacer />
+
+### List All Apps
+<CodeDisplay codeString={`
+const apps = await client.listApps();
+`}/>
+
+<Spacer />
+
+### Create a New App
+<CodeDisplay codeString={`
+const app = await client.createApp("my.new.app");
+`}/>
+
+<Spacer />
+
+### Get a Link API Instance for an App
+<CodeDisplay codeString={`
+// Use linkApi to manage links for this app
+const linkApi = await client.from("Your App Name");
+`}/>
+
+<Spacer />
+
+### List All Links for an App
+<CodeDisplay codeString={`
+const links = await linkApi.getLinks();
+`}/>
+
+<Spacer />
+
+### Create a New Link
+<CodeDisplay codeString={`
+const createdLink = await linkApi.createLink({
+  original: "https://www.example.com/",
+  description: "Example description",
+});
+`}/>
+
+<Spacer />
+
+### Update a Link
+<CodeDisplay codeString={`
+const updatedLink = await linkApi.updateLink("your-link-id", {
+  originalUrl: "https://www.updated-url.com/",
+  description: "Updated description",
+});
+`}/>
+
+<Spacer />
+
+### Delete a Link
+<CodeDisplay codeString={`
+const deleteLink = await linkApi.deleteLink("your-link-id");
+`}/>
+
+<Spacer />
+
+# Next Steps
+
+<Spacer />
+
+- See the [Getting Started](/docs/getting-started) guide for a quick walkthrough.
+- Make sure you have your Trackify API key and URL from your dashboard.
+
+<Spacer />
+
+> 💡 **Tip:**  
+> For security, never expose your API key in client-side code. Use the SDK in server-side or backend environments.

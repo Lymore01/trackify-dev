@@ -1,62 +1,82 @@
+"use client";
+
 import ApplicationCard from "@/components/cards/applications-card";
 import CreateApplication from "@/components/forms/create-application";
-import Tag from "@/components/tag";
-import { Button } from "@/components/ui/button";
+import SearchModal from "@/components/modals/search";
+import ApplicationCardSkelton from "@/components/skeletons/application-card-skelton";
 import { Separator } from "@/components/ui/separator";
-import { ArrowRight, Info, Plus } from "lucide-react";
-
-const apps = [
-  {
-    id: 1,
-    appName: "Docx",
-    plan: "Free Plan",
-    lastUpdated: "1 day ago",
-    link: "/dashboard/links",
-  },
-  {
-    id: 2,
-    appName: "Bintage",
-    plan: "Premium Plan",
-    lastUpdated: "3 days ago",
-    link: "/dashboard/links",
-  },
-  {
-    id: 3,
-    appName: "Shortly",
-    plan: "Free Plan",
-    lastUpdated: "5 hours ago",
-    link: "/dashboard/links",
-  },
-  {
-    id: 4,
-    appName: "AnalyticsPro",
-    plan: "Enterprise Plan",
-    lastUpdated: "2 weeks ago",
-    link: "/dashboard/links",
-  },
-];
+import { Skeleton } from "@/components/ui/skeleton";
+import { useApplications } from "@/hooks/use-applications";
+import { useAuth } from "@/hooks/use-auth";
+import { AppType } from "@/types/types";
+import { Info, Search } from "lucide-react";
+import { useState } from "react";
 
 export default function Dashboard() {
+  const { apps, isError, isLoading } = useApplications();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const user = useAuth();
+
+  if (isError) return <div>Error fetching applications</div>;
   return (
-    <div className="flex flex-col h-max w-[60%] mx-auto my-4 bg-[]">
-      <h1 className="text-xl my-2">Hello👋, Kelly!</h1>
-      <div className="flex gap-2 items-center">
-        <Info size={16} />
-        <p className="text-zinc-700 text-sm">Overview of your applications.</p>
+    <div className="flex flex-col h-max w-[100%] lg:w-[60%] mx-auto my-4">
+      <h1 className="text-xl my-2 flex gap-2 items-center ml-2 lg:ml-0">
+        Hello👋,{" "}
+        <span>
+          {isLoading ? (
+            <Skeleton className="w-24 h-6" />
+          ) : (
+            <span>{user.name}</span>
+          )}
+        </span>
+      </h1>
+
+      <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 ml-2 lg:ml-0">
+        <Info size={16} className="text-blue-600 dark:text-blue-400" />
+        <p className="text-sm text-zinc-700 dark:text-zinc-300 gap-2 flex">
+          <span className="text-blue-700 dark:text-blue-300 font-medium">
+            Overview:
+          </span>
+          Your current apps at a glance.
+        </p>
       </div>
       <Separator className="my-4" />
       {/* applications */}
-      <div className="mt-4 space-y-4">
+      <div className="mt-4 space-y-4 p-2 lg:p-0">
         <div className="flex items-center justify-between">
           <h1>Applications</h1>
-          <CreateApplication />
+          <div className="flex items-center gap-4">
+            <Search
+              size={16}
+              className="cursor-pointer"
+              onClick={() => {
+                setSearchOpen(true);
+              }}
+            />
+            <CreateApplication />
+          </div>
         </div>
-        <div className="grid grid-cols-3 gap-4">
-          {apps.map((app) => (
-            <ApplicationCard key={app.id} app={app} />
-          ))}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {isLoading ? (
+            [...Array(3)].map((_, idx) => <ApplicationCardSkelton key={idx} />)
+          ) : apps?.length > 0 ? (
+            apps.map((app: AppType) => (
+              <ApplicationCard key={app.id} app={app} />
+            ))
+          ) : (
+            <div className="text-gray-500 text-sm">
+              Apps not found! Create one.
+            </div>
+          )}
         </div>
       </div>
+      {searchOpen && (
+        <SearchModal
+          open={searchOpen}
+          openChange={setSearchOpen}
+          applications={apps}
+        />
+      )}
     </div>
   );
 }

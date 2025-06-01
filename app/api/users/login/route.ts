@@ -1,50 +1,69 @@
-import axiosInstance from "@/lib/axios";
-import { NextResponse } from "next/server";
+import { comparePassword } from "@/auth/core/password-hash";
+import { createSession } from "@/auth/core/session";
+import { cookies } from "next/headers";
+import { loginSchema } from "@/validations/authValidations";
+import { apiResponse } from "@/lib/utils";
+import { fetchUser } from "@/services/userServices";
 
-// register
 export async function POST(request: Request) {
   try {
-    const body: Pick<User, "email" | "password"> = await request.json();
-    const { email, password } = body;
+    const body = await request.json();
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password are required!" },
-        { status: 400 }
+    const { data: userData, success } = loginSchema.safeParse(body);
+
+    if (!success) {
+      return apiResponse(
+        { success: false, message: "Invalid request body" },
+        400
       );
     }
 
-    const response = await axiosInstance.post("/auth/login", body);
+    const user = await fetchUser(userData.email);
 
-    if (response.data.success === false) {
-      return NextResponse.json(
+    if (!user) {
+      return apiResponse(
         {
-          error: "Login attempt failed!",
-          details: response.data.error,
+          success: false,
+          message: "Invalid Email or Password",
         },
-        {
-          status: 400,
-        }
+        400
       );
     }
 
-    return NextResponse.json(
+    const isCorrectPassword = await comparePassword({
+      password: userData.password,
+      hashedPassword: user.password,
+      salt: user.salt,
+    });
+
+    if (!isCorrectPassword) {
+      return apiResponse(
+        {
+          success: false,
+          message: "Invalid Email or Password",
+        },
+        400
+      );
+    }
+
+    await createSession(
       {
-        user: response.data,
+        id: user.id,
+        email: user.email,
       },
+      await cookies()
+    );
+
+    return apiResponse(
       {
-        status: 201,
-      }
+        success: true,
+        message: "User Logged in Successfull, Redirecting....",
+        redirectUrl: "/dashboard",
+      },
+      201
     );
   } catch (error) {
-    console.error("Error logging in user", (error as Error).message);
-    return NextResponse.json(
-      {
-        error: "Internal Server Error!",
-      },
-      {
-        status: 500,
-      }
-    );
+    console.error("POST /api/login error:", error);
+    return apiResponse({ error: "Internal Server Error" }, 500);
   }
 }

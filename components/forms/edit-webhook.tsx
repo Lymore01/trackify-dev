@@ -19,32 +19,54 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RefObject, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+import useUpdateWebhook from "@/hooks/use-update-webhook";
+import { Loader } from "lucide-react";
 
-const formSchema = z.object({
+export const webhookFormSchema = z.object({
   url: z.string().url().nonempty("URL is required"),
 });
 
 export default function EditWebhook({
   current,
 }: {
-  current: RefObject<HTMLHeadingElement | null>;
+  current: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
+  const endpoint = searchParams.get("endpoint");
+  const form = useForm<z.infer<typeof webhookFormSchema>>({
+    resolver: zodResolver(webhookFormSchema),
     defaultValues: {
-      url: current?.current?.textContent || "",
+      url: current,
     },
   });
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+
+  const { updateWebhook, isPending } = useUpdateWebhook(endpoint as string);
+
+  useEffect(() => {
+    if (isDialogOpen) {
+      form.reset({ url: current });
+    }
+  }, [isDialogOpen, current, form]);
+
+  const onSubmit = async (values: z.infer<typeof webhookFormSchema>) => {
+    await updateWebhook(values);
+    setIsDialogOpen(false);
+    form.reset();
+    queryClient.invalidateQueries({
+      queryKey: ["webhooks"],
+    });
   };
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
@@ -69,7 +91,7 @@ export default function EditWebhook({
                   <FormLabel>Endpoint URL</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={current?.current?.textContent || ""}
+                      placeholder={"Enter endpoint url..."}
                       autoComplete="off"
                       {...field}
                     />
@@ -83,7 +105,7 @@ export default function EditWebhook({
             />
           </form>
         </Form>
-        <DialogFooter className="flex justify-between items-center">
+        <DialogFooter className="flex justify-between w-full lg:items-center">
           <Button
             variant={"outline"}
             className="cursor-pointer"
@@ -99,7 +121,14 @@ export default function EditWebhook({
             type="submit"
             form="edit-webhook-form"
           >
-            Submit
+            {isPending ? (
+              <div className="flex items-center gap-2">
+                <Loader className="animate-spin" size={16} />
+                <span>Submitting...</span>
+              </div>
+            ) : (
+              <span>Submit</span>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

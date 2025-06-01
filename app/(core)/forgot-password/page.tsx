@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function ForgotPassword() {
   return (
-    <div className="w-[60%] mx-auto flex flex-col items-center">
+    <div className="w-[100%] lg:w-[60%] mx-auto flex flex-col items-center mt-8 lg:mt-0">
       <Link
         href={"/login"}
         className="w-full flex justify-start items-center gap-2"
@@ -17,8 +17,8 @@ export default function ForgotPassword() {
       </Link>
 
       <div className="space-y-2 mt-8">
-        <h1 className="text-2xl text-zinc-700">Forgot Your Password?</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-2xl text-zinc-700 dark:text-foreground">Forgot Your Password?</h1>
+        <p className="text-sm text-gray-500 dark:text-muted-foreground">
           Enter your email you signed up with and wait for your recovery data to
           be sent.
         </p>

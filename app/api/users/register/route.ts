@@ -1,65 +1,71 @@
-import axiosInstance from "@/lib/axios";
-import { NextResponse } from "next/server";
+import { generateSalt, hashPassword } from "@/auth/core/password-hash";
+import { createSession } from "@/auth/core/session";
+import { cookies } from "next/headers";
+import { registerSchema } from "@/validations/authValidations";
+import { apiResponse, generateAPIKey } from "@/lib/utils";
+import { createUser, fetchUser } from "@/services/userServices";
 
-// register
 export async function POST(request: Request) {
   try {
-    const body: Pick<User, "name" | "email" | "password"> =
-      await request.json();
-    const { email, password } = body;
+    const body = await request.json();
+    const { data: userData, success } = registerSchema.safeParse(body);
 
-    const missingFields: string[] = [];
-    // if (!name) missingFields.push("name");
-    if (!email) missingFields.push("email");
-    if (!password) missingFields.push("password");
-
-    // validations
-    if (missingFields.length > 0) {
-      return NextResponse.json(
-        {
-          error: "All fields are required",
-          details: {
-            missingFields,
-          },
-        },
-        {
-          status: 400,
-        }
+    if (!success) {
+      return apiResponse(
+        { success: false, message: "Invalid request body" },
+        400
       );
     }
 
-    // send the payload to the api endpoint
-    const response = await axiosInstance.post("/auth/register", body);
+    const existingUser = await fetchUser(userData.email);
 
-    if (response.data.success === false) {
-      return NextResponse.json(
+    if (existingUser) {
+      return apiResponse(
         {
-          error: "Registration attempt failed!",
-          details: response.data.error,
+          success: false,
+          message: "User already Exists!",
         },
-        {
-          status: 400,
-        }
+        400
       );
     }
 
-    return NextResponse.json(
+    const salt = generateSalt();
+    const hashedPassword = (await hashPassword(
+      userData.password,
+      salt
+    )) as string;
+
+    const api_key = await generateAPIKey()
+
+    const user = await createUser({
+      ...userData,
+      password: hashedPassword,
+      salt: salt,
+      apiKey: api_key,
+    });
+
+    if (!user) {
+      return apiResponse(
+        {
+          success: false,
+          message: "Failed to create user!",
+        },
+        400
+      );
+    }
+
+    await createSession(user, await cookies());
+
+    return apiResponse(
       {
-        user: response.data
+        success: true,
+        message: "User Registered Successfully. Redirecting....",
+        redirectUrl: "/dashboard",
       },
-      {
-        status: 201,
-      }
+      201
     );
   } catch (error) {
-    console.error("Error registering user", (error as Error).message);
-    return NextResponse.json(
-      {
-        error: "Internal Server Error!",
-      },
-      {
-        status: 500,
-      }
-    );
+    console.error("POST /api/register error:", error);
+    return apiResponse({ error: "Internal Server Error" }, 500);
   }
 }

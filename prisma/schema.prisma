@@ -1,9 +1,113 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum EventsToSubscribe {
+  user_created
+  user_updated
+  user_deleted
+  link_created
+  link_updated
+  link_deleted
+  link_clicked
+}
+
+enum Plan {
+  Free_Plan
+  Premium_Plan
+  Enterprise_Plan
+}
+
+model User {
+  id        String     @id @default(uuid())
+  name      String?
+  email     String     @unique
+  password  String
+  apiKey    String     @unique @default(uuid())
+  urls      UrlShort[]
+  salt      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  endpoints Endpoint[]
+  App       App[]
+}
+
+model App {
+  id        String     @id @default(uuid())
+  name      String
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String
+  endpoint  Endpoint[]
+  urls      UrlShort[]
+  plan      Plan       @default(Free_Plan)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Endpoint {
+  id               String              @id @default(uuid())
+  description      String /// webhook name/desc
+  url              String
+  subscribedEvents EventsToSubscribe[]
+  signingSecret    String
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  app              App                 @relation(fields: [appId], references: [id], onDelete: Cascade)
+  userId           String
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  appId            String
+  WebhookRequest   WebhookRequest[]
+}
+
+model UrlShort {
+  id          String         @id @default(nanoid())
+  original    String
+  description String?
+  shortId     String         @unique
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  clicks      ClickTracker[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  App         App?           @relation(fields: [appId], references: [id])
+  appId       String?
+}
+
+model ClickTracker {
+  id        String   @id @default(uuid())
+  url       UrlShort @relation(fields: [urlId], references: [id], onDelete: Cascade)
+  urlId     String
+  ip        String?
+  country   String?
+  region    String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model WebhookRequest {
+  id         String   @id @default(uuid())
+  appId      String
+  endpoint   Endpoint @relation(fields: [endpointId], references: [id])
+  statusCode Int
+  response   String?
+  payload    Json
+  eventType  String
+  durationMs Int
+  createdAt  DateTime @default(now())
+  endpointId String
 }

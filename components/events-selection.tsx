@@ -2,27 +2,31 @@ import { ControllerRenderProps } from "react-hook-form";
 import { Checkbox } from "./ui/checkbox";
 import { Input } from "./ui/input";
 import { useState } from "react";
+import { formSchema } from "./forms/add-endpoint";
+import { z } from "zod";
 
 const LINK_EVENTS: string[] = [
-  "link.created",
-  "link.updated",
-  "link.deleted",
-  "link.clicked",
+  "link_created",
+  "link_updated",
+  "link_deleted",
+  "link_clicked",
 ];
-const USER_EVENTS: string[] = ["user.created", "user.updated", "user.deleted"];
+const USER_EVENTS: string[] = ["user_created", "user_updated", "user_deleted"];
 
-export default function EventSelection({
-  field,
-}: {
-  field: ControllerRenderProps<
-    {
-      url?: string;
-      description?: string;
-      events: string[];
-    },
-    "events"
-  >;
-}) {
+type FormData = {
+  url?: string;
+  description: string;
+  events: string[];
+  app: string;
+};
+
+interface Props {
+  field: ControllerRenderProps<z.infer<typeof formSchema>, "events">;
+}
+
+export default function EventSelection(
+  { field }: Props
+) {
   const [searchValue, setSearchValue] = useState("");
   // Ensure field.value is always an array
   const selectedEvents = Array.isArray(field.value) ? field.value : [];
@@ -107,7 +111,7 @@ export default function EventSelection({
       )}
 
       {/* Users Section */}
-      {filteredUsers.length > 0 && (
+      {/* {filteredUsers.length > 0 && (
         <div className="my-4">
           <div className="flex gap-2 items-center mb-2">
             <Checkbox
@@ -136,7 +140,7 @@ export default function EventSelection({
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

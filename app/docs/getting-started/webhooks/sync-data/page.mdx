@@ -1,0 +1,177 @@
+import InfoCard from "@/components/docs/info-card";
+import Spacer from "@/components/docs/spacer";
+import CodeDisplay from "@/components/code-display";
+import { User, Globe, Lock } from "lucide-react";
+
+# Sync Trackify Data to Your Apps Using Webhooks
+<Spacer />
+
+<InfoCard
+  title="Before you start"
+  items={[
+    { icon: User, label: "Trackify account is required", href: "http://localhost:3000/register" },
+    { icon: Globe, label: "Ngrok account is required", href: "https://dashboard.ngrok.com/signup" },
+    { icon: Lock, label: "A backend server (Node.js, Python, etc.) to receive webhooks" }
+  ]}
+/>
+
+
+<Spacer />
+
+Webhooks allow Trackify to notify your application in real time when important events happen, such as when a link is clicked, created, updated, or deleted. This guide will walk you through setting up a webhook endpoint, testing it locally with ngrok, securing it with a signing secret, and preparing for production.
+
+<Spacer />
+
+
+
+## 1. Set Up Your Webhook Endpoint
+
+<Spacer />
+
+Create an endpoint in your backend to receive POST requests from Trackify. Here’s a simple Node.js/Express example:
+
+<CodeDisplay
+  language="typescript"
+  codeString={`import express from "express";
+import Webhook from "trackify-sdk/webhook";
+
+const app = express();
+app.use(express.json());
+
+const webhookSecret = process.env.TRACKIFY_WEBHOOK_SECRET!;
+
+app.post("/webhook/trackify", (req, res) => {
+  try {
+    const event = new Webhook(webhookSecret).verify(
+      JSON.stringify(req.body),
+      { "webhook-signature": req.headers["webhook-signature"] as string }
+    );
+    // Handle the event (e.g., update your database)
+    res.status(200).send("Received");
+  } catch (err) {
+    res.status(400).send("Invalid signature");
+  }
+});
+
+app.listen(3001, () => console.log("Listening for webhooks on port 3001"));
+`}
+/>
+
+<Spacer />
+
+## 2. Expose Your Local Server with ngrok
+
+<Spacer />
+
+Trackify needs to reach your local server over the internet. [ngrok](https://ngrok.com/) makes this easy:
+
+1. [Sign up for an ngrok account](https://dashboard.ngrok.com/signup) and install ngrok.
+2. Start your backend server (e.g., `node index.js` or `npm run dev`).
+3. In a new terminal, run:
+
+<CodeDisplay
+  language="bash"
+  codeString={`ngrok http 3001`}
+  />
+
+4. Copy the generated HTTPS URL (e.g., `https://abcd1234.ngrok.io`).
+
+<Spacer />
+
+## 3. Register Your Webhook Endpoint in Trackify
+
+<Spacer />
+
+1. Go to the **Trackify Dashboard**.
+2. Navigate to **Webhooks** or **App Settings**.
+3. Click **Add Endpoint** and paste your ngrok URL with your endpoint path (e.g., `https://abcd1234.ngrok.io/webhook/trackify`).
+4. Select the events you want to subscribe to (e.g., `link_clicked`, `link_created`).
+
+<Spacer />
+
+## 4. Add Your Signing Secret to Your Environment
+
+<Spacer />
+
+Trackify provides a **signing secret** for each app or webhook endpoint.  
+Add this to your server’s environment variables:
+
+<CodeDisplay
+  language="bash"
+  codeString={`TRACKIFY_WEBHOOK_SECRET=your_signing_secret_here`}
+  />
+
+**Never expose your signing secret in client-side code.**
+
+<Spacer />
+
+## 5. Test Your Webhook Integration
+
+<Spacer />
+
+Trackify provides a tool to send test events to your endpoint.  
+Alternatively, you can use the built-in "Test Endpoint" tool in the dashboard.
+
+- Select an event (e.g., `link_clicked`).
+- Trackify will send a sample payload to your endpoint.
+
+**Sample Payload for `link_clicked`:**
+
+<CodeDisplay
+  language="json"
+  codeString={`{
+  "type": "link_clicked",
+  "data": {
+    "shortId": "abc123",
+    "ip": "102.123.45.67",
+    "country": "Kenya",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/113.0.0.0 Safari/537.36",
+    "geo": {
+      "city": "Nairobi",
+      "region": "Nairobi County",
+      "lat": -1.2921,
+      "lon": 36.8219
+    },
+    "deviceInfo": {
+      "type": "desktop"
+    }
+  }
+}`}
+  />
+
+If your endpoint is set up correctly, you should see a 200 OK response in the dashboard and your server logs.
+
+<Spacer />
+
+## 6. Triggering the Endpoint
+
+<Spacer />
+
+Once your webhook is set up, Trackify will automatically send POST requests to your endpoint whenever the selected events occur (e.g., when a link is clicked).
+
+You can also manually trigger events for testing using the dashboard or by simulating actions in your app.
+
+<Spacer />
+
+## 7. Securing and Configuring for Production
+
+<Spacer />
+
+- **Always verify the webhook signature** using your signing secret to ensure requests are from Trackify.
+- **Use HTTPS** for your production webhook endpoints.
+- **Rotate your signing secret** if you suspect it has been compromised.
+- **Log webhook deliveries and failures** for monitoring and debugging.
+- **Handle retries**: Trackify may retry failed webhook deliveries. Ensure your endpoint is idempotent.
+
+<Spacer />
+
+> 💡 **Tip:**  
+> When moving to production, update your webhook endpoint in the Trackify dashboard to your production server URL and keep your signing secret secure.
+
+<Spacer />
+
+## Next Steps
+
+- [See all supported webhook events](/docs/webhooks/events)
+- [Learn more about securing your webhooks](/docs/webhooks/security)
+- [API Reference](/docs/api)
