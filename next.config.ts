@@ -13,6 +13,16 @@ const nextConfig: NextConfig = {
     }
   },
   pageExtensions: ["js", "jsx", "ts", "tsx", "mdx"],
+  images:{
+    remotePatterns: [
+      {
+        hostname: "api.dicebear.com"
+      },
+       {
+        hostname: "img.freepik.com"
+      }
+    ]
+  }
 };
 
 export default withMDXConfig(nextConfig);

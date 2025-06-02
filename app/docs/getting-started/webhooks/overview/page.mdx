@@ -31,10 +31,10 @@ Webhooks are **asynchronous**: Trackify will send the event as soon as possible,
 
 Trackify currently supports the following webhook events:
 
-- `link_created`
-- `link_updated`
-- `link_deleted`
-- `link_clicked`
+- <code>link_created</code>
+- <code>link_updated</code>
+- <code>link_deleted</code>
+- <code>link_clicked</code>
 
 <Spacer />
 
@@ -83,24 +83,39 @@ You should verify this signature in your backend before processing the event.
 
 <CodeDisplay
   language="typescript"
-  codeString={`import Webhook from "trackify-sdk/webhook";
+  codeString={`import express from "express";
+import { TrackifyWebhook } from "trackify-sdk";
 
-const secret = process.env.TRACKIFY_WEBHOOK_SECRET!;
+const app = express();
+app.use(express.json());
 
-const webhook = new Webhook(secret);
+const webhookSecret = process.env.TRACKIFY_WEBHOOK_SECRET!;
 
-try {
-  const event = webhook.verify(
-    req.body, // raw request body as string or Buffer
-    { "webhook-signature": req.headers["x-webhook-signature"] as string }
-  );
-  // Process the event
-} catch (err) {
-  // Invalid signature or malformed payload
-  res.status(400).send("Invalid webhook signature");
-}
+app.post("/webhook/trackify", (req, res) => {
+  try {
+    const event = TrackifyWebhook.verifyPayload(
+      webhookSecret,
+      JSON.stringify(req.body),
+      { "x-webhook-signature": req.headers["x-webhook-signature"] as string }
+    );
+    // Handle the event (e.g., update your database)
+    res.status(200).send("Received");
+  } catch (err) {
+    res.status(400).send("Invalid signature");
+  }
+});
+
+app.listen(3001, () => console.log("Listening for webhooks on port 3001"));
 `}
 />
+
+<Spacer />
+
+**Key parts to note:**  
+- Endpoint path: <code>"/webhook/trackify"</code>  
+- Signature header: <code>"x-webhook-signature"</code>  
+- Success response: <code>"Received"</code>  
+- Error response: <code>"Invalid signature"</code>
 
 <Spacer />
 

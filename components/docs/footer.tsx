@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github, Heart } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Separator } from "../ui/separator";
@@ -10,7 +10,7 @@ export function Footer() {
   return (
     <div className="flex flex-col mt-12 text-muted-foreground text-sm">
       <Link
-        href={`https://github.com/Lymore01/trackify-dev/app${pathname}/page.mdx`}
+        href={`https://github.com/Lymore01/trackify-dev/tree/main/app${pathname}/page.mdx`}
         className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer"
       >
         <p>Edit this page on Github</p>
@@ -23,7 +23,15 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Trackify
           </p>
         </Link>
-        <Link href="https://github.com/Lymore01/trackify-dev/">
+        <div className="text-foreground text-sm flex items-center">
+          Built with <Heart className="fill-red-800 mx-2" size={12} />
+          by Kelly Limo
+        </div>
+        <Link
+          href="https://github.com/Lymore01/trackify-dev/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <Github
             size={16}
             className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"

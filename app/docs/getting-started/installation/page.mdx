@@ -1,5 +1,6 @@
 import Spacer from "@/components/docs/spacer"
 import CodeDisplay from "@/components/code-display"
+import NextSteps from "@/components/docs/next-steps-card";
 
 # Installation
 
@@ -98,6 +99,11 @@ const deleteLink = await linkApi.deleteLink("your-link-id");
 
 <Spacer />
 
+> 💡 **Tip:**  
+> For security, never expose your API key in client-side code. Use the SDK in server-side or backend environments.
+
+<Spacer />
+
 # Next Steps
 
 <Spacer />
@@ -107,5 +113,6 @@ const deleteLink = await linkApi.deleteLink("your-link-id");
 
 <Spacer />
 
-> 💡 **Tip:**  
-> For security, never expose your API key in client-side code. Use the SDK in server-side or backend environments.
+<NextSteps title={"Webhooks"} description=" How to integrate Trackify webhooks to your app " href="/docs/getting-started/webhooks"/>
+<Spacer />
+

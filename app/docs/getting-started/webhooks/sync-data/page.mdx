@@ -9,26 +9,29 @@ import { User, Globe, Lock } from "lucide-react";
 <InfoCard
   title="Before you start"
   items={[
-    { icon: User, label: "Trackify account is required", href: "http://localhost:3000/register" },
+    { icon: User, label: "Trackify account is required", href: "http://192.168.100.25:3000/signup" },
     { icon: Globe, label: "Ngrok account is required", href: "https://dashboard.ngrok.com/signup" },
-    { icon: Lock, label: "A backend server (Node.js, Python, etc.) to receive webhooks" }
+    { icon: Lock, label: "A backend server (Node.js, Deno etc.) to receive webhooks" }
   ]}
 />
 
-
 <Spacer />
 
-Webhooks allow Trackify to notify your application in real time when important events happen, such as when a link is clicked, created, updated, or deleted. This guide will walk you through setting up a webhook endpoint, testing it locally with ngrok, securing it with a signing secret, and preparing for production.
+Webhooks are the fastest way to keep your app in sync with Trackify in real time. Whenever a key event happens—like a link is clicked, created, updated, or deleted—Trackify can instantly notify your backend, so your data and workflows are always up to date.
+
+This guide will help you:
+- **Set up a secure webhook endpoint** in your backend.
+- **Test webhooks locally** using ngrok.
+- **Verify webhook signatures** to ensure authenticity.
+- **Prepare your integration for production** with best practices.
 
 <Spacer />
-
-
 
 ## 1. Set Up Your Webhook Endpoint
 
 <Spacer />
 
-Create an endpoint in your backend to receive POST requests from Trackify. Here’s a simple Node.js/Express example:
+Create a POST endpoint in your backend to receive Trackify webhook events. Here’s a simple Node.js/Express example using the Trackify SDK for signature verification:
 
 <CodeDisplay
   language="typescript"
@@ -56,6 +59,11 @@ app.post("/webhook/trackify", (req, res) => {
 app.listen(3001, () => console.log("Listening for webhooks on port 3001"));
 `}
 />
+
+<Spacer />
+
+> 💡 **Tip**   
+> You can use any backend language, just make sure to verify the webhook signature for security.
 
 <Spacer />
 
@@ -118,26 +126,32 @@ Alternatively, you can use the built-in "Test Endpoint" tool in the dashboard.
 **Sample Payload for `link_clicked`:**
 
 <CodeDisplay
-  language="json"
-  codeString={`{
-  "type": "link_clicked",
-  "data": {
-    "shortId": "abc123",
-    "ip": "102.123.45.67",
-    "country": "Kenya",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/113.0.0.0 Safari/537.36",
-    "geo": {
-      "city": "Nairobi",
-      "region": "Nairobi County",
-      "lat": -1.2921,
-      "lon": 36.8219
-    },
-    "deviceInfo": {
-      "type": "desktop"
-    }
+  language="typescript"
+  codeString={`import express from "express";
+import { TrackifyWebhook } from "trackify-sdk";
+
+const app = express();
+app.use(express.json());
+
+const webhookSecret = process.env.TRACKIFY_WEBHOOK_SECRET!;
+
+app.post("/webhook/trackify", (req, res) => {
+  try {
+    const event = TrackifyWebhook.verifyPayload(
+      webhookSecret,
+      JSON.stringify(req.body),
+      { "x-webhook-signature": req.headers["x-webhook-signature"] as string }
+    );
+    // Handle the event (e.g., update your database)
+    res.status(200).send("Received");
+  } catch (err) {
+    res.status(400).send("Invalid signature");
   }
-}`}
-  />
+});
+
+app.listen(3001, () => console.log("Listening for webhooks on port 3001"));
+`}
+/>
 
 If your endpoint is set up correctly, you should see a 200 OK response in the dashboard and your server logs.
 
@@ -165,13 +179,14 @@ You can also manually trigger events for testing using the dashboard or by simul
 
 <Spacer />
 
-> 💡 **Tip:**  
-> When moving to production, update your webhook endpoint in the Trackify dashboard to your production server URL and keep your signing secret secure.
+> 💡 **Pro Tip:**  
+> When moving to production, update your webhook endpoint in the Trackify dashboard to your production server URL and keep your signing secret secure.  
+> Consider using queueing or background jobs to process webhook events for better reliability.
 
 <Spacer />
 
-## Next Steps
+# Next Steps
+<Spacer />
 
-- [See all supported webhook events](/docs/webhooks/events)
-- [Learn more about securing your webhooks](/docs/webhooks/security)
-- [API Reference](/docs/api)
+- [See all supported webhook events](/docs/getting-started/webhooks/overview#supported-events)
+- [Learn more about securing your webhooks](/docs/getting-started/webhooks/overview#securing-your-webhook-endpoint)

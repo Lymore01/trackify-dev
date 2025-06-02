@@ -9,6 +9,7 @@ import { TESTIMONIALS, STATS, howItWorksSection } from "@/lib/constants";
 import {
   ChartArea,
   File,
+  Github,
   Heart,
   Instagram,
   Linkedin,
@@ -120,7 +121,7 @@ export default function Home() {
             />
             <div className="flex relative w-[90%] h-[90%] z-10">
               <Image
-                src="/images/Screenshot-dark.png"
+                src="/images/Screenshot-dark.jpeg"
                 alt="dashboard image"
                 layout="fill"
                 objectFit="cover"
@@ -265,6 +266,7 @@ const HowItWorksSection2 = () => {
                         />
                       ) : (
                         <CodeDisplay
+                          language="bash"
                           codeString={"npm i @trackify-sdk"}
                         ></CodeDisplay>
                       )}
@@ -406,14 +408,19 @@ export const NavBar = () => {
         border-b border-white/20 dark:border-white/10
         shadow-sm"
     >
-      <Logo />
+      <div className="flex items-center gap-2">
+        <Logo />
+        <h1 className="text-foreground">Trackify.</h1>
+      </div>
       {/* menu options */}
       <div className="hidden lg:flex items-center gap-8">
         <ul className="flex items-center gap-8 text-slate-900 dark:text-muted-foreground text-sm">
-          <li className="cursor-pointer hover:text-foreground">Products</li>
-          <Link href={"/docs"} className="cursor-pointer hover:text-foreground">Docs</Link>
-          <li className="cursor-pointer hover:text-foreground">Pricing</li>
-          <li className="cursor-pointer hover:text-foreground">Company</li>
+          {/* <li className="cursor-pointer hover:text-foreground">Products</li> */}
+          <Link href={"/docs"} className="cursor-pointer hover:text-foreground">
+            Documentation
+          </Link>
+          {/* <li className="cursor-pointer hover:text-foreground">Pricing</li>
+          <li className="cursor-pointer hover:text-foreground">Company</li> */}
         </ul>
       </div>
       <div className="flex gap-2 items-center">
@@ -430,6 +437,20 @@ export const NavBar = () => {
             Get Started
           </Button>
         </div>
+        {/* github */}
+        <Button variant={"outline"} className="flex">
+          <a
+            href="https://github.com/Lymore01/trackify-dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Github
+              size={16}
+              className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            />
+          </a>
+        </Button>
+
         {/* mobile */}
         <div
           className="size-10 shrink-0 grid place-content-center bg-black rounded-full cursor-pointer text-white lg:hidden transition-transform duration-700"
@@ -454,15 +475,15 @@ const MobileMenu = () => {
       className="w-full z-30 fixed top-14 left-0 h-auto px-2 block lg:hidden"
     >
       <div className="flex h-full w-full bg-background rounded-b-2xl shadow-lg px-2 py-4 flex-col justify-between">
-        <ul className="space-y-4 text-lg">
-          <li>Products</li>
+        <ul className="space-y-4 text-sm">
+          {/* <li>Products</li>
+          <Separator /> */}
+          <li onClick={() => router.push("/docs")}>Documentation</li>
           <Separator />
-          <li>Docs</li>
-          <Separator />
-          <li>Pricing</li>
+          {/* <li>Pricing</li>
           <Separator />
           <li>Company</li>
-          <Separator />
+          <Separator /> */}
         </ul>
         {/* CTA */}
         <div className="mt-4 justify-between flex items-center">
@@ -508,7 +529,7 @@ const HeroSection = () => {
         variants={fadeInUp}
       >
         Build faster with our developer-friendly SDKs and APIs. Connect, manage,
-        and track your apps and links—all in one secure, powerful platform.
+        and track your apps and links, all in one secure, powerful platform.
       </motion.p>
 
       <motion.div variants={fadeInUp}>
@@ -548,11 +569,14 @@ const Footer = () => {
       <div className="w-[80vw] mx-auto grid grid-cols-1 lg:grid-cols-2 mt-[30vh] relative">
         <div className="flex flex-col justify-between items-start pb-4 text-sm text-zinc-300">
           <div className="space-y-4">
-            <Logo />
+            <div className="flex items-center gap-2">
+              <Logo />
+              <h1 className="text-foreground">Trackify.</h1>
+            </div>
             <h1 className="">Track, Connect, and Power Your Apps with Ease.</h1>
             <div className="p-2 rounded-md bg-black text-white inline-flex items-center">
               Built with <Heart className="fill-red-800 mx-2" size={12} /> by
-              Lymore
+              Kelly Limo
             </div>
           </div>
           {/*copyright  */}
@@ -565,7 +589,7 @@ const Footer = () => {
         {/* legal */}
         <div className="grid lg:grid-cols-2 gap-4 mb-12">
           <div className="space-y-4 text-sm text-zinc-300 flex flex-col">
-            <div className="flex flex-col">
+            <div className="hidden flex-col ">
               <h1 className="text-zinc-400">Legal</h1>
               <ul className="mt-3 space-y-1">
                 <li>Terms of services</li>
@@ -574,9 +598,9 @@ const Footer = () => {
             </div>
             <div className="flex flex-col">
               <h1 className="text-zinc-400">Links</h1>
-              <ul className="mt-3 space-y-1">
-                <li>Login</li>
-                <li>Docs</li>
+              <ul className="mt-3 flex flex-col gap-2">
+                <Link href="http://192.168.100.25:3000/login">Login</Link>
+                <Link href="http://192.168.100.25:3000/docs">Docs</Link>
               </ul>
             </div>
           </div>
@@ -585,9 +609,18 @@ const Footer = () => {
             <div className="flex flex-col">
               <h1 className="text-zinc-400">Social</h1>
               <ul className="mt-3 flex gap-4 lg:flex-col">
-                <Instagram size={16} />
-                <Linkedin size={16} />
-                <Twitter size={16} />
+                <Link
+                  href="https://github.com/Lymore01/trackify-dev/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Github
+                    size={16}
+                    className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  />
+                </Link>
+                {/* <Linkedin size={16} />
+                <Twitter size={16} /> */}
               </ul>
             </div>
           </div>
