@@ -19,7 +19,7 @@ export async function trackClick(req: NextRequest) {
 
   if (!url) return;
 
-  await fetch(`http://localhost:3000/api/track`, {
+  await fetch(`https://trackify-dev-69k7.vercel.app/api/track`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

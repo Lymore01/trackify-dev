@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     const resetToken = crypto.randomBytes(32).toString("hex");
     const expiresAt = addMinutes(new Date(), 30);
 
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${emailData.email}`;
+    const resetLink = `https://trackify-dev-69k7.vercel.app/reset-password?token=${resetToken}&email=${emailData.email}`;
 
     const emailHtml = `
       <div style="font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; padding: 30px;">

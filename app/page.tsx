@@ -599,8 +599,8 @@ const Footer = () => {
             <div className="flex flex-col">
               <h1 className="text-zinc-400">Links</h1>
               <ul className="mt-3 flex flex-col gap-2">
-                <Link href="http://192.168.100.25:3000/login">Login</Link>
-                <Link href="http://192.168.100.25:3000/docs">Docs</Link>
+                <Link href="/login">Login</Link>
+                <Link href="/docs">Docs</Link>
               </ul>
             </div>
           </div>
