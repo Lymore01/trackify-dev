@@ -20,6 +20,8 @@ import { motion } from "framer-motion";
 import { logOut } from "@/actions/actions";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { TabButton } from "@/components/tab-button";
+import { LogoutButton } from "@/components/logout-button";
 
 export default function Settings() {
   const [currentTab, setCurrentTab] = useState("profile");
@@ -124,73 +126,6 @@ export default function Settings() {
   );
 }
 
-export const TabButton = ({
-  currentTab,
-  setCurrentTab,
-  tab,
-  Icon,
-}: {
-  currentTab: string;
-  setCurrentTab: (value: string) => void;
-  tab: string;
-  Icon: LucideIcon;
-}) => {
-  return (
-    <motion.li
-      layout
-      className={`${
-        currentTab === tab
-          ? "bg-indigo-100 text-blue-600"
-          : "text-slate-500 hover:bg-slate-100"
-      } font-medium cursor-pointer transition-colors p-2 rounded-md text-sm capitalize flex items-center`}
-      onClick={() => setCurrentTab(tab)}
-    >
-      <motion.div
-        layout
-        className="grid h-full w-10 place-content-center text-lg"
-      >
-        <Icon />
-      </motion.div>
 
-      <motion.span
-        layout
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.125 }}
-        className="text-sm font-medium"
-      >
-        {tab}
-      </motion.span>
-    </motion.li>
-  );
-};
 
-export const LogoutButton = () => {
-  const handleLogout = async () => {
-    await logOut();
-  };
-  return (
-    <motion.button
-      layout
-      className="flex font-medium w-full rounded-md bg-primary p-2 capitalize items-center text-primary-foreground cursor-pointer"
-      onClick={handleLogout}
-    >
-      <motion.div
-        layout
-        className="grid h-full place-content-center text-lg w-10"
-      >
-        <LogOut />
-      </motion.div>
-      <motion.span
-        layout
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.125 }}
-        className="text-sm font-medium"
-        onClick={handleLogout}
-      >
-        Logout
-      </motion.span>
-    </motion.button>
-  );
-};
+
