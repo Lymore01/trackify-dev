@@ -1,3 +1,5 @@
+"use client"
+
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { FileWarning, Loader } from "lucide-react";

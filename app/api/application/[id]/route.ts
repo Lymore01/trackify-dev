@@ -2,14 +2,15 @@ import { getCurrentUser } from "@/auth/core/getCurrentUser";
 import { apiResponse } from "@/lib/utils";
 import { deleteApp, updateApp } from "@/services/appServices";
 import { createAppSchema } from "@/validations/appValidations";
+import { NextRequest } from "next/server";
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await req.json();
-    const { id } = params;
+    const { id } = await params;
 
     const payload = createAppSchema.safeParse(body);
     if (!payload.success) {
@@ -32,11 +33,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const user = await getCurrentUser({
       withFullUser: false,

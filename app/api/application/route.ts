@@ -74,7 +74,6 @@ export async function GET(req: Request) {
       return apiResponse({ error: "User not found" }, 401);
     }
 
-    // todo: pass user.id instead
     const applications = await fetchApplications(user.id);
 
     return apiResponse(applications, 200);

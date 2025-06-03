@@ -5,9 +5,9 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: { shortId: string } }
+  { params }: { params: Promise<{ shortId: string }> }
 ) {
-  const { shortId } = params;
+  const { shortId } = await params;
   if (!shortId) {
     return NextResponse.redirect("/");
   }

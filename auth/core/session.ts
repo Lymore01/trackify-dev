@@ -47,7 +47,7 @@ export function setCookie(sessionId: string, cookies: Pick<Cookie, "set">) {
   cookies.set(COOKIE_SESSION_KEY, sessionId, {
     secure: true,
     httpOnly: true,
-    sameSite: false, // todo: Change to 'lax'
+    sameSite: "lax", 
     expires: Date.now() + SESSION_EXPIRATION_SECONDS * 1000,
   });
 }

@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   experimental: {
     turbo: {
       loaders: {}
-    }
+    },
   },
   pageExtensions: ["js", "jsx", "ts", "tsx", "mdx"],
   images:{

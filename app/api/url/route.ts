@@ -115,7 +115,6 @@ export async function GET(req: Request) {
       );
     }
 
-    // todo: user.id
     const urls = await fetchUrl({
       userId: user.id,
       appId: appId,

@@ -32,22 +32,28 @@ import { useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
+  app: z.string(),
+  url: z.string(),
+  description: z.string(),
   events: z.array(z.string()),
 });
 
 export default function AddMoreEvents() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const searchParams = useSearchParams();
+  const endpoint = searchParams.get('endpoint');
   const queryClient = useQueryClient();
-  const endpoint = searchParams.get("endpoint");
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      app: "",
+      url: "",
+      description: "",
       events: [],
     },
   });
 
-  const { updateWebhook, isPending } = useUpdateWebhook(endpoint as string);
+  const { updateWebhook, isPending } = useUpdateWebhook(endpoint || '');
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);

@@ -1,6 +1,6 @@
-
 import { Metadata } from "next";
 import LayoutShell from "@/components/layout-shell";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Trackify | Dashboard",
@@ -12,5 +12,9 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <LayoutShell>{children}</LayoutShell>;
+  return (
+    <Suspense>
+      <LayoutShell>{children}</LayoutShell>
+    </Suspense>
+  );
 }

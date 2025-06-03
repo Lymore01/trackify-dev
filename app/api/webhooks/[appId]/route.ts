@@ -1,5 +1,4 @@
-import { formSchema as endpointSchema } from "@/components/forms/add-endpoint";
-import { prisma } from "@/lib/prisma";
+
 import { apiResponse } from "@/lib/utils";
 import {
   deleteWebhook,
@@ -7,7 +6,7 @@ import {
   updateWebhook,
 } from "@/services/webhookServices";
 import { webhookSchema } from "@/validations/webhooksValidation";
-import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 // get webhooks for a specific app
 
@@ -16,18 +15,14 @@ type Filter = {
 };
 
 export async function GET(
-  req: Request,
-  {
-    params,
-  }: {
-    params: { appId: string };
-  }
+  req: NextRequest,
+  { params }: { params: Promise<{ appId: string }> }
 ) {
   try {
     const url = new URL(req.url);
     const searchParams = url.searchParams;
     const endpoint = searchParams.get("endpoint");
-    const appId = params.appId;
+    const {appId} = await params;
 
     let filters: Filter = {};
 
@@ -67,11 +62,11 @@ export async function GET(
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { appId: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ appId: string }> }
 ) {
   try {
-    const { appId } = params;
+    const {appId} = await params;
     const searchParams = new URL(req.url).searchParams;
     const endpoint = searchParams.get("endpoint");
 
@@ -103,11 +98,11 @@ export async function PUT(
 
 // delete endpoint
 export async function DELETE(
-  req: Request,
-  { params }: { params: { appId: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ appId: string }> }
 ) {
   try {
-    const { appId } = params;
+    const {appId} = await params;
     const searchParams = new URL(req.url).searchParams;
     const endpoint = searchParams.get("endpoint");
 

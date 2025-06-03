@@ -18,7 +18,6 @@ import { motion } from "framer-motion";
 import { SidebarProvider } from "@/contexts/useSidebar";
 import Image from "next/image";
 import { Separator } from "./ui/separator";
-import { LogoutButton, TabButton } from "@/app/(user)/dashboard/settings/page";
 import { Button } from "./ui/button";
 import Tag from "./tag";
 import ProfileInfoCard from "./profile-info-card";

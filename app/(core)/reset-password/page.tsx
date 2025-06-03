@@ -1,9 +1,11 @@
+"use client";
+
 import ChangePassForm from "@/components/forms/change-password";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
-
-export default function Login() {
+export default function Page() {
   return (
     <div className="w-[100%] lg:w-[60%] mx-auto flex flex-col items-center mt-8 lg:mt-0">
       <Link
@@ -25,7 +27,9 @@ export default function Login() {
       </div>
 
       <div className="mt-8 w-full">
-        <ChangePassForm />
+        <Suspense>
+          <ChangePassForm />
+        </Suspense>
       </div>
     </div>
   );

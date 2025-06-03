@@ -1,13 +1,14 @@
 import { apiResponse } from "@/lib/utils";
 import { deleteUrl, updateUrl } from "@/services/urlServices";
 import { urlSchema } from "@/validations/urlValidations";
+import { NextRequest } from "next/server";
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const {id} = await params;
 
     if (!id) {
       return apiResponse({ error: "Invalid ID" }, 400);
@@ -23,11 +24,11 @@ export async function DELETE(
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const {id} = await params;
 
     console.log("ID:", id);
 

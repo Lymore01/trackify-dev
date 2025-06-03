@@ -8,7 +8,7 @@ import {
 import { NextResponse } from "next/server";
 import { UAParser } from "ua-parser-js";
 
-export async function fetchGeoLocationInfo() {
+async function fetchGeoLocationInfo() {
   try {
     const response = await fetch(`https://ipinfo.io/?token=${process.env.IPINFO_TOKEN}`);
     if (!response.ok) {
