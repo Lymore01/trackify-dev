@@ -29,7 +29,7 @@ export default function CodeDisplay({
         type="button"
       >
         {copied ? <CopyCheck size={16}/> : <Copy size={16}/>}
-      </button>
+    </button>
       <SyntaxHighlighter
         language={language}
         style={monokaiSublime}

@@ -32,7 +32,7 @@ export function ProfileTrigger({
   setProfileOpen: (open: boolean) => void;
 }) {
   return (
-    <div className="flex items-center flex-row-reverse gap-2 mt-4">
+    <div className="flex items-center flex-row-reverse gap-2 mt-0 lg:mt-4">
       <Image
         src={"/images/profile.jpg"}
         alt={"profile picture"}
@@ -94,7 +94,7 @@ export default function LayoutShell({
             <CustomSidebar>
               <motion.div layout className="top-0 left-[100%] absolute">
                 <div
-                  className="grid place-content-center p-2 bg-gray-100"
+                  className="grid place-content-center p-2 bg-background"
                   onClick={() => {
                     setOpen(false);
                   }}

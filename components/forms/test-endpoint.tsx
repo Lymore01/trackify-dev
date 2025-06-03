@@ -56,7 +56,7 @@ export default function TestEndpoint({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      event: "link_clicked" as EventType, 
+      event: "link_clicked" as EventType,
     },
   });
 
@@ -106,7 +106,6 @@ export default function TestEndpoint({
       console.log("Webhook Test Error:", error);
     },
   });
-
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const dt = JSON.parse(payload);
@@ -170,7 +169,7 @@ export default function TestEndpoint({
         {/* payload */}
         <div>
           <label htmlFor="payload">Payload</label>
-          <CodeDisplay codeString={payload as string} />
+          <CodeDisplay language="json" codeString={payload as string} />
         </div>
         <div className="mt-4">
           <Button
@@ -191,18 +190,11 @@ export default function TestEndpoint({
         <div>
           <div className="flex justify-between items-center">
             <p>Or, Use cURL command</p>
-            <Copy
-              className="cursor-pointer"
-              size={16}
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  generateCurlCommand(endpoint, payload)
-                );
-                toast.success("cURL command copied to clipboard");
-              }}
-            />
           </div>
-          <CodeDisplay codeString={generateCurlCommand(endpoint, payload)} />
+          <CodeDisplay
+            language="bash"
+            codeString={generateCurlCommand(endpoint, payload)}
+          />
         </div>
       </div>
       <div className="px-4 py-2">

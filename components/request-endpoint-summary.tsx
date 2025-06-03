@@ -33,6 +33,8 @@ export default function RequestEndpointSummary({ request }: { request: any }) {
       <div className="space-y-2">
         <h2 className="text-md font-semibold">Request Payload</h2>
         <CodeDisplay
+          language="typescript"
+
           codeString={JSON.stringify(
             {
               data: "",
@@ -47,6 +49,7 @@ export default function RequestEndpointSummary({ request }: { request: any }) {
       <div className="space-y-2">
         <h2 className="text-md font-semibold">Simulated Response</h2>
         <CodeDisplay
+          language="typescript"
           codeString={JSON.stringify(
             {
               success: isSuccess,
@@ -61,7 +64,7 @@ export default function RequestEndpointSummary({ request }: { request: any }) {
       {/* Headers */}
       <div className="space-y-2">
         <h2 className="text-md font-semibold">Request Headers</h2>
-        <CodeDisplay codeString={JSON.stringify(headers, null, 2)} />
+        <CodeDisplay language="typescript" codeString={JSON.stringify(headers, null, 2)} />
       </div>
     </div>
   );

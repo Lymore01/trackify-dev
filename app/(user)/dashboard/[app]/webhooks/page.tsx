@@ -62,10 +62,10 @@ export default function Webhooks() {
           size={18}
           className="text-blue-600 dark:text-blue-400 mt-1 hidden lg:block"
         />
-        <p className="text-sm text-zinc-700 dark:text-zinc-300 gap-2 flex">
+        <p className="text-sm text-zinc-700 dark:text-zinc-300">
           Learn how to use{" "}
           <span className="font-medium text-blue-700">Webhooks</span> with
-          Trackify by reading our
+          Trackify by reading our{" "}
           <a
             href="/docs/webhooks"
             className="text-blue-600 font-medium ml-1 hover:underline transition-colors"

@@ -267,7 +267,7 @@ const HowItWorksSection2 = () => {
                       ) : (
                         <CodeDisplay
                           language="bash"
-                          codeString={"npm i @trackify-sdk"}
+                          codeString={"npm i trackify-sdk"}
                         ></CodeDisplay>
                       )}
                     </div>
