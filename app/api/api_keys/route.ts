@@ -1,9 +1,9 @@
 import { getCurrentUser } from "@/auth/core/getCurrentUser";
 import { apiResponse, generateAPIKey } from "@/lib/utils";
 import { fetchUserById, updateApiKey } from "@/services/userServices";
-import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser({
       withFullUser: false,
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
 }
 
 // new api key
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const searchParams = url.searchParams;
