@@ -645,6 +645,9 @@ const CTA = () => {
       <Button
         className="cursor-pointer capitalize rounded-full dark:text-foreground"
         variant={"outline"}
+        onClick={() => {
+          router.push("/docs");
+        }}
       >
         View docs
       </Button>
