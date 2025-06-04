@@ -67,7 +67,7 @@ export default function Webhooks() {
           <span className="font-medium text-blue-700">Webhooks</span> with
           Trackify by reading our{" "}
           <a
-            href="/docs/webhooks"
+            href="/docs/getting-started/webhooks"
             className="text-blue-600 font-medium ml-1 hover:underline transition-colors"
             target="_blank"
             rel="noopener noreferrer"
