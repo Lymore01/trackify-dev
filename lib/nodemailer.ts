@@ -20,8 +20,8 @@ export async function sendEmail({
   html,
   service = "gmail",
 }: EmailProps): Promise<EmailResponse> {
-  const sender = process.env.EMAIL_SENDER;
-  const password = config.GOOGLE_APP_ID;
+  const sender = config.EMAIL_SENDER;
+  const password = config.GOOGLE_APP_ID?.replace(/\s/g, "");
 
   if (!sender || !password) {
     return {
@@ -33,6 +33,7 @@ export async function sendEmail({
   try {
     const transporter = nodemailer.createTransport({
       service,
+      secure: true,
       auth: {
         user: sender,
         pass: password,

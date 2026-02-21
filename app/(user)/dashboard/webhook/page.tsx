@@ -2,7 +2,7 @@
 
 import ApplicationCard from "@/components/cards/applications-card";
 import SearchModal from "@/components/modals/search";
-import ApplicationCardSkelton from "@/components/skeletons/application-card-skelton";
+import ApplicationCardSkeleton from "@/components/skeletons/application-card-skeleton";
 import { Separator } from "@/components/ui/separator";
 import { useApplications } from "@/hooks/use-applications";
 import { AppType } from "@/types/types";
@@ -39,7 +39,7 @@ export default function Webhook() {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {isLoading ? (
-            [...Array(3)].map((_, idx) => <ApplicationCardSkelton key={idx} />)
+            [...Array(3)].map((_, idx) => <ApplicationCardSkeleton key={idx} />)
           ) : apps?.length > 0 ? (
             apps.map((app: AppType) => (
               <ApplicationCard

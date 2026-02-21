@@ -1,6 +1,9 @@
 import { ItemsProp } from "@/types/types";
 import { File, Home, Key, KeyIcon, Settings, Webhook } from "lucide-react";
-import { CardProps } from "../app/page";
+export interface CardProps {
+  stat: string;
+  value: string;
+}
 
 export const NAV_ITEMS: ItemsProp[] = [
   {
@@ -153,7 +156,7 @@ export const STATS: CardProps[] = [
     value: "API req / month",
   },
   {
-    stat: "100",
+    stat: "9K",
     value: "SDK downloads",
   },
 ];
@@ -168,25 +171,29 @@ interface Testimonials {
 export const TESTIMONIALS: Testimonials[] = [
   {
     name: "Jane Wanjiku",
-    image: "https://img.freepik.com/free-photo/side-view-young-woman-wearing-sunglasses_23-2149452670.jpg?uid=R196512584&ga=GA1.1.1549616876.1743794615&semt=ais_hybrid&w=740",
+    image:
+      "https://img.freepik.com/free-photo/side-view-young-woman-wearing-sunglasses_23-2149452670.jpg?uid=R196512584&ga=GA1.1.1549616876.1743794615&semt=ais_hybrid&w=740",
     text: "Trackify has made it effortless to track my online shop links. I can now see which campaigns are driving real sales in Nairobi. The analytics dashboard is a lifesaver!",
     company: "E-commerce Entrepreneur, Nairobi",
   },
   {
     name: "Samuel Kiptoo",
-    image: "https://img.freepik.com/free-photo/close-up-smiley-man-with-glasses_23-2149009406.jpg?uid=R196512584&ga=GA1.1.1549616876.1743794615&semt=ais_hybrid&w=740",
+    image:
+      "https://img.freepik.com/free-photo/close-up-smiley-man-with-glasses_23-2149009406.jpg?uid=R196512584&ga=GA1.1.1549616876.1743794615&semt=ais_hybrid&w=740",
     text: "Integrating Trackify into our SaaS platform was straightforward. The webhook notifications help us keep our CRM in sync with every link click. Highly recommended for Kenyan startups!",
     company: "Software Engineer, Eldoret",
   },
   {
     name: "Amina Yusuf",
-    image: "https://img.freepik.com/free-photo/medium-shot-happy-friends-outdoors_23-2149009416.jpg?uid=R196512584&ga=GA1.1.1549616876.1743794615&semt=ais_hybrid&w=740",
+    image:
+      "https://img.freepik.com/free-photo/medium-shot-happy-friends-outdoors_23-2149009416.jpg?uid=R196512584&ga=GA1.1.1549616876.1743794615&semt=ais_hybrid&w=740",
     text: "I use Trackify for all my digital marketing campaigns. The real-time click data helps me optimize my ads for Mombasa audiences. My conversion rates have improved significantly.",
     company: "Digital Marketer, Mombasa",
   },
   {
     name: "Chris Nekesa",
-    image: "https://img.freepik.com/free-photo/portrait-young-man-with-afro-dreadlocks-white-t-shirt-outdoors_23-2149451577.jpg?uid=R196512584&ga=GA1.1.1549616876.1743794615&semt=ais_hybrid&w=740",
+    image:
+      "https://img.freepik.com/free-photo/portrait-young-man-with-afro-dreadlocks-white-t-shirt-outdoors_23-2149451577.jpg?uid=R196512584&ga=GA1.1.1549616876.1743794615&semt=ais_hybrid&w=740",
     text: "Sharing short links with Trackify is so easy, and the webhook integration means my team always gets notified instantly. We love the local support and reliability.",
     company: "Product Manager, Kisumu",
   },
@@ -194,9 +201,9 @@ export const TESTIMONIALS: Testimonials[] = [
 
 export const howItWorksSection = [
   {
-    title: "Create an app on your dashboard",
+    title: "Project Containers",
     content:
-      "Start by creating an app to manage your links, webhooks, and analytics all in one place.",
+      "Start by creating an App container to organize and manage your link assets, webhooks, and analytics in one unified workspace.",
     image: "/images/create-app.jpeg",
   },
   {
@@ -218,9 +225,9 @@ export const howItWorksSection = [
     image: "/images/add-webhook.jpeg",
   },
   {
-    title: "Integrate seamlessly using our lightweight SDK (coming soon 😊)",
+    title: "Integrate seamlessly using our lightweight SDK",
     content:
-      "Our upcoming SDK will make it easy to connect and interact with your app programmatically.",
+      "Our SDK makes it easy to connect and interact with your app programmatically.",
   },
   {
     title: "Receive instant link events through your webhook",

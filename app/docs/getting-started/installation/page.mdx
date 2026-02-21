@@ -59,8 +59,8 @@ const app = await client.createApp("my.new.app");
 
 ### Get a Link API Instance for an App
 <CodeDisplay codeString={`
-// Use linkApi to manage links for this app
-const linkApi = await client.from("Your App Name");
+// Use linkApi to manage links for this app container
+const linkApi = await client.from("YOUR_APP_CONTAINER_ID");
 `}/>
 
 <Spacer />
@@ -75,7 +75,7 @@ const links = await linkApi.getLinks();
 ### Create a New Link
 <CodeDisplay codeString={`
 const createdLink = await linkApi.createLink({
-  original: "https://www.example.com/",
+  url: "https://www.example.com/",
   description: "Example description",
 });
 `}/>
@@ -85,7 +85,7 @@ const createdLink = await linkApi.createLink({
 ### Update a Link
 <CodeDisplay codeString={`
 const updatedLink = await linkApi.updateLink("your-link-id", {
-  originalUrl: "https://www.updated-url.com/",
+  url: "https://www.updated-url.com/",
   description: "Updated description",
 });
 `}/>

@@ -2,9 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 
 export function useApplications() {
   const {
-    data: apps,
+    data: apps, // Renamed data to apps for clarity
     isLoading,
     isError,
+    refetch,
+    isFetching,
   } = useQuery({
     queryKey: ["applications"],
     queryFn: async () => {
@@ -14,9 +16,18 @@ export function useApplications() {
           "Content-Type": "application/json",
         },
       });
-      return response.json();
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.error?.message || "Failed to fetch applications",
+        );
+      }
+
+      return result.data;
     },
   });
 
-  return { apps, isLoading, isError };
+  return { apps, isLoading, isError, refetch, isFetching };
 }

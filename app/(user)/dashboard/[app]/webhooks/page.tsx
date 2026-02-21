@@ -5,27 +5,29 @@ import AddEndpoint from "@/components/forms/add-endpoint";
 import EndpointsTable from "@/components/tables/endpoints-table";
 import { Separator } from "@/components/ui/separator";
 import { BookOpen, RefreshCcw } from "lucide-react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useIsFetching, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 
 export default function Webhooks() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const endpoint = searchParams.get("endpoint");
   const appId = searchParams.get("appId");
   const { app } = useParams();
   const queryClient = useQueryClient();
+  const isFetchingWebhooks = useIsFetching({ queryKey: ["webhooks"] });
 
   const { data: webhook, isLoading } = useQuery({
     queryKey: ["webhook", appId, endpoint],
+    enabled: !!endpoint && !!appId,
     queryFn: async () => {
       const res = await fetch(`/api/webhooks/${appId}?endpoint=${endpoint}`, {
         method: "GET",
@@ -36,8 +38,14 @@ export default function Webhooks() {
       if (!res.ok) {
         throw new Error("Failed to fetch webhooks");
       }
-      const data = await res.json();
-      return data;
+      const result = await res.json();
+      if (!result.success || !result.data) {
+        throw new Error(result.error?.message || "Failed to fetch endpoint");
+      }
+      return {
+        message: "success",
+        webhooks: result.data,
+      };
     },
   });
 
@@ -56,7 +64,18 @@ export default function Webhooks() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="text-xl my-2">Webhooks</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl my-2">Webhooks</h1>
+        <Button
+          variant={"link"}
+          className="cursor-pointer underline"
+          onClick={() => {
+            router.push(`/dashboard/links?app=${appId}&name=${app}`);
+          }}
+        >
+          Links
+        </Button>
+      </div>
       <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 ml-2 lg:ml-0">
         <BookOpen
           size={18}
@@ -84,18 +103,23 @@ export default function Webhooks() {
         ) : (
           <>
             <div className="flex items-center justify-between">
-              <h1>Endpoints</h1>
+              <h1 className="text-lg font-semibold">Endpoints</h1>
               <div className="flex gap-2 items-center">
                 <Button
                   variant={"outline"}
+                  size="sm"
                   className="cursor-pointer"
                   onClick={() => {
                     queryClient.invalidateQueries({
                       queryKey: ["webhooks"],
                     });
                   }}
+                  disabled={!!isFetchingWebhooks}
                 >
-                  <RefreshCcw size={16} />
+                  <RefreshCcw
+                    size={14}
+                    className={isFetchingWebhooks ? "animate-spin" : ""}
+                  />
                 </Button>
                 <AddEndpoint />
               </div>

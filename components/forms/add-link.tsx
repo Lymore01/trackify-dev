@@ -50,7 +50,7 @@ export default function AddLink() {
   });
   const queryClient = useQueryClient();
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch("/api/url", {
         method: "POST",
@@ -60,7 +60,8 @@ export default function AddLink() {
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        throw new Error(await response.json().then((res) => res.message));
+        const res = await response.json();
+        throw new Error(res.error?.message || "Failed to add URL");
       }
       return await response.json();
     },
@@ -81,20 +82,18 @@ export default function AddLink() {
       appId: app ?? "",
     };
 
-    await mutateAsync(data);
+    mutate(data);
   };
 
   return (
     <div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button className="cursor-pointer dark:bg-accent dark:text-accent-foreground hover:dark:bg-sidebar-accent-hover">
-            <span className="sr-only">Create Link</span>
-            <Plus />
-            Add Link
+          <Button className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 rounded-lg px-5 h-11 transition-all duration-300 active:scale-95 group">
+            <Plus className="size-4 group-hover:rotate-90 transition-transform duration-300" />
+            <span className="font-normal tracking-tight">Add Link</span>
           </Button>
         </DialogTrigger>
-        <Separator />
 
         <DialogContent className="max-h-[90vh] w-[80vw] md:w-[60vw] lg:w-[50vw] overflow-auto">
           <DialogHeader>
@@ -173,7 +172,10 @@ export default function AddLink() {
               form="add-link-form"
             >
               {isPending ? (
-                <Loader className="animate-spin" size={16} />
+                <div className="flex gap-2 items-center">
+                  <Loader className="animate-spin" size={16} />
+                  <span>Adding...</span>
+                </div>
               ) : (
                 <span>Add</span>
               )}

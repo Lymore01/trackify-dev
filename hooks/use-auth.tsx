@@ -3,14 +3,15 @@
 import { useQuery } from "@tanstack/react-query";
 
 interface User {
+  id: string;
   name: string;
   email: string;
   password: string;
   plan: "Free Plan";
 }
 
-export function useAuth(): User {
-  const { data: userData } = useQuery({
+export function useAuth() {
+  const { data: userData, isLoading } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       const res = await fetch("/api/users", {
@@ -20,13 +21,18 @@ export function useAuth(): User {
           "Cache-Control": "no-cache",
         },
       });
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.error?.message || "Failed to fetch user");
       }
-      return res.json();
+
+      return result.data;
     },
     refetchOnWindowFocus: false,
   });
 
-  return { ...userData?.data, plan: "Free Plan" };
+  const user = { ...userData, plan: "Free Plan" } as User;
+  return { user, isLoading };
 }

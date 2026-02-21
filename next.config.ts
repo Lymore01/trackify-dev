@@ -1,4 +1,3 @@
-
 import type { NextConfig } from "next";
 import withMDX from "@next/mdx";
 
@@ -7,22 +6,22 @@ const withMDXConfig = withMDX({
 });
 
 const nextConfig: NextConfig = {
-  experimental: {
-    turbo: {
-      loaders: {}
-    },
+  turbopack: {
+    rules: {},
   },
+  serverExternalPackages: ["pg", "@prisma/client"],
+
   pageExtensions: ["js", "jsx", "ts", "tsx", "mdx"],
-  images:{
+  images: {
     remotePatterns: [
       {
-        hostname: "api.dicebear.com"
+        hostname: "api.dicebear.com",
       },
-       {
-        hostname: "img.freepik.com"
-      }
-    ]
-  }
+      {
+        hostname: "img.freepik.com",
+      },
+    ],
+  },
 };
 
 export default withMDXConfig(nextConfig);

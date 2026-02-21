@@ -23,21 +23,20 @@ const useUpdateWebhook = (endpoint: string) => {
         },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) {
-        throw new Error("Failed to update webhook");
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.error?.message || "Failed to update webhook");
       }
-      const data = await res.json();
-      return data;
+
+      return result.data;
     },
     onSuccess: (data) => {
-      if (data.success) {
-        queryClient.invalidateQueries({
-          queryKey: ["webhook"],
-        });
-        toast.success(data.message);
-      } else {
-        toast.error(data.message);
-      }
+      queryClient.invalidateQueries({
+        queryKey: ["webhook"],
+      });
+      toast.success(data.message || "Webhook updated successfully");
     },
     onError: (error) => {
       toast.error(error.message);

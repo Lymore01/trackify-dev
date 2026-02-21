@@ -7,7 +7,7 @@ export async function createUrl(
   userId: string,
   appId: string,
   shortId: string,
-  description?: string
+  description?: string,
 ) {
   return prisma.urlShort.create({
     data: {
@@ -58,7 +58,11 @@ export async function fetchUrl({
     return prisma.urlShort.findFirst({ where });
   }
 
-  return prisma.urlShort.findMany({ where, include: { clicks: true } });
+  return prisma.urlShort.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    include: { clicks: true },
+  });
 }
 
 export async function deleteUrl(id: string) {
@@ -71,7 +75,7 @@ export async function deleteUrl(id: string) {
 
 export async function updateUrl(
   id: string,
-  data: Omit<Partial<z.infer<typeof urlSchema>>, "appId">
+  data: Omit<Partial<z.infer<typeof urlSchema>>, "appId">,
 ) {
   const payload: any = {};
 

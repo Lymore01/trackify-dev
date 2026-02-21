@@ -1,7 +1,18 @@
-// service layer
 import { prisma } from "@/lib/prisma";
+import { ValidationError } from "@/lib/exceptions";
 
 export async function createApp(appName: string, userId: string) {
+  const existingApp = await prisma.app.findFirst({
+    where: {
+      name: appName,
+      userId: userId,
+    },
+  });
+
+  if (existingApp) {
+    throw new ValidationError("An application with this name already exists");
+  }
+
   return prisma.app.create({
     data: {
       name: appName,
@@ -18,6 +29,9 @@ export async function fetchApplications(userId: string) {
   return prisma.app.findMany({
     where: {
       userId: userId,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
     select: {
       id: true,

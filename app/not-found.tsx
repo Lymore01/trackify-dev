@@ -15,7 +15,7 @@ export default function NotFound() {
         <div className="absolute top-4 left-4 w-full flex justify-end lg:justify-between items-center">
           <Link
             href={"/"}
-            className="hidden lg:grid size-10 shrink-0 place-content-center rounded-md bg-indigo-600 "
+            className="hidden lg:grid size-10 shrink-0 place-content-center rounded-md bg-blue-600 "
           >
             <svg
               width="24"
@@ -71,7 +71,7 @@ export default function NotFound() {
       </main>
       <aside className="hidden lg:flex lg:flex-col h-screen lg:w-[50%] bg-black relative">
         <Image
-          src="/images/aside.jpg"
+          src="/images/aside.webp"
           alt="aside image"
           layout="fill"
           objectFit="cover"

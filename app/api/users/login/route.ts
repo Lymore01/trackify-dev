@@ -4,30 +4,21 @@ import { cookies } from "next/headers";
 import { loginSchema } from "@/validations/authValidations";
 import { apiResponse } from "@/lib/utils";
 import { fetchUser } from "@/services/userServices";
+import { UnauthorizedError, ValidationError } from "@/lib/exceptions";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-
     const { data: userData, success } = loginSchema.safeParse(body);
 
     if (!success) {
-      return apiResponse(
-        { success: false, message: "Invalid request body" },
-        400
-      );
+      throw new ValidationError("Invalid request body");
     }
 
     const user = await fetchUser(userData.email);
 
     if (!user) {
-      return apiResponse(
-        {
-          success: false,
-          message: "Invalid Email or Password",
-        },
-        400
-      );
+      throw new UnauthorizedError("Invalid email or password");
     }
 
     const isCorrectPassword = await comparePassword({
@@ -37,13 +28,7 @@ export async function POST(request: Request) {
     });
 
     if (!isCorrectPassword) {
-      return apiResponse(
-        {
-          success: false,
-          message: "Invalid Email or Password",
-        },
-        400
-      );
+      throw new UnauthorizedError("Invalid email or password");
     }
 
     await createSession(
@@ -51,19 +36,18 @@ export async function POST(request: Request) {
         id: user.id,
         email: user.email,
       },
-      await cookies()
+      await cookies(),
     );
 
     return apiResponse(
       {
-        success: true,
-        message: "User Logged in Successfull, Redirecting....",
+        message: "User logged in successfully",
         redirectUrl: "/dashboard",
       },
-      201
+      200,
     );
   } catch (error) {
-    console.error("POST /api/login error:", error);
-    return apiResponse({ error: "Internal Server Error" }, 500);
+    console.error("POST /api/users/login error:", error);
+    return apiResponse(error);
   }
 }

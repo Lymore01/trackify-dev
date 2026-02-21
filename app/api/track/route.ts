@@ -1,5 +1,6 @@
 import { sendEvents } from "@/auth/webhooks/webhook";
 import { apiResponse } from "@/lib/utils";
+
 import { fetchApplicationByShortId } from "@/services/appServices";
 import {
   addClickTracking,
@@ -7,10 +8,14 @@ import {
 } from "@/services/trackingServices";
 import { NextResponse } from "next/server";
 import { UAParser } from "ua-parser-js";
+import { config } from "@/config/config";
 
 async function fetchGeoLocationInfo() {
   try {
-    const response = await fetch(`https://ipinfo.io/?token=${process.env.IPINFO_TOKEN}`);
+    const response = await fetch(
+      `https://ipinfo.io/?token=${config.IPINFO_TOKEN}`,
+    );
+
     if (!response.ok) {
       throw new Error(`Geo fetch failed with status: ${response.status}`);
     }
@@ -25,39 +30,26 @@ async function fetchGeoLocationInfo() {
 
 export async function POST(req: Request) {
   try {
-    const { shortId, ip, userAgent } = await req.json();
+    const { shortId, ip, userAgent, utm, referrer } = await req.json();
 
     if (!shortId) {
       return apiResponse(
         { success: false, message: "shortId is required" },
-        400
+        400,
       );
     }
 
     const deviceInfo = new UAParser(userAgent || "").getResult();
-
     const geo = await fetchGeoLocationInfo();
-
-    // todo: uncomment
-    // const alreadyTracked = await hasAlreadyTracked(ip, shortId);
-    // if (alreadyTracked) {
-    //   return apiResponse(
-    //     {
-    //       success: false,
-    //       message: "This link has already been tracked from this IP",
-    //     },
-    //     200
-    //   );
-    // }
 
     const payload = {
       shortId,
       ip: geo.ip || ip || "unknown",
-      geo: geo,
-      deviceInfo: { type: deviceInfo.device.type as UAParser.IDevice['type'] },
+      geo,
+      deviceInfo: { type: deviceInfo.device.type as UAParser.IDevice["type"] },
+      utm,
+      referrer,
     };
-
-    console.log("deviceInfo: ", deviceInfo);
 
     // Track the click
     await addClickTracking(payload);
@@ -68,7 +60,7 @@ export async function POST(req: Request) {
     if (!appData) {
       return apiResponse(
         { success: false, message: "Application not found" },
-        404
+        404,
       );
     }
 

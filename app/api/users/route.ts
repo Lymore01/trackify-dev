@@ -1,9 +1,8 @@
 import { getCurrentUser } from "@/auth/core/getCurrentUser";
-import axiosInstance from "@/lib/axios";
 import { prisma } from "@/lib/prisma";
 import { apiResponse } from "@/lib/utils";
 import { fetchUserById } from "@/services/userServices";
-import { NextResponse } from "next/server";
+import { UnauthorizedError } from "@/lib/exceptions";
 
 export async function GET(request: Request) {
   try {
@@ -24,30 +23,69 @@ export async function GET(request: Request) {
     }
 
     if (!user) {
-      return apiResponse(
-        {
-          success: false,
-          message: "User not found",
-        },
-        401
-      );
+      throw new UnauthorizedError("User not found");
     }
 
     const userData = await fetchUserById(user.id, {
+      id: true,
       name: true,
       email: true,
       password: true,
     });
 
-    return apiResponse(
-      {
-        message: "User fetched successfully",
-        data: userData,
-      },
-      200
-    );
+    return apiResponse(userData, 200);
   } catch (error) {
-    console.error("POST /api/users error:", error);
-    return apiResponse({ error: "Internal Server Error" }, 500);
+    console.error("GET /api/users error:", error);
+    return apiResponse(error);
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const user = await getCurrentUser({
+      withFullUser: false,
+      redirectIfNotFound: false,
+    });
+
+    if (!user) {
+      throw new UnauthorizedError("User not found");
+    }
+
+    const { name, email } = await request.json();
+
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        ...(name && { name }),
+        ...(email && { email }),
+      },
+    });
+
+    return apiResponse(updatedUser, 200);
+  } catch (error) {
+    console.error("PATCH /api/users error:", error);
+    return apiResponse(error);
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const user = await getCurrentUser({
+      withFullUser: false,
+      redirectIfNotFound: false,
+    });
+
+    if (!user) {
+      throw new UnauthorizedError("User not found");
+    }
+
+    await prisma.user.delete({
+      where: { id: user.id },
+    });
+
+    return apiResponse({ message: "Account deleted" }, 200);
+  } catch (error) {
+    console.error("DELETE /api/users error:", error);
+    return apiResponse(error);
   }
 }

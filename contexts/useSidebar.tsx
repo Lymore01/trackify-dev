@@ -30,7 +30,7 @@ function SidebarProvider({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
   const [open, setOpen] = React.useState(false); //colapsible
   const [openMobile, setOpenMobile] = React.useState(false);
-  const user = useAuth();
+  const { user } = useAuth();
 
   const contextValue = React.useMemo<SidebarContextProps>(
     () => ({
@@ -41,7 +41,7 @@ function SidebarProvider({ children }: { children: React.ReactNode }) {
       openMobile,
       setOpenMobile,
     }),
-    [isMobile, open, openMobile]
+    [isMobile, open, openMobile],
   );
 
   return (

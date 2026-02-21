@@ -39,7 +39,6 @@ import {
   TableRow,
 } from "../ui/table";
 import Tag from "../tag";
-import { sendEvents } from "@/auth/webhooks/webhook";
 
 const formSchema = z.object({
   event: z.string().min(1, "Event type is required") as z.ZodType<EventType>,
@@ -48,15 +47,19 @@ const formSchema = z.object({
 export default function TestEndpoint({
   endpoint,
   secret,
+  subscribedEvents = [],
 }: {
   endpoint: string;
   secret: string;
+  subscribedEvents?: string[];
 }) {
+  const eventOptions =
+    subscribedEvents.length > 0 ? subscribedEvents : LINK_EVENTS;
   const [payload, setPayload] = useState("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      event: "link_clicked" as EventType,
+      event: (eventOptions[0] ?? "link_clicked") as EventType,
     },
   });
 
@@ -76,34 +79,32 @@ export default function TestEndpoint({
     data: webhookData,
   } = useMutation({
     mutationFn: async (data: any) => {
-      try {
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "trackify-webhook-signature": generateHMAC(
-              secret,
-              JSON.stringify(data)
-            ),
-          },
-          body: JSON.stringify(data),
-        });
-        const responseData = await response.json();
-        console.log(data);
-        return responseData;
-      } catch (error) {
-        console.error("Error sending webhook request:", error);
-        throw error;
+      const signature = generateHMAC(secret, JSON.stringify(data));
+
+      // Proxy through our API route to avoid CORS — browser can't POST directly to external URLs
+      const response = await fetch("/api/test-webhook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          endpointUrl: endpoint,
+          payload: data,
+          signature,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to reach endpoint");
       }
+
+      return result;
     },
-    onSuccess: (data) => {
-      toast.success("Test Passed Successfully!");
-      console.log("Webhook Test Success:", data);
-      // Log the webhook request
+    onSuccess: () => {
+      toast.success("Test sent successfully!");
     },
     onError: (error) => {
-      toast.error("Test Example Failed!");
-      console.log("Webhook Test Error:", error);
+      toast.error(error.message || "Test failed");
     },
   });
 
@@ -140,22 +141,13 @@ export default function TestEndpoint({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          <SelectLabel>Links</SelectLabel>
-                          {LINK_EVENTS.map((linkEvt, idx) => (
-                            <SelectItem value={linkEvt} key={`link-${idx}`}>
-                              {linkEvt}
+                          <SelectLabel>Subscribed Events</SelectLabel>
+                          {eventOptions.map((evt, idx) => (
+                            <SelectItem value={evt} key={`evt-${idx}`}>
+                              {evt}
                             </SelectItem>
                           ))}
                         </SelectGroup>
-
-                        {/* <SelectGroup>
-                          <SelectLabel>Users</SelectLabel>
-                          {USER_EVENTS.map((userEvt, idx) => (
-                            <SelectItem value={userEvt} key={`user-${idx}`}>
-                              {userEvt}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup> */}
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -198,42 +190,62 @@ export default function TestEndpoint({
         </div>
       </div>
       <div className="px-4 py-2">
-        {/* tests */}
         {webhookData?.summary && (
-          <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto">
-            <TableCaption>Test results</TableCaption>
-            <TableHeader className="rounded-tr-lg rounded-tl-lg p-4">
-              <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase ">
-                <TableHead>Request</TableHead>
-                <TableHead>Status Code</TableHead>
-                <TableHead>Time</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow className="hover:bg-gray-50 cursor-pointer">
-                <TableCell className="flex items-center gap-2 my-2">
-                  <p className="truncate max-w-md">
-                    {webhookData?.summary.method}{" "}
-                    {webhookData?.summary.pathName}
-                  </p>
-                </TableCell>
-                <TableCell>
-                  <Tag
-                    variant={
-                      webhookData?.summary.statusCode === 200
-                        ? "default"
-                        : "error"
-                    }
-                  >
-                    {webhookData?.summary.statusCode}
-                  </Tag>
-                </TableCell>
-                <TableCell>
-                  <p>{webhookData?.summary.time}</p>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <>
+            <p className="text-sm font-medium tracking-wide">Test Results</p>
+            <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto bg-blue-50 dark:bg-background">
+              <TableHeader className="rounded-tr-lg rounded-tl-lg p-4 dark:bg-accent">
+                <TableRow className="bg-muted/50 text-muted-foreground text-sm uppercase dark:bg-accent">
+                  <TableHead>Request</TableHead>
+                  <TableHead>Status Code</TableHead>
+                  <TableHead>Time</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow className="hover:bg-gray-50 cursor-pointer">
+                  <TableCell className="flex items-center gap-2 my-2">
+                    <p className="truncate max-w-md">
+                      {webhookData?.summary.method}{" "}
+                      {webhookData?.summary.pathName}
+                    </p>
+                  </TableCell>
+                  <TableCell>
+                    <Tag
+                      variant={
+                        webhookData?.summary.statusCode === 200
+                          ? "default"
+                          : "error"
+                      }
+                    >
+                      {webhookData?.summary.statusCode}
+                    </Tag>
+                  </TableCell>
+                  <TableCell>
+                    <p>{webhookData?.summary.time}</p>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+
+            {/* Response body */}
+            <div className="mt-4 space-y-1">
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+                Response Body
+              </p>
+              <CodeDisplay
+                language={
+                  typeof webhookData?.response === "string" ? "text" : "json"
+                }
+                codeString={
+                  webhookData?.response == null
+                    ? "// No response body"
+                    : typeof webhookData.response === "string"
+                      ? webhookData.response
+                      : JSON.stringify(webhookData.response, null, 2)
+                }
+              />
+            </div>
+          </>
         )}
       </div>
     </div>

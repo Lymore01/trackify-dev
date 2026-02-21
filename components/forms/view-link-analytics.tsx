@@ -15,21 +15,35 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import LinksSkeleton from "../skeletons/links-skeleton";
 import { useAnalytics } from "@/hooks/use-analytics";
-import { Table } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
-export default function ViewLinkAnalyticsDetails() {
-  const searchParmas = useSearchParams();
-  const linkId = searchParmas.get("link");
-  const { analyticsData, isError, isLoading } = useAnalytics(linkId ?? "");
+const FALLBACK = (
+  <span className="text-muted-foreground/40 select-none">—</span>
+);
 
+function truncate(str: string | null | undefined, n: number) {
+  if (!str) return null;
+  return str.length > n ? str.slice(0, n) + "…" : str;
+}
+
+export default function ViewLinkAnalyticsDetails({
+  data,
+  isLoading,
+  isError,
+}: {
+  data: any;
+  isLoading: boolean;
+  isError: boolean;
+}) {
   if (isError) {
     return (
-      <div className="flex items-center justify-center h-full w-full">
-        <p className="text-red-500">Failed to fetch analytics data</p>
-      </div>
+      <TableRow>
+        <TableCell colSpan={9} className="text-center p-4">
+          <p className="text-red-500 text-sm">Failed to fetch analytics data</p>
+        </TableCell>
+      </TableRow>
     );
   }
-  const data = analyticsData?.clicks[0]?.clicks;
 
   return (
     <>
@@ -40,28 +54,81 @@ export default function ViewLinkAnalyticsDetails() {
           return (
             <TableRow
               key={dataItem.id}
-              className="hover:bg-gray-50 dark:bg-background cursor-pointer"
+              className="hover:bg-muted/30 dark:bg-background cursor-pointer transition-colors"
             >
-              <TableCell>
-                <p>{new Date(dataItem.createdAt).toLocaleString()}</p>
+              <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                {new Date(dataItem.createdAt).toLocaleString()}
               </TableCell>
-              <TableCell>{dataItem.ip}</TableCell>
-              <TableCell>
-                <p>{dataItem.country}</p>
+              <TableCell className="text-xs font-mono">
+                {dataItem.ip ?? FALLBACK}
+              </TableCell>
+              <TableCell>{dataItem.country ?? FALLBACK}</TableCell>
+              <TableCell>{dataItem.region ?? FALLBACK}</TableCell>
+              <TableCell
+                className="max-w-[160px] truncate text-xs"
+                title={dataItem.userAgent ?? ""}
+              >
+                {truncate(dataItem.userAgent, 30) ?? FALLBACK}
               </TableCell>
               <TableCell>
-                <p>{dataItem.region ?? "Unknown"}</p>
+                {dataItem.utmSource ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                    {dataItem.utmSource}
+                  </span>
+                ) : (
+                  FALLBACK
+                )}
               </TableCell>
               <TableCell>
-                <p>{dataItem.userAgent}</p>
+                {dataItem.utmMedium ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+                    {dataItem.utmMedium}
+                  </span>
+                ) : (
+                  FALLBACK
+                )}
+              </TableCell>
+              <TableCell>
+                {dataItem.utmCampaign ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                    {dataItem.utmCampaign}
+                  </span>
+                ) : (
+                  FALLBACK
+                )}
+              </TableCell>
+              <TableCell className="max-w-[160px]">
+                {dataItem.referrer && dataItem.referrer !== "direct" ? (
+                  <a
+                    href={
+                      dataItem.referrer.startsWith("http")
+                        ? dataItem.referrer
+                        : `https://${dataItem.referrer}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-primary hover:underline truncate"
+                    title={dataItem.referrer}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {truncate(dataItem.referrer, 25)}
+                    <ExternalLink size={10} className="shrink-0" />
+                  </a>
+                ) : dataItem.referrer === "direct" ? (
+                  <span className="text-xs text-muted-foreground italic">
+                    direct
+                  </span>
+                ) : (
+                  FALLBACK
+                )}
               </TableCell>
             </TableRow>
           );
         })
       ) : (
         <TableRow>
-          <TableCell colSpan={5} className="text-center">
-            <div className="text-gray-500 text-sm p-4">
+          <TableCell colSpan={9} className="text-center">
+            <div className="text-muted-foreground text-sm p-4">
               No clicks found for this link yet
             </div>
           </TableCell>

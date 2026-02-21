@@ -6,6 +6,7 @@ import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
 import { getDaysDifference } from "@/lib/utils";
 import { AppType } from "@/types/types";
+import { motion } from "framer-motion";
 
 export default function ApplicationCard({
   app,
@@ -15,17 +16,26 @@ export default function ApplicationCard({
   href?: string;
 }) {
   const router = useRouter();
-  const addQueryParameters = (appId: string) => {
+  const handleNavigate = () => {
     if (href) {
       router.push(href);
     } else {
-      router.push(`/dashboard/links?app=${appId}&name=${app.name}`);
+      router.push(`/dashboard/links?app=${app.id}&name=${app.name}`);
     }
   };
   return (
-    <div className="rounded-lg border">
-      <div className="bg-slate-200 dark:bg-accent p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600 dark:text-accent-foreground flex justify-between items-center">
-        <h1>{app.name}</h1>
+    <motion.div
+      whileHover={{
+        y: -5,
+        boxShadow:
+          "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+      }}
+      whileTap={{ scale: 0.98 }}
+      onClick={handleNavigate}
+      className="rounded-lg border bg-card cursor-pointer transition-colors hover:border-primary/50 overflow-hidden"
+    >
+      <div className="bg-slate-200 dark:bg-accent p-2 text-sm text-gray-600 dark:text-accent-foreground flex justify-between items-center">
+        <h1 className="font-bold">{app.name}</h1>
         <Tag variant={app.plan === "Free Plan" ? "warning" : "default"}>
           {app.plan}
         </Tag>
@@ -39,17 +49,14 @@ export default function ApplicationCard({
           </span>{" "}
           days ago
         </p>
-        <div
-          className="flex gap-1 group items-center text-xs text-zinc-700 dark:text-accent-foreground cursor-pointer"
-          onClick={() => addQueryParameters(app.id)}
-        >
+        <div className="flex gap-1 group items-center text-xs text-zinc-700 dark:text-accent-foreground font-bold">
           <span>View</span>
           <ArrowRight
             size={16}
-            className="group-hover:scale-150 transition-all"
+            className="group-hover:translate-x-1 transition-transform"
           />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

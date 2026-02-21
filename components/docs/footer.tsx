@@ -17,25 +17,34 @@ export function Footer() {
         <ExternalLink size={16} />
       </Link>
       <Separator className="my-8" />
-      <div className="flex w-full items-center justify-between mb-8">
-        <Link href={"/"}>
-          <p className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} Trackify
+      <div className="flex flex-col md:flex-row w-full items-start md:items-center justify-between gap-y-4 mb-8">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
+          <Link href={"/"}>
+            <p className="text-sm text-muted-foreground font-light hover:text-foreground transition-colors">
+              © 2026 Trackify Labs Inc.
+            </p>
+          </Link>
+          <span className="hidden md:inline text-muted-foreground/40 text-xs">
+            •
+          </span>
+          <p className="text-sm text-muted-foreground font-light">
+            Made with ❤️ by{" "}
+            <Link
+              href="https://github.com/Lymore01"
+              target="_blank"
+              className="hover:text-blue-500 transition-colors underline underline-offset-4"
+            >
+              Kelly Limo
+            </Link>
           </p>
-        </Link>
-        <div className="text-foreground text-sm flex items-center">
-          Built with <Heart className="fill-red-800 mx-2" size={12} />
-          by Kelly Limo
         </div>
         <Link
           href="https://github.com/Lymore01/trackify-dev/"
           target="_blank"
           rel="noopener noreferrer"
+          className="p-2 -m-2 hover:text-foreground transition-colors"
         >
-          <Github
-            size={16}
-            className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          />
+          <Github size={18} />
         </Link>
       </div>
     </div>

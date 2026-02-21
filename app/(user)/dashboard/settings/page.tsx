@@ -22,11 +22,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { TabButton } from "@/components/tab-button";
 import { LogoutButton } from "@/components/logout-button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Settings() {
   const [currentTab, setCurrentTab] = useState("profile");
   const [isPasswordVisible, setPasswordVisible] = useState(false);
-  const user = useAuth();
+  const { user, isLoading } = useAuth();
 
   return (
     <div className="flex flex-col h-max w-[60%] mx-auto my-4">
@@ -57,7 +58,7 @@ export default function Settings() {
             <div className="flex gap-4 items-center">
               <div className="rounded-full size-24 relative">
                 <Image
-                  src={"/images/aside.jpg"}
+                  src={"/images/aside.webp"}
                   alt="profile image"
                   layout="fill"
                   objectFit="cover"
@@ -66,8 +67,17 @@ export default function Settings() {
                 />
               </div>
               <div className="flex flex-col gap-2 items-start">
-                <h1 className="text-sm">{user.name}</h1>
-                <h1 className="text-sm text-blue-600">{user.email}</h1>
+                {isLoading ? (
+                  <>
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-48" />
+                  </>
+                ) : (
+                  <>
+                    <h1 className="text-sm">{user?.name}</h1>
+                    <h1 className="text-sm text-blue-600">{user?.email}</h1>
+                  </>
+                )}
               </div>
             </div>
             <Button>Change Image</Button>
@@ -77,25 +87,33 @@ export default function Settings() {
             {/* email address */}
             <div className="flex flex-col gap-4">
               <label htmlFor="email">Email</label>
-              <Input
-                placeholder="Email"
-                value={user.email}
-                id="email"
-                disabled
-              />
+              {isLoading ? (
+                <Skeleton className="h-10 w-full" />
+              ) : (
+                <Input
+                  placeholder="Email"
+                  value={user?.email}
+                  id="email"
+                  disabled
+                />
+              )}
             </div>
             {/* password */}
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-4">
                 <label htmlFor="password">Password</label>
                 <div className="relative" id="password">
-                  <Input
-                    type={isPasswordVisible ? "text" : "password"}
-                    placeholder="password"
-                    value={user.password}
-                    autoComplete="off"
-                    disabled
-                  />
+                  {isLoading ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Input
+                      type={isPasswordVisible ? "text" : "password"}
+                      placeholder="password"
+                      value={user?.password}
+                      autoComplete="off"
+                      disabled
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={() => setPasswordVisible(!isPasswordVisible)}
@@ -125,7 +143,3 @@ export default function Settings() {
     </div>
   );
 }
-
-
-
-

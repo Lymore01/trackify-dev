@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 const formschema = z.object({
@@ -43,6 +43,7 @@ type FormType = z.infer<typeof formschema>;
 
 export default function LoginForm() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const form = useForm<FormType>({
     resolver: zodResolver(formschema),
     defaultValues: {
@@ -52,35 +53,41 @@ export default function LoginForm() {
     },
   });
 
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (data: FormType) => {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (formData: FormType) => {
       const response = await fetch("/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: data.email,
-          password: data.password,
+          email: formData.email,
+          password: formData.password,
         }),
       });
-      if (!response.ok) {
-        const res = await response.json();
-        throw new Error(res.message);
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error?.message || "Login failed");
       }
-      return response.json();
+
+      return result.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message);
-      router.push(data.redirectUrl);
+      toast.success(data.message || "Welcome back!");
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      if (data.redirectUrl) {
+        router.push(data.redirectUrl);
+      }
     },
     onError: (err) => {
-      toast.error(err.message);
+      toast.error(err.message || "Login failed");
     },
   });
 
   const onSubmit = async (values: FormType) => {
-    await mutateAsync(values);
+    mutate(values);
   };
 
   return (
@@ -185,7 +192,10 @@ export default function LoginForm() {
 
         <Button type="submit" className="w-full shrink-0 cursor-pointer">
           {isPending ? (
-            <Loader size={16} className="animate-spin" />
+            <div className="flex gap-2 items-center">
+              <Loader size={16} className="animate-spin" />
+              Logging in...
+            </div>
           ) : (
             <span>Login</span>
           )}
@@ -194,7 +204,7 @@ export default function LoginForm() {
           className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white w-full flex items-center justify-center gap-2"
           type="button"
           onClick={async () => {
-            await mutateAsync({
+            mutate({
               email: "test@trackify.dev",
               password: "testpassword",
               rememberMe: true,

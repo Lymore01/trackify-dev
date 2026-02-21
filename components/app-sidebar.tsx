@@ -30,7 +30,6 @@ export default function AppSideBar({ items }: { items: SidebarItem[] }) {
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex items-start justify-center p-4">
         <h1 className="font-semibold">Trackify.</h1>
-       
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -54,9 +53,7 @@ export default function AppSideBar({ items }: { items: SidebarItem[] }) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="h-auto">
-             user
-            </SidebarMenuButton>
+            <SidebarMenuButton className="h-auto">user</SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

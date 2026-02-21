@@ -28,7 +28,7 @@ function _getCurrentUser(options: {
 function _getCurrentUser(options: {
   withFullUser: true;
   redirectIfNotFound?: false;
-}): Promise<User | null>;
+}): Promise<FullUser | null>;
 function _getCurrentUser(options: {
   withFullUser?: false;
   redirectIfNotFound: true;
@@ -43,7 +43,7 @@ async function _getCurrentUser({
   redirectIfNotFound = false,
 }) {
   const user = (await getUserFromSession(
-    await cookies()
+    await cookies(),
   )) as SessionUser | null;
 
   if (user == null) {

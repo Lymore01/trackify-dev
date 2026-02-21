@@ -10,7 +10,7 @@ import { User, Globe, Lock } from "lucide-react";
   title="Before you start"
   items={[
     { icon: User, label: "Trackify account is required", href: "https://trackify-dev.vercel.app/signup" },
-    { icon: Globe, label: "Ngrok account is required", href: "https://dashboard.ngrok.com/signup" },
+    { icon: Globe, label: "Ngrok account (optional — for testing with a real local server)", href: "https://dashboard.ngrok.com/signup" },
     { icon: Lock, label: "A backend server (Node.js, Deno etc.) to receive webhooks" }
   ]}
 />
@@ -47,7 +47,7 @@ app.post("/webhook/trackify", (req, res) => {
   try {
     const event = new Webhook(webhookSecret).verify(
       JSON.stringify(req.body),
-      { "webhook-signature": req.headers["webhook-signature"] as string }
+      { "x-webhook-signature": req.headers["x-webhook-signature"] as string }
     );
     // Handle the event (e.g., update your database)
     res.status(200).send("Received");
@@ -154,6 +154,40 @@ app.listen(3001, () => console.log("Listening for webhooks on port 3001"));
 />
 
 If your endpoint is set up correctly, you should see a 200 OK response in the dashboard and your server logs.
+
+<Spacer />
+
+## 5b. Quick Test with webhook.site (No Setup Required)
+
+<Spacer />
+
+Don't have a backend server yet? **[webhook.site](https://webhook.site)** gives you an instant public URL that captures any HTTP request — perfect for verifying that Trackify is sending the right payload before you write a single line of server code.
+
+**Steps:**
+
+1. Go to **[webhook.site](https://webhook.site)** — you'll immediately get a unique URL like:
+
+<CodeDisplay
+  language="bash"
+  codeString={`https://webhook.site/your-unique-id`}
+/>
+
+2. In the **Trackify Dashboard**, open your webhook endpoint and paste the webhook.site URL as the endpoint URL.
+3. Click **"Send Example"** in the **Test Endpoint** panel.
+4. Switch back to webhook.site — you'll see the full request appear in real time, including:
+   - The `x-webhook-signature` header
+   - The event type and payload body
+   - The response status code and timing
+
+> **No account, no install, no backend needed.** webhook.site is the fastest way to confirm your webhook is being fired correctly before connecting a real server.
+
+<Spacer />
+
+> **What to check on webhook.site:**
+> - The **request method** should be `POST`
+> - The **`Content-Type`** header should be `application/json`
+> - The **`x-webhook-signature`** header should be present (used to verify authenticity)
+> - The **body** should contain the event type and data matching your selected event
 
 <Spacer />
 

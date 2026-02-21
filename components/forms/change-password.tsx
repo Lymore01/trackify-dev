@@ -48,7 +48,7 @@ export default function ChangePassForm({ username }: { username?: string }) {
   const email = searchParams.get("email");
   const { updatePassword, isPending } = useUpdatePass(
     token ?? undefined,
-    email ?? undefined
+    email ?? undefined,
   );
   const form = useForm<FormType>({
     resolver: zodResolver(formschema),
@@ -134,7 +134,10 @@ export default function ChangePassForm({ username }: { username?: string }) {
           disabled={username === "Test User"}
         >
           {isPending ? (
-            <Loader size={16} className="animate-spin" />
+            <div className="flex gap-2 items-center">
+              <Loader className="animate-spin" size={16} />
+              <span>Changing...</span>
+            </div>
           ) : (
             <span>Change Password</span>
           )}

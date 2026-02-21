@@ -6,6 +6,11 @@ import WebhookAccordion from "./webhook-accordion";
 
 const navItems = [
   {
+    name: "Introduction",
+    href: "/docs",
+    description: "Welcome to Trackify",
+  },
+  {
     name: "Getting Started",
     href: "/docs/getting-started",
     description: "Learn how to set up and use Trackify",
@@ -31,7 +36,7 @@ export function Sidebar({ className }: { className?: string }) {
                 href={item.href}
                 className={cn(
                   "text-muted-foreground text-sm hover:text-foreground transition-colors",
-                  item.href === currentPath && "font-semibold text-foreground"
+                  item.href === currentPath && "font-semibold text-foreground",
                 )}
               >
                 {item.name}

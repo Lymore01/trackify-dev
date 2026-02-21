@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import crypto from "crypto";
 import { NextResponse } from "next/server";
+import { AppError } from "./exceptions";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -21,7 +22,7 @@ export function getDaysDifference(dateString: string) {
   const differenceInMilliseconds = today.getTime() - givenDate.getTime();
 
   const differenceInDays = Math.floor(
-    differenceInMilliseconds / (1000 * 60 * 60 * 24)
+    differenceInMilliseconds / (1000 * 60 * 60 * 24),
   );
 
   return differenceInDays;
@@ -29,7 +30,27 @@ export function getDaysDifference(dateString: string) {
 
 // api repsonse
 export function apiResponse(data: any, status = 200) {
-  return NextResponse.json(data, { status });
+  if (data instanceof AppError) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          message: data.message,
+          code: data.code,
+        },
+      },
+      { status: data.statusCode },
+    );
+  }
+
+  const isSuccess = status >= 200 && status < 300;
+  return NextResponse.json(
+    {
+      success: isSuccess,
+      ...(isSuccess ? { data } : { error: data }),
+    },
+    { status },
+  );
 }
 
 export const generateShortId: () => string = () => {

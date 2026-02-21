@@ -13,7 +13,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import LinksSkeleton from "../skeletons/links-skeleton";
 import { LinkType } from "@/types/types";
 import { useUrl } from "@/hooks/use-url";
-import { useAnalytics } from "@/hooks/use-analytics";
 
 export default function LinksTable() {
   const searchParams = useSearchParams();
@@ -35,8 +34,8 @@ export default function LinksTable() {
   return (
     <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto bg-blue-50 dark:bg-background">
       <TableCaption>A list of your shortened links.</TableCaption>
-      <TableHeader className="rounded-tr-lg rounded-tl-lg p-4 dark:bg-accent ">
-        <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase dark:bg-accent">
+      <TableHeader className="rounded-tr-lg rounded-tl-lg p-4 dark:bg-accent">
+        <TableRow className="bg-muted/50 text-muted-foreground text-sm uppercase dark:bg-accent">
           <TableHead>URL</TableHead>
           <TableHead>Total Clicks</TableHead>
         </TableRow>
@@ -44,10 +43,10 @@ export default function LinksTable() {
       <TableBody className="">
         {isLoading ? (
           [...Array(3)].map((_, idx) => <LinksSkeleton key={idx} />)
-        ) : links.data?.length > 0 ? (
-          links.data.map(
+        ) : links?.length > 0 ? (
+          links.map(
             (
-              link: Pick<LinkType, "id" | "original" | "shortId" | "clicks">
+              link: Pick<LinkType, "id" | "original" | "shortId" | "clicks">,
             ) => (
               <TableRow
                 key={link.id}
@@ -59,7 +58,7 @@ export default function LinksTable() {
                 </TableCell>
                 <TableCell>{link.clicks.length ?? 0}</TableCell>
               </TableRow>
-            )
+            ),
           )
         ) : (
           <TableRow>

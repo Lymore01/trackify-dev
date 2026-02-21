@@ -38,10 +38,14 @@ const formSchema = z.object({
   events: z.array(z.string()),
 });
 
-export default function AddMoreEvents() {
+export default function AddMoreEvents({
+  currentEvents = [],
+}: {
+  currentEvents?: string[];
+}) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const searchParams = useSearchParams();
-  const endpoint = searchParams.get('endpoint');
+  const endpoint = searchParams.get("endpoint");
   const queryClient = useQueryClient();
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -53,16 +57,16 @@ export default function AddMoreEvents() {
     },
   });
 
-  const { updateWebhook, isPending } = useUpdateWebhook(endpoint || '');
+  const { updateWebhook, isPending } = useUpdateWebhook(endpoint || "");
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    await updateWebhook(values);
+    // Merge newly selected events with existing ones (deduped)
+    const merged = Array.from(new Set([...currentEvents, ...values.events]));
+    await updateWebhook({ events: merged });
     setIsDialogOpen(false);
     form.reset();
-    queryClient.invalidateQueries({
-      queryKey: ["webhooks"],
-    });
+    queryClient.invalidateQueries({ queryKey: ["webhook"] });
+    queryClient.invalidateQueries({ queryKey: ["webhooks"] });
   };
   return (
     <div>
@@ -96,7 +100,10 @@ export default function AddMoreEvents() {
                   <FormItem>
                     <FormControl>
                       <div className="flex space-x-2 py-2 flex-col gap-2">
-                        <EventSelection field={field} />
+                        <EventSelection
+                          field={field}
+                          excludedEvents={currentEvents}
+                        />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -106,7 +113,7 @@ export default function AddMoreEvents() {
             </form>
           </Form>
           <Separator />
-           <DialogFooter className="flex justify-between w-full lg:items-center">
+          <DialogFooter className="flex justify-between w-full lg:items-center">
             <Button
               variant={"outline"}
               className="cursor-pointer"

@@ -13,6 +13,8 @@ export function useUrl(params: useUrlOptions) {
     data: links,
     isLoading,
     isError,
+    refetch,
+    isFetching,
   } = useQuery({
     queryKey: ["links", query],
     queryFn: async () => {
@@ -23,13 +25,15 @@ export function useUrl(params: useUrlOptions) {
         },
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch links");
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error?.message || "Failed to fetch links");
       }
 
-      return await response.json();
+      return result.data;
     },
   });
 
-  return { links, isLoading, isError };
+  return { links, isLoading, isError, refetch, isFetching };
 }

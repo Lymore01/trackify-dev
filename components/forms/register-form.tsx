@@ -46,7 +46,7 @@ export default function RegistrationForm() {
     },
   });
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async (data: FormType) => {
       const response = await fetch("/api/users/register", {
         method: "POST",
@@ -59,11 +59,13 @@ export default function RegistrationForm() {
           password: data.password,
         }),
       });
-      if (!response.ok) {
-        const res = await response.json();
-        throw new Error(res.message);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error?.message || "Registration failed");
       }
-      return response.json();
+
+      return result.data;
     },
     onSuccess: (data) => {
       toast.success(data.message);
@@ -75,7 +77,7 @@ export default function RegistrationForm() {
   });
 
   const onSubmit = async (values: FormType) => {
-    await mutateAsync(values);
+    mutate(values);
   };
 
   return (
@@ -159,7 +161,10 @@ export default function RegistrationForm() {
         />
         <Button type="submit" className="w-full shrink-0 cursor-pointer">
           {isPending ? (
-            <Loader size={16} className="animate-spin" />
+            <div className="flex gap-2 items-center">
+              <Loader size={16} className="animate-spin" />
+              Registering...
+            </div>
           ) : (
             <span>Register</span>
           )}

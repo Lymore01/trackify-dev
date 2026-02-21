@@ -5,6 +5,8 @@ export function useAnalytics(linkId: string) {
     data: analyticsData,
     isLoading,
     isError,
+    refetch,
+    isFetching,
   } = useQuery({
     queryKey: ["link-analytics", linkId],
     queryFn: async () => {
@@ -14,11 +16,17 @@ export function useAnalytics(linkId: string) {
           "Content-Type": "application/json",
         },
       });
-      if (!response.ok) {
-        throw new Error("Failed to fetch analytics data");
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.error?.message || "Failed to fetch analytics data",
+        );
       }
-      return await response.json();
+
+      return result.data;
     },
   });
-  return { analyticsData, isLoading, isError };
+  return { analyticsData, isLoading, isError, refetch, isFetching };
 }

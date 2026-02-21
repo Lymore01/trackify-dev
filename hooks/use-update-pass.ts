@@ -4,14 +4,14 @@ import { toast } from "sonner";
 import { useAuth } from "./use-auth";
 
 export function useUpdatePass(token?: string, email?: string) {
-  const user = useAuth();
+  const { user } = useAuth();
 
   const { mutateAsync: updatePassword, isPending } = useMutation({
     mutationFn: async (data: FormType) => {
       const defaultBody = {
         email: email ? email : user.email,
         newPassword: data.newPass,
-        currentPassword: data.currentPass
+        currentPassword: data.currentPass,
       };
       const response = await fetch("/api/users/reset-password", {
         method: "POST",
@@ -21,13 +21,15 @@ export function useUpdatePass(token?: string, email?: string) {
         body: JSON.stringify(token ? { token, ...defaultBody } : defaultBody),
       });
 
-      if (!response.ok) {
-        const res = await response.json();
-        throw new Error(res.message || "Something went wrong");
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error?.message || "Something went wrong");
       }
 
-      return response.json();
+      return result.data;
     },
+
     onSuccess: (data) => {
       toast.success(data.message || "Password changed successfully");
     },

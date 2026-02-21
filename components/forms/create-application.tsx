@@ -50,49 +50,54 @@ export default function CreateApplication() {
   });
   const queryClient = useQueryClient();
 
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (data: ApplicationType) => {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (formData: ApplicationType) => {
       const response = await fetch("/api/application", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          appName: data.applicationName,
+          appName: formData.applicationName,
         }),
       });
-      if (!response.ok) {
-        const res = await response.json();
-        throw new Error(res.message);
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.error?.message || "Failed to create application",
+        );
       }
-      return response.json();
+
+      return result.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message);
+      toast.success(data.message || "Application created successfully");
       setIsDialogOpen(false);
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["applications"] });
     },
     onError: (err) => {
-      toast.error(err.message);
+      toast.error(err.message || "Something went wrong");
     },
   });
 
   const onSubmit = async (values: ApplicationType) => {
-    await mutateAsync(values);
+    mutate(values);
   };
 
   return (
     <div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button className="cursor-pointer dark:bg-accent dark:text-accent-foreground hover:dark:bg-sidebar-accent-hover">
-            <span className="sr-only">Create Application</span>
-            <Plus />
-            Create Application
+          <Button className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 rounded-lg px-5 h-11 transition-all duration-300 active:scale-95 group">
+            <Plus className="size-4 group-hover:rotate-90 transition-transform duration-300" />
+            <span className="font-normal tracking-tight">
+              Create Application
+            </span>
           </Button>
         </DialogTrigger>
-    
 
         <DialogContent className="max-h-[90vh] w-[80vw] md:w-[60vw] lg:w-[50vw] overflow-auto">
           <DialogHeader>
@@ -150,9 +155,13 @@ export default function CreateApplication() {
               className="cursor-pointer"
               type="submit"
               form="create-app-form"
+              disabled={isPending}
             >
               {isPending ? (
-                <Loader size={16} className="animate-spin" />
+                <div className="flex gap-2 items-center">
+                  <Loader className="animate-spin" size={16} />
+                  <span>Creating...</span>
+                </div>
               ) : (
                 <span>Create</span>
               )}

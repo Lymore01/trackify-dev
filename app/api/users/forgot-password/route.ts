@@ -7,6 +7,7 @@ import { fetchUser } from "@/services/userServices";
 import { forgotPassSchema } from "@/validations/authValidations";
 import crypto from "crypto";
 import { addMinutes } from "date-fns";
+import { config } from "@/config/config";
 
 export async function POST(req: Request) {
   try {
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
     if (!success) {
       return apiResponse(
         { success: false, message: "Invalid email format" },
-        400
+        400,
       );
     }
 
@@ -24,21 +25,21 @@ export async function POST(req: Request) {
     if (!user) {
       return apiResponse(
         { success: false, message: "No account found with that email" },
-        404
+        404,
       );
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
     const expiresAt = addMinutes(new Date(), 30);
 
-    const resetLink = `https://trackify-dev.vercel.app/reset-password?token=${resetToken}&email=${emailData.email}`;
+    const resetLink = `${config.BASE_URL}/reset-password?token=${resetToken}&email=${emailData.email}`;
 
     const emailHtml = `
       <div style="font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; padding: 30px;">
         <table style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 8px;">
           <tr>
             <td style="text-align: center;">
-              <img src="https://yourdomain.com/logo.svg" alt="Trackify Logo" style="height: 50px; margin-bottom: 20px;" />
+              <h1 style="color: #007BFF; margin-bottom: 20px;">Trackify</h1>
             </td>
           </tr>
           <tr>
@@ -78,7 +79,6 @@ export async function POST(req: Request) {
       html: emailHtml,
     });
 
-  
     await storeEmailToken({
       email: emailData.email,
       token: resetToken,
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
         success: response.success,
         message: "Password reset email sent successfully",
       },
-      200
+      200,
     );
   } catch (error) {
     console.error("Forgot password error:", error);
@@ -99,7 +99,7 @@ export async function POST(req: Request) {
         success: false,
         message: "Something went wrong. Please try again later.",
       },
-      500
+      500,
     );
   }
 }

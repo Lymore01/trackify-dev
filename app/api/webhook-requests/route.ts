@@ -1,9 +1,11 @@
 import { apiResponse } from "@/lib/utils";
 import {
   createWebhookRequest,
+  deleteWebhookRequests,
   fetchWebhookSummary,
 } from "@/services/webhookServices";
 import { webhookRequestSchema } from "@/validations/webhooksValidation";
+import { ValidationError, AppError } from "@/lib/exceptions";
 
 export async function POST(req: Request) {
   try {
@@ -11,24 +13,18 @@ export async function POST(req: Request) {
     const { data: parsedData, success } = webhookRequestSchema.safeParse(body);
 
     if (!success) {
-      return apiResponse(
-        { success: false, message: "Invalid request body" },
-        400
-      );
+      throw new ValidationError("Invalid request body");
     }
 
     await createWebhookRequest(parsedData);
 
     return apiResponse(
-      {
-        success: true,
-        message: "Webhook request created",
-      },
-      201
+      { message: "Webhook request created successfully" },
+      201,
     );
   } catch (error) {
-    console.error("POST /api/webhook-request error:", error);
-    return apiResponse({ error: "Internal Server Error" }, 500);
+    console.error("POST /api/webhook-requests error:", error);
+    return apiResponse(error);
   }
 }
 
@@ -38,28 +34,32 @@ export async function GET(req: Request) {
     const endpointId = searchParams.get("endpoint");
 
     if (!endpointId) {
-      return apiResponse(
-        { success: false, message: "Endpoint id required" },
-        400
-      );
+      throw new ValidationError("Endpoint id is required");
     }
 
     const data = await fetchWebhookSummary(endpointId);
 
-    return apiResponse(
-      {
-        success: true,
-        message: "Webhook request summary fetched",
-        data,
-      },
-      200
-    );
-    
+    return apiResponse(data, 200);
   } catch (error) {
-    console.error(
-      "GET /api/webhook-request?endpoint=${endpointId} error:",
-      error
-    );
-    return apiResponse({ error: "Internal Server Error" }, 500);
+    console.error("GET /api/webhook-requests error:", error);
+    return apiResponse(error);
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const searchParams = new URL(req.url).searchParams;
+    const endpointId = searchParams.get("endpoint");
+
+    if (!endpointId) {
+      throw new ValidationError("Endpoint id is required");
+    }
+
+    await deleteWebhookRequests(endpointId);
+
+    return apiResponse({ message: "Webhook logs cleared successfully" }, 200);
+  } catch (error) {
+    console.error("DELETE /api/webhook-requests error:", error);
+    return apiResponse(error);
   }
 }

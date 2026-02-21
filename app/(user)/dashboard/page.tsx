@@ -3,19 +3,21 @@
 import ApplicationCard from "@/components/cards/applications-card";
 import CreateApplication from "@/components/forms/create-application";
 import SearchModal from "@/components/modals/search";
-import ApplicationCardSkelton from "@/components/skeletons/application-card-skelton";
+import ApplicationCardSkeleton from "@/components/skeletons/application-card-skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApplications } from "@/hooks/use-applications";
 import { useAuth } from "@/hooks/use-auth";
 import { AppType } from "@/types/types";
-import { Info, Search } from "lucide-react";
+import { Info, LogOut, RefreshCcw, Search } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function Dashboard() {
-  const { apps, isError, isLoading } = useApplications();
+  const { apps, isError, isLoading, refetch, isFetching } = useApplications();
   const [searchOpen, setSearchOpen] = useState(false);
-  const user = useAuth();
+  const { user, isLoading: userLoading } = useAuth();
 
   if (isError) return <div>Error fetching applications</div>;
   return (
@@ -23,7 +25,7 @@ export default function Dashboard() {
       <h1 className="text-xl my-2 flex gap-2 items-center ml-2 lg:ml-0">
         Hello👋,{" "}
         <span>
-          {isLoading ? (
+          {userLoading ? (
             <Skeleton className="w-24 h-6" />
           ) : (
             <span>{user.name}</span>
@@ -44,8 +46,22 @@ export default function Dashboard() {
       {/* applications */}
       <div className="mt-4 space-y-4 p-2 lg:p-0">
         <div className="flex items-center justify-between">
-          <h1>Applications</h1>
+          <h1 className="text-lg font-semibold">Applications</h1>
           <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                refetch().then(() => toast.success("Dashboard refreshed"));
+              }}
+              disabled={isLoading || isFetching}
+              className="cursor-pointer"
+            >
+              <RefreshCcw
+                size={14}
+                className={isFetching ? "animate-spin" : ""}
+              />
+            </Button>
             <Search
               size={16}
               className="cursor-pointer"
@@ -58,7 +74,7 @@ export default function Dashboard() {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {isLoading ? (
-            [...Array(3)].map((_, idx) => <ApplicationCardSkelton key={idx} />)
+            [...Array(3)].map((_, idx) => <ApplicationCardSkeleton key={idx} />)
           ) : apps?.length > 0 ? (
             apps.map((app: AppType) => (
               <ApplicationCard key={app.id} app={app} />

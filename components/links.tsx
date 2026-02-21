@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Breadcrumb,
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Separator } from "./ui/separator";
+import { Skeleton } from "./ui/skeleton";
 
 import EditWebhook from "./forms/edit-webhook";
 import { startTransition, useRef, useState } from "react";
@@ -51,12 +52,10 @@ export default function Links() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [confirmDeletionOpen, setConfirmDeletionOpen] = useState(false);
-  let hostName: string = "";
-
-  if (typeof window !== "undefined") {
-    hostName = window.location.origin;
-  }
-  const data: LinkType = links?.data[0];
+  const hostName =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "");
+  const data: LinkType = links?.[0];
 
   const { mutateAsync: deleteUrl, isPending } = useMutation({
     mutationFn: async () => {
@@ -103,7 +102,7 @@ export default function Links() {
     return <div>Error fetching links</div>;
   }
 
-  if (!data) {
+  if (!isLoading && !data) {
     return (
       <div className="flex items-center w-full text-gray-500 text-sm">
         No link found or has been deleted
@@ -133,43 +132,55 @@ export default function Links() {
           <Tag variant={"default"}>Active</Tag>
         </div>
         <div className="flex justify-end items-center">
-          <DropdownMenu open={open} onOpenChange={setOpen}>
-            <DropdownMenuTrigger>
-              <EllipsisVertical className="cursor-pointer" size={16} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {/* <DropdownMenuItem>Disable link</DropdownMenuItem> */}
-              <DropdownMenuItem
-                className="text-red-600 hover:text-red-600"
-                onClick={() => {
-                  startTransition(() => {
-                    setConfirmDeletionOpen(true);
-                  });
-                }}
-              >
-                Delete Link
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {isLoading ? (
+            <Skeleton className="h-8 w-8 rounded-full" />
+          ) : (
+            <DropdownMenu open={open} onOpenChange={setOpen}>
+              <DropdownMenuTrigger>
+                <EllipsisVertical className="cursor-pointer" size={16} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {/* <DropdownMenuItem>Disable link</DropdownMenuItem> */}
+                <DropdownMenuItem
+                  className="text-red-600 hover:text-red-600"
+                  onClick={() => {
+                    startTransition(() => {
+                      setConfirmDeletionOpen(true);
+                    });
+                  }}
+                >
+                  Delete Link
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
       <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="col-span-2 space-y-4">
           <div className="flex justify-between items-center">
-            <h1 ref={linkRef}>
-              {hostName}/u/{data.shortId}
-            </h1>
-            <div
-              className=""
-              onClick={() => {
-                navigator.clipboard.writeText(`${hostName}/u/${data.shortId}`);
-                toast.success("Link copied to clipboard");
-              }}
-            >
-              <Copy size={16} className="cursor-pointer" />
-            </div>
+            {isLoading ? (
+              <Skeleton className="h-8 w-64" />
+            ) : (
+              <h1 ref={linkRef}>
+                {hostName}/u/{data.shortId}
+              </h1>
+            )}
+            {!isLoading && (
+              <div
+                className=""
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${hostName}/u/${data.shortId}`,
+                  );
+                  toast.success("Link copied to clipboard");
+                }}
+              >
+                <Copy size={16} className="cursor-pointer" />
+              </div>
+            )}
           </div>
           {/* overview */}
           <div className="rounded-lg border">
@@ -180,31 +191,70 @@ export default function Links() {
             <div className="p-4 text-sm space-y-4">
               <div className="flex justify-between items-center">
                 <h1>Original URL</h1>
-                <EditLinkURL current={data.original} linkID={data.id} />
+                {!isLoading && (
+                  <EditLinkURL current={data.original} linkID={data.id} />
+                )}
               </div>
-              <div className="p-2 border text-gray-600" ref={originalLinkRef}>
-                {data.original}
-              </div>
+              {isLoading ? (
+                <Skeleton className="h-10 w-full" />
+              ) : (
+                <div
+                  className="p-2 border text-muted-foreground"
+                  ref={originalLinkRef}
+                >
+                  {data.original}
+                </div>
+              )}
             </div>
             <div className="p-4 text-sm space-y-4">
               <div className="flex justify-between items-center">
                 <h1>Description</h1>
-                <EditLinkDescription
-                  current={data.description}
-                  linkID={data.id}
-                />
+                {!isLoading && (
+                  <EditLinkDescription
+                    current={data.description}
+                    linkID={data.id}
+                  />
+                )}
               </div>
-              <div className="p-2 border text-gray-600" ref={descriptionRef}>
-                {data.description}
-              </div>
+              {isLoading ? (
+                <Skeleton className="h-10 w-full" />
+              ) : (
+                <div
+                  className="p-2 border text-muted-foreground"
+                  ref={descriptionRef}
+                >
+                  {data.description
+                    ? data.description
+                    : "No description provided"}
+                </div>
+              )}
             </div>
           </div>
         </div>
-        <LinkDetails
-          createdAt={data.createdAt}
-          updatedAt={data.updatedAt}
-          trackingId={data.shortId}
-        />
+        {isLoading ? (
+          <div className="mt-2 ml-4 space-y-6">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          </div>
+        ) : (
+          <LinkDetails
+            createdAt={data.createdAt}
+            updatedAt={data.updatedAt}
+            trackingId={data.shortId}
+          />
+        )}
       </div>
       {/* anlaytics */}
       <LinkAnalytics />

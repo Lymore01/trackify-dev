@@ -1,6 +1,7 @@
 import { getUserFromSession } from "@/auth/core/session";
 import { NextResponse, type NextRequest } from "next/server";
 import { trackClick } from "./lib/middlewares/click-tracker";
+import { ratelimit } from "./lib/ratelimit";
 
 const privateRoutePattern = /^\/dashboard(\/|$)/;
 const publicRoutePattern =
@@ -8,6 +9,27 @@ const publicRoutePattern =
 const redirectRoutesPattern = /^\/u\/[^/]+$/;
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Only rate-limit API routes — not every dashboard navigation
+  if (pathname.startsWith("/api/")) {
+    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const { success, limit, reset, remaining } = await ratelimit.limit(
+      `ratelimit_${ip}`,
+    );
+
+    if (!success) {
+      return new NextResponse("Too Many Requests", {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": limit.toString(),
+          "X-RateLimit-Remaining": remaining.toString(),
+          "X-RateLimit-Reset": reset.toString(),
+        },
+      });
+    }
+  }
+
   const response = (await middlewareAuth(request)) ?? NextResponse.next();
   return response;
 }
@@ -41,7 +63,8 @@ export async function handlePublicRoutes(request: NextRequest) {
 }
 
 export async function handleRedirectRoutes(request: NextRequest) {
-  await trackClick(request);
+  // Fire-and-forget — don't block the redirect waiting for tracking to complete
+  trackClick(request).catch(() => {});
 }
 
 export const config = {

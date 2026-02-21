@@ -17,7 +17,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  useIsFetching,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { EllipsisVertical, Info, Loader, RefreshCcw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -31,7 +36,8 @@ export default function Link() {
   const appId = searchParams.get("app");
   const appName = searchParams.get("name");
   const queryClient = useQueryClient();
-  const { apps } = useApplications();
+  const isFetchingLinks = useIsFetching({ queryKey: ["links"] });
+  const { apps, isLoading } = useApplications();
 
   const [confirmDeletionOpen, setConfirmDeletionOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -65,6 +71,31 @@ export default function Link() {
 
   const app = apps?.find((app: { id: string }) => app.id === appId);
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col h-max w-[100%] lg:w-[60%] mx-auto my-4 p-2 lg:p-0 space-y-4">
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-8 w-48 rounded" />
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-24 rounded-md" />
+            <Skeleton className="h-9 w-9 rounded-full" />
+          </div>
+        </div>
+        <Skeleton className="h-10 w-full rounded-md" />
+        <div className="mt-8 space-y-4">
+          <div className="flex justify-between items-center">
+            <Skeleton className="h-7 w-20" />
+            <div className="flex gap-2">
+              <Skeleton className="h-8 w-10" />
+              <Skeleton className="h-8 w-24" />
+            </div>
+          </div>
+          <Skeleton className="h-[300px] w-full rounded-lg border shadow-sm" />
+        </div>
+      </div>
+    );
+  }
+
   if (!app) {
     return (
       <div className="flex flex-col h-max w-[100%] lg:w-[60%] mx-auto my-4 p-2 lg:p-0">
@@ -83,7 +114,7 @@ export default function Link() {
         <div className="flex gap-2 items-center">
           <Button
             variant={"link"}
-            className="cursor-pointer"
+            className="cursor-pointer underline"
             onClick={() => {
               router.push(`/dashboard/${appName}/webhooks?appId=${appId}`);
             }}
@@ -136,18 +167,25 @@ export default function Link() {
       ) : (
         <>
           <div className="mt-4 flex justify-between items-center">
-            <h1>Links</h1>
+            <h1 className="text-lg font-semibold">Links</h1>
             <div className="flex gap-2 items-center">
               <Button
                 variant={"outline"}
+                size="sm"
                 className="cursor-pointer"
                 onClick={() => {
-                  queryClient.invalidateQueries({
-                    queryKey: ["links"],
-                  });
+                  queryClient
+                    .invalidateQueries({
+                      queryKey: ["links"],
+                    })
+                    .then(() => toast.success("Links refreshed"));
                 }}
+                disabled={!!isFetchingLinks}
               >
-                <RefreshCcw size={16} />
+                <RefreshCcw
+                  size={14}
+                  className={isFetchingLinks ? "animate-spin" : ""}
+                />
               </Button>
               <AddLink />
             </div>

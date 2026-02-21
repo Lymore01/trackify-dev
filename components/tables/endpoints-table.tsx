@@ -10,9 +10,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
-import { WebhookIcon } from "lucide-react";
+import { RefreshCcw, WebhookIcon } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Tag from "../tag";
+import EndpointsSkeleton from "../skeletons/endpoints-skeleton";
+import { Button } from "../ui/button";
 
 export type WebhookType = {
   id: string;
@@ -28,7 +30,12 @@ export default function EndpointsTable() {
   const addQueryParameters = (id: string) => {
     router.push(`/dashboard/${app}/webhooks?appId=${appId}&endpoint=${id}`);
   };
-  const { data: webhooks } = useQuery({
+  const {
+    data: webhooks,
+    isLoading,
+    refetch,
+    isFetching,
+  } = useQuery({
     queryKey: ["webhooks", appId],
     queryFn: async () => {
       const res = await fetch(`/api/webhooks/${appId}`, {
@@ -37,25 +44,30 @@ export default function EndpointsTable() {
           "Content-Type": "application/json",
         },
       });
-      if (!res.ok) {
-        throw new Error("Failed to fetch webhooks");
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.error?.message || "Failed to fetch webhooks");
       }
-      const data = await res.json();
-      return data;
+
+      return result.data;
     },
   });
   return (
     <Table className="mt-6 rounded-lg border shadow-md overflow-x-auto bg-blue-50 dark:bg-background">
       <TableCaption>A list of your webhooks endpoints.</TableCaption>
       <TableHeader className="rounded-tr-lg rounded-tl-lg p-4 dark:bg-accent">
-        <TableRow className="bg-gray-100 text-gray-600 text-sm uppercase dark:bg-accent">
+        <TableRow className="bg-muted/50 text-muted-foreground text-sm uppercase dark:bg-accent">
           <TableHead>URL</TableHead>
           <TableHead>Error Rate</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {webhooks?.webhooks.length > 0 ? (
-          webhooks?.webhooks.map((webhook: WebhookType) => (
+        {isLoading ? (
+          [...Array(3)].map((_, idx) => <EndpointsSkeleton key={idx} />)
+        ) : webhooks?.length > 0 ? (
+          webhooks.map((webhook: WebhookType) => (
             <TableRow
               key={webhook.id}
               className="hover:bg-gray-50 cursor-pointer"
@@ -66,9 +78,7 @@ export default function EndpointsTable() {
                 <p className="truncate max-w-md">{webhook.url}</p>
               </TableCell>
               <TableCell>
-               <Tag>
-                0.00%
-               </Tag>
+                <Tag>0.00%</Tag>
               </TableCell>
             </TableRow>
           ))

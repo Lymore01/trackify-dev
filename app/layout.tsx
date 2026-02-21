@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
 import localFont from "next/font/local";
 import "./globals.css";
-import CustomSidebar from "@/components/custom-sidebar";
-import TopNav from "@/components/top-nav";
 import { ReactQueryProvider } from "../lib/react-query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 

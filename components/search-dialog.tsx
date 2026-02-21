@@ -1,3 +1,5 @@
+"use client";
+
 import { Search, File, Hash } from "lucide-react";
 import {
   Dialog,
@@ -24,7 +26,7 @@ export default function SearchDialog() {
         e.preventDefault();
       }
     },
-    [open]
+    [open],
   );
 
   useEffect(() => {
@@ -41,17 +43,19 @@ export default function SearchDialog() {
         <div>
           <div
             role="button"
-            className="p-2 hidden md:flex gap-4 items-center justify-between rounded-lg cursor-pointer bg-accent dark:bg-accent dark:text-accent-foreground border "
+            className="group/trigger w-full px-3 py-2.5 hidden md:flex gap-3 items-center justify-between rounded-xl cursor-pointer bg-zinc-100/50 dark:bg-zinc-900/50 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/80 text-muted-foreground hover:text-foreground border border-border/50 transition-all duration-200"
           >
-            <div className="flex items-center gap-2">
-              <Search size={16} />
-              <p className="text-muted-foreground text-sm">
-                Search documentation
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Search
+                size={16}
+                className="shrink-0 opacity-60 group-hover/trigger:opacity-100 transition-opacity"
+              />
+              <p className="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+                Search docs...
               </p>
             </div>
             <Shortcut setOpen={setOpen} />
           </div>
-          {/* mobile */}
           <Button
             variant={"outline"}
             className="flex md:hidden"
@@ -63,7 +67,7 @@ export default function SearchDialog() {
       </DialogTrigger>
       <DialogContent
         aria-describedby={undefined}
-        className="fixed top-[10vh] translate-y-[25%] w-[98vw] max-w-screen-sm rounded-lg border bg-accent text-accent-foreground shadow-lg p-0"
+        className="fixed top-[10vh] left-1/2 -translate-x-1/2 w-[95vw] md:max-w-2xl rounded-xl border bg-accent text-accent-foreground shadow-2xl p-0 overflow-hidden"
       >
         <DialogTitle className="hidden">Search Docs</DialogTitle>
         <div className="flex flex-row items-center gap-2 px-3 mt-3.5">
@@ -109,7 +113,6 @@ function SearchResults({
       {value && results.length === 0 && (
         <div className="px-3 py-2">
           <p className="text-muted-foreground text-sm">No results found.</p>
-
         </div>
       )}
       {results.map((result, idx) => (
@@ -121,11 +124,11 @@ function SearchResults({
           onClick={() => setOpen(false)}
         >
           {result.icon === "file" ? (
-            <File size={16} className="text-muted-foreground" />
+            <File size={16} className="text-muted-foreground shrink-0" />
           ) : (
-            <Hash size={16} className="text-muted-foreground" />
+            <Hash size={16} className="text-muted-foreground shrink-0" />
           )}
-          <span>{result.label}</span>
+          <span className="truncate flex-1">{result.label}</span>
         </a>
       ))}
     </div>
@@ -148,8 +151,10 @@ function Shortcut({ setOpen }: { setOpen: (open: boolean) => void }) {
   }, [onKey]);
 
   return (
-    <div className="text-xs text-muted-foreground bg-white/60 dark:bg-background dark:text-accent-foreground flex px-2 py-1 rounded-sm items-center gap-1 border">
-      <kbd className="kbd">Ctrl</kbd> + <kbd className="kbd">K</kbd>
+    <div className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-border/50 bg-background/50 text-[10px] font-medium text-muted-foreground/70 tracking-tighter shadow-sm">
+      <kbd className="font-sans">Ctrl</kbd>
+      <span className="opacity-40 font-light">+</span>
+      <kbd className="font-sans">K</kbd>
     </div>
   );
 }

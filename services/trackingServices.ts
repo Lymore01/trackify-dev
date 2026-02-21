@@ -5,11 +5,15 @@ export async function addClickTracking({
   ip,
   geo,
   deviceInfo,
+  utm,
+  referrer,
 }: {
   shortId: string;
   ip: string | null;
   geo: any | null;
   deviceInfo: Pick<UAParser.IDevice, "type">;
+  utm?: { source?: string; medium?: string; campaign?: string };
+  referrer?: string | null;
 }) {
   return prisma.clickTracker.create({
     data: {
@@ -18,6 +22,10 @@ export async function addClickTracking({
       country: geo?.country || "unknown",
       region: geo?.region,
       userAgent: deviceInfo.type || "unknown",
+      utmSource: utm?.source,
+      utmMedium: utm?.medium,
+      utmCampaign: utm?.campaign,
+      referrer: referrer || "direct",
     },
   });
 }
@@ -44,6 +52,7 @@ export async function getClickTrackingPerShortId(shortId: string) {
     },
     select: {
       clicks: {
+        orderBy: { createdAt: "desc" },
         select: {
           id: true,
           ip: true,
@@ -51,6 +60,10 @@ export async function getClickTrackingPerShortId(shortId: string) {
           region: true,
           userAgent: true,
           createdAt: true,
+          utmSource: true,
+          utmCampaign: true,
+          utmMedium: true,
+          referrer: true,
         },
       },
     },

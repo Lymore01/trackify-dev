@@ -16,19 +16,7 @@ export const Breadcrumbs = () => {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink
-            href={
-              currentPath === "/docs/getting-started"
-                ? "/docs/getting-started"
-                : "/docs"
-            }
-          >
-            {currentPath === "/docs/getting-started"
-              ? "Docs"
-              : currentPath === "/docs"
-              ? "Docs"
-              : "Getting Started"}
-          </BreadcrumbLink>
+          <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
@@ -36,16 +24,16 @@ export const Breadcrumbs = () => {
             {currentPath === "/docs/getting-started"
               ? "Getting Started"
               : currentPath === "/docs/getting-started/installation"
-              ? "Installation"
-              : currentPath === "/docs/getting-started/webhooks"
-              ? "Webhooks"
-              : currentPath === "/docs/getting-started/webhooks/overview"
-              ? "Webhook Overview"
-               : currentPath === "/docs/getting-started/webhooks/sync-data"
-              ? "Sync Data"
-              : currentPath === "/docs/troubleshooting"
-              ? "Troubleshooting"
-              : "Introduction"}
+                ? "Installation"
+                : currentPath === "/docs/getting-started/webhooks"
+                  ? "Webhooks"
+                  : currentPath === "/docs/getting-started/webhooks/overview"
+                    ? "Webhook Overview"
+                    : currentPath === "/docs/getting-started/webhooks/sync-data"
+                      ? "Sync Data"
+                      : currentPath === "/docs/troubleshooting"
+                        ? "Troubleshooting"
+                        : "Introduction"}
           </BreadcrumbLink>
         </BreadcrumbItem>
       </BreadcrumbList>

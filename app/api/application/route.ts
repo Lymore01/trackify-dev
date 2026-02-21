@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { apiResponse } from "@/lib/utils";
 import { createApp, fetchApplications } from "@/services/appServices";
 import { createAppSchema } from "@/validations/appValidations";
+import { UnauthorizedError, ValidationError } from "@/lib/exceptions";
 
 export async function POST(req: Request) {
   try {
@@ -12,10 +13,7 @@ export async function POST(req: Request) {
     const { data: app, success } = createAppSchema.safeParse(body);
 
     if (!success) {
-      return apiResponse(
-        { success: false, message: "Invalid request body" },
-        400
-      );
+      throw new ValidationError("Invalid request body");
     }
 
     // SDK use: check for API key
@@ -34,21 +32,15 @@ export async function POST(req: Request) {
     }
 
     if (!user) {
-      return apiResponse(
-        {
-          success: false,
-          message: "User not found",
-        },
-        401
-      );
+      throw new UnauthorizedError("User not found");
     }
 
     await createApp(app.appName, user.id);
 
-    return apiResponse({ success: true, message: "Application created" }, 201);
+    return apiResponse({ message: "Application created successfully" }, 201);
   } catch (error) {
-    console.error("POST /api/app error:", error);
-    return apiResponse({ error: "Internal Server Error" }, 500);
+    console.error("POST /api/application error:", error);
+    return apiResponse(error);
   }
 }
 
@@ -71,14 +63,14 @@ export async function GET(req: Request) {
       });
     }
     if (!user) {
-      return apiResponse({ error: "User not found" }, 401);
+      throw new UnauthorizedError("User not found");
     }
 
     const applications = await fetchApplications(user.id);
 
     return apiResponse(applications, 200);
   } catch (error) {
-    console.error("GET /api/app error:", error);
-    return apiResponse({ error: "Internal Server Error" }, 500);
+    console.error("GET /api/application error:", error);
+    return apiResponse(error);
   }
 }

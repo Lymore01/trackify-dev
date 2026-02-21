@@ -26,10 +26,14 @@ export default function Api() {
           "Content-Type": "application/json",
         },
       });
-      if (!res.ok) {
-        throw new Error("Failed to fetch API key");
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.error?.message || "Failed to fetch API key");
       }
-      return res.json();
+
+      return result.data;
     },
   });
 
@@ -39,28 +43,34 @@ export default function Api() {
 
   const handleApiKeyGen = async () => {
     setUpdateLoading(true);
-    const res = await fetch("/api/api_keys?new=true", {
-      method: "PUT",
-      cache: "no-store",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (!res.ok) {
-      setUpdateLoading(false);
-      toast.error("Failed to generate new API key");
-      return;
-    }
-    const data = await res.json();
-    if (data.success) {
-      setUpdateLoading(false);
-      toast.success("New API key generated successfully");
+    try {
+      const res = await fetch("/api/api_keys?new=true", {
+        method: "PUT",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        toast.error(result.error?.message || "Failed to generate new API key");
+        setUpdateLoading(false);
+        return;
+      }
+
+      toast.success(
+        result.data?.message || "New API key generated successfully",
+      );
       queryClient.invalidateQueries({
         queryKey: ["api-key"],
       });
-    } else {
       setUpdateLoading(false);
-      toast.error("Failed to generate new API key");
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+      setUpdateLoading(false);
     }
   };
 
@@ -77,7 +87,10 @@ export default function Api() {
       <div className="flex flex-col">
         <h1 className="text-xl my-2">Api Keys</h1>
         <div className="flex items-start gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-900/20 dark:border-blue-700 ml-2 lg:ml-0">
-          <ShieldCheck size={18} className="text-blue-600 mt-1 dark:text-blue-400" />
+          <ShieldCheck
+            size={18}
+            className="text-blue-600 mt-1 dark:text-blue-400"
+          />
           <p className="text-sm text-zinc-700 dark:text-zinc-300">
             Your{" "}
             <span className="font-medium text-blue-700">API credentials</span>{" "}
@@ -90,7 +103,7 @@ export default function Api() {
         </div>
       </div>
       <Separator className="my-4" />
-      <ApiTable apiKey={apiData?.data} isLoading={isLoading} />
+      <ApiTable apiKey={apiData} isLoading={isLoading} />
       <div className="mt-4 space-y-4">
         <div className="rounded-lg border">
           <div className="bg-slate-200 dark:bg-accent dark:text-accent-foreground p-2 rounded-tr-lg rounded-tl-lg text-sm text-gray-600">
@@ -109,7 +122,7 @@ export default function Api() {
                 <Skeleton className="h-8 w-48 rounded-lg" />
               ) : (
                 <p className="max-w-[70%] truncate text-gray-600 text-sm border p-2">
-                  {apiData?.data}
+                  {apiData}
                 </p>
               )}
 
@@ -117,7 +130,7 @@ export default function Api() {
                 variant={"outline"}
                 className="cursor-pointer"
                 onClick={() => {
-                  navigator.clipboard.writeText(apiData?.data || "");
+                  navigator.clipboard.writeText(apiData || "");
                   toast.success("API key copied to clipboard");
                 }}
               >
@@ -132,7 +145,7 @@ export default function Api() {
                   </div>
                 ) : (
                   <span>Generate new key</span>
-                )}{" "}
+                )}
               </Button>
             </div>
           </div>

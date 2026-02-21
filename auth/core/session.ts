@@ -1,6 +1,5 @@
 import userSchema from "@/schemas/userSchema";
 import { z } from "zod";
-import crypto from "crypto";
 import { redisClient } from "@/redis/redis";
 import { config } from "@/config/config";
 
@@ -23,7 +22,7 @@ type Cookie = {
       httpOnly?: boolean;
       sameSite?: "strict" | "lax" | "none" | false;
       expires?: number;
-    }
+    },
   ) => void;
   get: (key: string) =>
     | {
@@ -35,7 +34,10 @@ type Cookie = {
 };
 
 export async function createSession(user: UserType, cookies: Cookie) {
-  const sessionId = crypto.randomBytes(512).toString("hex").normalize();
+  const sessionId = Array.from(crypto.getRandomValues(new Uint8Array(256)))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
   await redisClient.set(`Session:${sessionId}`, partialUserSchema.parse(user), {
     ex: SESSION_EXPIRATION_SECONDS,
   });
@@ -45,14 +47,16 @@ export async function createSession(user: UserType, cookies: Cookie) {
 
 export function setCookie(sessionId: string, cookies: Pick<Cookie, "set">) {
   cookies.set(COOKIE_SESSION_KEY, sessionId, {
-    secure: true,
+    secure: config.NODE_ENV === "production",
     httpOnly: true,
-    sameSite: "lax", 
+    sameSite: "lax",
     expires: Date.now() + SESSION_EXPIRATION_SECONDS * 1000,
   });
 }
 
-export async function getUserFromSession(cookies: Pick<Cookie, "get">): Promise<UserType | null> {
+export async function getUserFromSession(
+  cookies: Pick<Cookie, "get">,
+): Promise<UserType | null> {
   const sessionId = cookies.get(COOKIE_SESSION_KEY)?.value;
 
   if (!sessionId) return null;
@@ -69,7 +73,7 @@ export async function getSessionById(sessionId: string) {
 }
 
 export async function removeUserFromSession(
-  cookies: Pick<Cookie, "get" | "delete">
+  cookies: Pick<Cookie, "get" | "delete">,
 ) {
   // remove from cookie
   const sessionId = cookies.get(COOKIE_SESSION_KEY)?.value;

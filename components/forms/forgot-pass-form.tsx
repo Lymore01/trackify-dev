@@ -31,7 +31,7 @@ export default function ForgotPasswordForm() {
     },
   });
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async (data: z.infer<typeof formschema>) => {
       const response = await fetch(`/api/users/forgot-password`, {
         method: "POST",
@@ -40,21 +40,25 @@ export default function ForgotPasswordForm() {
         },
         body: JSON.stringify(data),
       });
-      if (!response.ok) {
-        throw new Error("Failed to send email");
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error?.message || "Failed to send email");
       }
-      return await response.json();
+
+      return result;
     },
     onSuccess: (data) => {
-      toast.success(data.message);
+      toast.success(data.message || "Email sent successfully");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to send email");
+      toast.error(error.message || "Something went wrong. Please try again.");
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formschema>) => {
-    await mutateAsync(values);
+    mutate(values);
   };
   return (
     <Form {...form}>
@@ -79,7 +83,11 @@ export default function ForgotPasswordForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full cursor-pointer">
+        <Button
+          type="submit"
+          className="w-full cursor-pointer"
+          disabled={isPending}
+        >
           {isPending ? (
             <div className="flex gap-2 items-center">
               <Loader className="animate-spin" size={16} /> Submitting...

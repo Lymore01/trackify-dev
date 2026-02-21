@@ -33,7 +33,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const formSchema = z.object({
   url: z.string().url().nonempty("URL is required"),
-  description: z.string().min(5, "Description must be at least 5 characters"),
+  description: z.string().optional(),
   events: z.array(z.string()),
   app: z.string(),
 });
@@ -52,7 +52,7 @@ export default function AddEndpoint() {
       app: appId as string,
     },
   });
-  const { mutateAsync: addEndpoint, isPending } = useMutation({
+  const { mutate: addEndpoint, isPending } = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
       const response = await fetch("/api/webhooks", {
         method: "POST",
@@ -61,39 +61,42 @@ export default function AddEndpoint() {
         },
         body: JSON.stringify(data),
       });
-      return response.json();
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error?.message || "Failed to create endpoint");
+      }
+
+      return result;
     },
     onSuccess: (data) => {
-      if (data.success) {
-        toast.success("Endpoint created successfully!");
-        setIsDialogOpen(false);
-        form.reset();
-        queryClient.invalidateQueries({
-          queryKey: ["webhooks", appId],
-        });
-      } else {
-        toast.error(data.message || "Failed to create endpoint");
-      }
+      toast.success("Endpoint created successfully!");
+      setIsDialogOpen(false);
+      form.reset();
+      queryClient.invalidateQueries({
+        queryKey: ["webhooks", appId],
+      });
     },
     onError: (error) => {
-      toast.error("An error occurred while creating the endpoint");
+      toast.error(
+        error.message || "An error occurred while creating the endpoint",
+      );
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("Form values:", values);
-    await addEndpoint(values);
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    addEndpoint(values);
   };
   return (
     <div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button className="cursor-pointer dark:bg-accent dark:text-accent-foreground">
-            <Plus />
-            Add Endpoint
+          <Button className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 rounded-lg px-5 h-11 transition-all duration-300 active:scale-95 group">
+            <Plus className="size-4 group-hover:rotate-90 transition-transform duration-300" />
+            <span className="font-normal tracking-tight">Add Endpoint</span>
           </Button>
         </DialogTrigger>
-        <Separator />
 
         <DialogContent className="max-h-[90vh] w-[80vw] md:w-[60vw] lg:w-[50vw] overflow-auto">
           <DialogHeader>
@@ -136,10 +139,10 @@ export default function AddEndpoint() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Description (Optional)</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="An option description on what the endpoint is used for."
+                        placeholder="An optional description of what the endpoint is used for."
                         autoComplete="off"
                         {...field}
                       />
@@ -170,7 +173,7 @@ export default function AddEndpoint() {
             </form>
           </Form>
           <Separator />
-           <DialogFooter className="flex justify-between w-full lg:items-center">
+          <DialogFooter className="flex justify-between w-full lg:items-center">
             <Button
               variant={"outline"}
               className="cursor-pointer"

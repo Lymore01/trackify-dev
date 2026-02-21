@@ -40,9 +40,9 @@ import { Skeleton } from "./ui/skeleton";
 
 export default function Endpoint({
   endpoint,
-  isLoading
+  isLoading,
 }: {
-  endpoint: {
+  endpoint?: {
     message: string;
     webhooks: {
       id: string;
@@ -75,20 +75,20 @@ export default function Endpoint({
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete endpoint");
+        throw new Error("Failed to delete webhook");
       }
 
-      return response.json();
+      return await response.json();
     },
     onSuccess: (data) => {
-      toast.success(data.message);
+      toast.success(data?.data?.message || "Webhook deleted successfully");
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to delete endpoint");
+      toast.error(error?.message || "Failed to delete webhook");
     },
   });
 
@@ -98,7 +98,10 @@ export default function Endpoint({
     router.refresh();
   };
 
-  if (!endpoint || !endpoint.webhooks || endpoint.webhooks.length === 0) {
+  if (
+    !isLoading &&
+    (!endpoint || !endpoint.webhooks || endpoint.webhooks.length === 0)
+  ) {
     return (
       <div className="flex items-center w-full text-gray-500 text-sm">
         No endpoint found or has been deleted.
@@ -113,27 +116,31 @@ export default function Endpoint({
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href={`/dashboard/${app}/webhooks?appId=${appId}`}>
+                <BreadcrumbLink
+                  href={`/dashboard/${app}/webhooks?appId=${appId}`}
+                >
                   Endpoints
                 </BreadcrumbLink>
-              </BreadcrumbItem> 
+              </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 {isLoading ? (
                   <Skeleton className="h-4 w-24" />
                 ) : (
-                  <BreadcrumbLink>{endpoint?.webhooks[0]?.id}</BreadcrumbLink>
+                  <BreadcrumbLink>
+                    {endpoint?.webhooks[0]?.id || ""}
+                  </BreadcrumbLink>
                 )}
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-           {isLoading ? (
+          {isLoading ? (
             <Skeleton className="h-6 w-16 rounded-full" />
           ) : (
             <Tag variant={"default"}>Active</Tag>
           )}
         </div>
-       <div className="flex justify-end items-center">
+        <div className="flex justify-end items-center">
           {isLoading ? (
             <Skeleton className="h-8 w-8 rounded-full" />
           ) : (
@@ -163,9 +170,11 @@ export default function Endpoint({
             {isLoading ? (
               <Skeleton className="h-6 w-64" />
             ) : (
-              <h1 ref={endpointRef}>{endpoint?.webhooks[0].url}</h1>
+              <h1 ref={endpointRef}>{endpoint?.webhooks[0]?.url || ""}</h1>
             )}
-            {!isLoading && <EditWebhook current={endpoint?.webhooks[0].url} />}
+            {!isLoading && (
+              <EditWebhook current={endpoint?.webhooks[0]?.url || ""} />
+            )}
           </div>
           {/* overview */}
           <div className="rounded-lg border">
@@ -176,13 +185,21 @@ export default function Endpoint({
             <div className="p-4 text-sm space-y-4">
               <div className="flex justify-between items-center">
                 <h1>Description</h1>
-                {!isLoading && <EditWebhookDescription current={endpoint?.webhooks[0].description} />}
+                {!isLoading && (
+                  <EditWebhookDescription
+                    current={
+                      endpoint?.webhooks[0]?.description
+                        ? endpoint?.webhooks[0]?.description
+                        : "No description provided"
+                    }
+                  />
+                )}
               </div>
-             {isLoading ? (
+              {isLoading ? (
                 <Skeleton className="h-10 w-full" />
               ) : (
                 <div className="p-2 border text-gray-600" ref={descriptionRef}>
-                  {endpoint?.webhooks[0].description || "No description"}
+                  {endpoint?.webhooks[0]?.description || "No description"}
                 </div>
               )}
             </div>
@@ -192,28 +209,44 @@ export default function Endpoint({
             <Skeleton className="h-24 w-full" />
           ) : (
             <TestEndpoint
-              endpoint={endpoint?.webhooks[0].url || ""}
+              endpoint={endpoint?.webhooks[0]?.url || ""}
               secret="whsec_8"
+              subscribedEvents={endpoint?.webhooks[0]?.subscribedEvents ?? []}
             />
           )}
         </div>
-       {isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-40" />
-            <Skeleton className="h-8 w-40" />
-            <Skeleton className="h-8 w-40" />
-            <Skeleton className="h-8 w-40" />
+        {isLoading ? (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-8 w-full" />
+            </div>
           </div>
         ) : (
           <EndpointDetails
-            createdAt={endpoint?.webhooks[0].createdAt}
-            updatedAt={endpoint?.webhooks[0].updatedAt}
-            subscribedEvents={endpoint?.webhooks[0].subscribedEvents}
-            signingSecret={endpoint?.webhooks[0].signingSecret}
+            createdAt={endpoint?.webhooks[0]?.createdAt || ""}
+            updatedAt={endpoint?.webhooks[0]?.updatedAt || ""}
+            subscribedEvents={endpoint?.webhooks[0]?.subscribedEvents || []}
+            signingSecret={endpoint?.webhooks[0]?.signingSecret || ""}
           />
         )}
       </div>
-       {isLoading ? (
+      {isLoading ? (
         <Skeleton className="h-32 w-full mt-4" />
       ) : (
         <RequestSummary />

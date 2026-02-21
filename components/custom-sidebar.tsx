@@ -9,14 +9,16 @@ import { Separator } from "./ui/separator";
 import { useAuth } from "@/hooks/use-auth";
 import { SidebarContext, useCustomSidebar } from "@/contexts/useSidebar";
 import { useApplications } from "@/hooks/use-applications";
+import { Badge } from "./ui/badge";
 import Tag from "./tag";
+import { Skeleton } from "./ui/skeleton";
 
 export default function CustomSidebar({
   children,
 }: {
   children?: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const { isMobile } = useCustomSidebar();
 
@@ -89,7 +91,7 @@ const Option = ({
         layout
         className="grid h-full w-10 place-content-center text-lg"
       >
-        <Icon />
+        <Icon className="w-5 h-5" />
       </motion.div>
       {open && (
         <motion.span
@@ -172,7 +174,7 @@ const OptionGroup = ({
 };
 
 const HeaderSection = ({ open }: { open: boolean }) => {
-  const user = useAuth();
+  const { user, isLoading } = useAuth();
 
   return (
     <div className="mb-3 pb-3 border-b">
@@ -190,26 +192,31 @@ const HeaderSection = ({ open }: { open: boolean }) => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.125 }}
+              className="flex flex-col min-w-0"
             >
-              <span className="block text-sm font-semibold capitalize">
-                {user.name}
-              </span>
-              <span className="block text-xs">
-                {user.name === "Test User" ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold shadow-sm border border-indigo-600 animate-pulse">
-                    <svg
-                      className="w-3 h-3 mr-1 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 16 16"
-                    >
-                      <circle cx="8" cy="8" r="8" />
-                    </svg>
+              {isLoading ? (
+                <Skeleton className="h-4 w-24 bg-muted/60 mb-1" />
+              ) : (
+                <span className="block text-sm font-bold truncate capitalize leading-tight">
+                  {user.name}
+                </span>
+              )}
+              <div className="mt-1 flex items-center">
+                {isLoading ? (
+                  <Skeleton className="h-3 w-16 bg-muted/60" />
+                ) : user.name === "Test User" ? (
+                  <Badge
+                    variant="secondary"
+                    className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200 text-[10px] px-1.5 py-0 h-4 font-bold"
+                  >
                     Test Mode
-                  </span>
+                  </Badge>
                 ) : (
-                  user.plan
+                  <span className="block text-[11px] text-muted-foreground font-medium">
+                    {user.plan}
+                  </span>
                 )}
-              </span>
+              </div>
             </motion.div>
           )}
         </div>
@@ -224,7 +231,7 @@ export const Logo = () => {
   return (
     <motion.div
       layout
-      className="grid size-10 shrink-0 place-content-center rounded-md bg-indigo-600 cursor-pointer"
+      className="grid size-10 shrink-0 place-content-center rounded-md bg-blue-600 cursor-pointer"
       onClick={() => router.push("/")}
     >
       <svg

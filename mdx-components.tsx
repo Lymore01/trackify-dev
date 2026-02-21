@@ -14,7 +14,12 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <h1 className="text-foreground text-3xl">{children}</h1>
     ),
     h2: ({ children }) => {
-      const text = typeof children === "string" ? children : (Array.isArray(children) ? children.join("") : "");
+      const text =
+        typeof children === "string"
+          ? children
+          : Array.isArray(children)
+            ? children.join("")
+            : "";
       const id = slugify(text);
       return (
         <h2 className="text-foreground text-xl" id={id}>

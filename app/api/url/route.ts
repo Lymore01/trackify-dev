@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { apiResponse, generateShortId } from "@/lib/utils";
 import { createUrl, fetchUrl } from "@/services/urlServices";
 import { urlSchema } from "@/validations/urlValidations";
+import { UnauthorizedError, ValidationError, AppError } from "@/lib/exceptions";
+import { sendEvents } from "@/auth/webhooks/webhook";
 
 export async function POST(req: Request) {
   try {
@@ -10,10 +12,7 @@ export async function POST(req: Request) {
     const { data: urlData, success } = urlSchema.safeParse(body);
 
     if (!success) {
-      return apiResponse(
-        { success: false, message: "Invalid request body" },
-        400
-      );
+      throw new ValidationError("Invalid request body");
     }
 
     const headers = req.headers;
@@ -34,13 +33,7 @@ export async function POST(req: Request) {
     }
 
     if (!user) {
-      return apiResponse(
-        {
-          success: false,
-          message: "User not found",
-        },
-        401
-      );
+      throw new UnauthorizedError("User not found");
     }
 
     const exisitingShortenedUrl = await fetchUrl({
@@ -49,10 +42,7 @@ export async function POST(req: Request) {
     });
 
     if (exisitingShortenedUrl) {
-      return apiResponse(
-        { success: false, message: "URL already shortened" },
-        400
-      );
+      throw new AppError("URL already shortened", 400, "URL_ALREADY_EXISTS");
     }
 
     const shortId = generateShortId();
@@ -62,23 +52,36 @@ export async function POST(req: Request) {
       user.id,
       urlData.appId,
       shortId,
-      urlData.description
+      urlData.description,
     );
 
     if (!url) {
-      return apiResponse(
-        { success: false, message: "Failed to create URL" },
-        500
-      );
+      throw new AppError("Failed to create URL", 500);
     }
 
-    return apiResponse(
-      { success: true, message: "URL created successfully" },
-      201
-    );
+    prisma.app
+      .findUnique({
+        where: { id: urlData.appId },
+        select: { endpoint: true },
+      })
+      .then((appInfo) => {
+        if (appInfo?.endpoint) {
+          sendEvents({
+            appId: urlData.appId,
+            evt: "link_created",
+            data: url as any,
+            endpoints: appInfo.endpoint,
+          });
+        }
+      })
+      .catch((err) =>
+        console.error("[Webhook] link_created dispatch failed:", err),
+      );
+
+    return apiResponse({ message: "URL created successfully", url }, 201);
   } catch (error) {
     console.error("POST /api/url error:", error);
-    return apiResponse({ error: "Internal Server Error" }, 500);
+    return apiResponse(error);
   }
 }
 
@@ -106,13 +109,7 @@ export async function GET(req: Request) {
     }
 
     if (!user) {
-      return apiResponse(
-        {
-          success: false,
-          message: "User not found",
-        },
-        401
-      );
+      throw new UnauthorizedError("User not found");
     }
 
     const urls = await fetchUrl({
@@ -121,18 +118,9 @@ export async function GET(req: Request) {
       shortId: shortId ?? undefined,
     });
 
-    console.log("Headers: ", typeof headers);
-    return apiResponse(
-      {
-        success: true,
-        message:
-          urls.length > 0 ? "URLs fetched successfully" : "No URLs found",
-        data: urls,
-      },
-      200
-    );
+    return apiResponse(urls, 200);
   } catch (error) {
     console.error("GET /api/url error:", error);
-    return apiResponse({ error: "Internal Server Error" }, 500);
+    return apiResponse(error);
   }
 }

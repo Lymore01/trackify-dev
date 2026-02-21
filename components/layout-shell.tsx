@@ -1,48 +1,29 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import CustomSidebar, { Logo } from "@/components/custom-sidebar";
 import TopNav from "@/components/top-nav";
 import { useIsMobile } from "@/hooks/use-mobile";
-import {
-  Edit,
-  Edit2,
-  Menu,
-  PanelLeftIcon,
-  UserCircle,
-  UserCogIcon,
-  X,
-} from "lucide-react";
+import { Menu, PanelLeftIcon, User } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SidebarProvider } from "@/contexts/useSidebar";
-import Image from "next/image";
-import { Separator } from "./ui/separator";
-import { Button } from "./ui/button";
-import Tag from "./tag";
-import ProfileInfoCard from "./profile-info-card";
-import ProfileModal from "./modals/profile";
 import { ModeToggle } from "./mode-toggle";
 
 const pathsWithTopNav = ["/dashboard/links"];
 
-export function ProfileTrigger({
-  setProfileOpen,
-}: {
-  setProfileOpen: (open: boolean) => void;
-}) {
+export function ProfileTrigger() {
+  const router = useRouter();
   return (
     <div className="flex items-center flex-row-reverse gap-2 mt-0 lg:mt-4">
-      <Image
-        src={"/images/profile.jpg"}
-        alt={"profile picture"}
-        width={28}
-        height={28}
-        className="rounded-full object-cover size-8 border-2 border-indigo-200 cursor-pointer"
+      <div
+        className="size-8 rounded-full border border-indigo-200 flex items-center justify-center cursor-pointer hover:bg-muted transition"
         onClick={() => {
-          setProfileOpen(true);
+          router.push("/profile");
         }}
-      />
+      >
+        <User size={16} className="text-muted-foreground" />
+      </div>
       <ModeToggle />
     </div>
   );
@@ -56,7 +37,6 @@ export default function LayoutShell({
   const pathname = usePathname();
   const showTopNav = pathsWithTopNav.some((path) => pathname.startsWith(path));
   const [open, setOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
 
   const handleOpenMenu = () => {
     setOpen(true);
@@ -73,7 +53,7 @@ export default function LayoutShell({
             <Menu onClick={handleOpenMenu} />
             <Logo />
           </div>
-          <ProfileTrigger setProfileOpen={setProfileOpen} />
+          <ProfileTrigger />
         </div>
         {/* mobile menu */}
         {open && (
@@ -107,12 +87,8 @@ export default function LayoutShell({
         )}
         <div className="w-full relative">
           <div className="fixed top-0 w-full h-[40px] hidden lg:flex items-center justify-end px-4">
-            <ProfileTrigger setProfileOpen={setProfileOpen} />
+            <ProfileTrigger />
           </div>
-
-          {profileOpen && (
-            <ProfileModal open={profileOpen} openChange={setProfileOpen} />
-          )}
 
           {showTopNav && (
             <div className="flex w-[100%] lg:w-[60%] mx-auto py-2 px-2 lg:p-0">

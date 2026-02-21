@@ -4,8 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -32,6 +30,8 @@ model App {
   user      User       @relation(fields: [userId], references: [id])
   endpoint  Endpoint[]
   urls      UrlShort[]
+
+  @@unique([name, userId])
 }
 
 model Endpoint {
@@ -42,12 +42,14 @@ model Endpoint {
   updatedAt        DateTime            @updatedAt
   subscribedEvents EventsToSubscribe[]
   /// webhook name/desc
-  description      String
+  description      String?
   signingSecret    String
   appId            String
   app              App                 @relation(fields: [appId], references: [id], onDelete: Cascade)
   user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   WebhookRequest   WebhookRequest[]
+
+  @@unique([url, appId])
 }
 
 model UrlShort {
@@ -65,14 +67,21 @@ model UrlShort {
 }
 
 model ClickTracker {
-  id        String   @id @default(uuid())
-  urlId     String
-  ip        String?
-  country   String?
-  userAgent String?
-  createdAt DateTime @default(now())
-  region    String?
-  url       UrlShort @relation(fields: [urlId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  urlId       String
+  ip          String?
+  country     String?
+  userAgent   String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  referrer    String?
+  createdAt   DateTime @default(now())
+  region      String?
+  url         UrlShort @relation(fields: [urlId], references: [id], onDelete: Cascade)
+
+  @@index([urlId])
+  @@index([createdAt])
 }
 
 model PasswordResetToken {
@@ -96,6 +105,9 @@ model WebhookRequest {
   endpointId String
   durationMs Int
   endpoint   Endpoint @relation(fields: [endpointId], references: [id])
+
+  @@index([endpointId])
+  @@index([createdAt])
 }
 
 enum EventsToSubscribe {

@@ -13,7 +13,7 @@ export default function CoreLayout({
         <div className="absolute top-4 left-4 w-full flex justify-end lg:justify-between items-center">
           <Link
             href={"/"}
-            className="hidden lg:grid size-10 shrink-0 place-content-center rounded-md bg-indigo-600 "
+            className="hidden lg:grid size-10 shrink-0 place-content-center rounded-md bg-blue-600 "
           >
             <svg
               width="24"
@@ -40,7 +40,7 @@ export default function CoreLayout({
         <div className="w-full flex items-center justify-center lg:hidden mt-6">
           <Link
             href={"/"}
-            className="grid size-16 shrink-0 place-content-center rounded-md bg-indigo-600"
+            className="grid size-16 shrink-0 place-content-center rounded-md bg-blue-600"
           >
             <svg
               width="32"
@@ -63,16 +63,17 @@ export default function CoreLayout({
       </main>
       <aside className="hidden lg:flex lg:flex-col h-screen lg:w-[50%] bg-black relative">
         <Image
-          src="/images/aside.jpg"
+          src="/images/aside.webp"
           alt="aside image"
           layout="fill"
           objectFit="cover"
           objectPosition="center"
+          priority
         />
       </aside>
       <div className="fixed bottom-6 left-4 z-50">
         <p className="text-xs text-gray-500 dark:text-muted-foreground">
-          copyright @ 2025-trackify. All rights reserved
+          copyright @ 2026-trackify. All rights reserved
         </p>
       </div>
     </div>

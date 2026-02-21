@@ -1,5 +1,5 @@
-import { fetchUrlByShortId } from "@/services/urlServices";
 import { NextRequest } from "next/server";
+import { config } from "@/config/config";
 
 export function getClientIp(req: NextRequest) {
   const forwarded = req.headers.get("x-forwarded-for");
@@ -14,16 +14,23 @@ export async function trackClick(req: NextRequest) {
   const shortId = pathname.split("/")[2];
   const ip = getClientIp(req);
   const userAgent = req.headers.get("user-agent") || "unknown";
+  const referrer = req.headers.get("referer") || "direct";
 
-  const url = fetchUrlByShortId(shortId);
+  // Extract UTM parameters
+  const searchParams = req.nextUrl.searchParams;
+  const utm = {
+    source: searchParams.get("utm_source"),
+    medium: searchParams.get("utm_medium"),
+    campaign: searchParams.get("utm_campaign"),
+  };
 
-  if (!url) return;
+  const baseUrl = config.BASE_URL || req.nextUrl.origin;
 
-  await fetch(`https://trackify-dev.vercel.app/api/track`, {
+  await fetch(`${baseUrl}/api/track`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ shortId, ip, userAgent }),
+    body: JSON.stringify({ shortId, ip, userAgent, utm, referrer }),
   });
 }

@@ -18,17 +18,20 @@ export async function getWebhookPerAppId({
       appId,
       ...filters,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 }
 
 export async function updateWebhook(
   id: string,
   endpoint: string,
-  data: Partial<z.infer<typeof webhookSchema>>
+  data: Partial<z.infer<typeof webhookSchema>>,
 ) {
   const payload: any = {};
 
-  if (data.events)
+  if (Array.isArray(data.events))
     payload.subscribedEvents = data.events as EventsToSubscribe[];
   if (data.description) payload.description = data.description;
   if (data.url) payload.url = data.url;
@@ -58,7 +61,7 @@ export async function deleteWebhook({
 }
 
 export async function createWebhookRequest(
-  parsedData: z.infer<typeof webhookRequestSchema>
+  parsedData: z.infer<typeof webhookRequestSchema>,
 ) {
   return await prisma.webhookRequest.create({
     data: {
@@ -71,6 +74,17 @@ export async function createWebhookRequest(
 
 export async function fetchWebhookSummary(endpointId: string) {
   return await prisma.webhookRequest.findMany({
+    where: {
+      endpointId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
+
+export async function deleteWebhookRequests(endpointId: string) {
+  return await prisma.webhookRequest.deleteMany({
     where: {
       endpointId,
     },

@@ -11,7 +11,7 @@ export async function fetchUser(email: string) {
 
 export async function fetchUserById(
   id: string,
-  select?: Partial<Record<keyof User, boolean>>
+  select?: Partial<Record<keyof User, boolean>>,
 ) {
   return prisma.user.findUnique({
     where: {
@@ -62,5 +62,21 @@ export async function updateUserPassword({
   return await prisma.user.update({
     where: { email },
     data: { password, salt },
+  });
+}
+
+export async function updateUser(
+  id: string,
+  data: { name?: string; email?: string },
+) {
+  return await prisma.user.update({
+    where: { id },
+    data,
+  });
+}
+
+export async function deleteUser(id: string) {
+  return await prisma.user.delete({
+    where: { id },
   });
 }

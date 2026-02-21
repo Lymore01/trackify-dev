@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { registerSchema } from "@/validations/authValidations";
 import { apiResponse, generateAPIKey } from "@/lib/utils";
 import { createUser, fetchUser } from "@/services/userServices";
+import { ValidationError, AppError } from "@/lib/exceptions";
 
 export async function POST(request: Request) {
   try {
@@ -11,31 +12,22 @@ export async function POST(request: Request) {
     const { data: userData, success } = registerSchema.safeParse(body);
 
     if (!success) {
-      return apiResponse(
-        { success: false, message: "Invalid request body" },
-        400
-      );
+      throw new ValidationError("Invalid request body");
     }
 
     const existingUser = await fetchUser(userData.email);
 
     if (existingUser) {
-      return apiResponse(
-        {
-          success: false,
-          message: "User already Exists!",
-        },
-        400
-      );
+      throw new AppError("User already exists", 400, "USER_ALREADY_EXISTS");
     }
 
     const salt = generateSalt();
     const hashedPassword = (await hashPassword(
       userData.password,
-      salt
+      salt,
     )) as string;
 
-    const api_key = await generateAPIKey()
+    const api_key = await generateAPIKey();
 
     const user = await createUser({
       ...userData,
@@ -45,27 +37,20 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      return apiResponse(
-        {
-          success: false,
-          message: "Failed to create user!",
-        },
-        400
-      );
+      throw new AppError("Failed to create user", 400);
     }
 
     await createSession(user, await cookies());
 
     return apiResponse(
       {
-        success: true,
-        message: "User Registered Successfully. Redirecting....",
+        message: "User registered successfully",
         redirectUrl: "/dashboard",
       },
-      201
+      201,
     );
   } catch (error) {
-    console.error("POST /api/register error:", error);
-    return apiResponse({ error: "Internal Server Error" }, 500);
+    console.error("POST /api/users/register error:", error);
+    return apiResponse(error);
   }
 }
