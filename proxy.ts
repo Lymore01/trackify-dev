@@ -8,7 +8,7 @@ const publicRoutePattern =
   /^\/(login|signup|forgot-password|reset-password)(\/|$)/;
 const redirectRoutesPattern = /^\/u\/[^/]+$/;
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Only rate-limit API routes — not every dashboard navigation
@@ -30,11 +30,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const response = (await middlewareAuth(request)) ?? NextResponse.next();
+  const response = (await proxyAuth(request)) ?? NextResponse.next();
   return response;
 }
 
-export async function middlewareAuth(request: NextRequest) {
+export async function proxyAuth(request: NextRequest) {
   if (privateRoutePattern.test(request.nextUrl.pathname)) {
     return handlePrivateRoutes(request);
   }
@@ -47,7 +47,6 @@ export async function middlewareAuth(request: NextRequest) {
 }
 
 export async function handlePrivateRoutes(request: NextRequest) {
-  //
   const user = await getUserFromSession(request.cookies);
 
   if (user == null) {
