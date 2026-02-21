@@ -13,15 +13,8 @@ const LINK_EVENTS: string[] = [
 ];
 const USER_EVENTS: string[] = ["user_created", "user_updated", "user_deleted"];
 
-type FormData = {
-  url?: string;
-  description: string;
-  events: string[];
-  app: string;
-};
-
 interface Props {
-  field: ControllerRenderProps<z.infer<typeof formSchema>, "events">;
+  field: ControllerRenderProps<any, any>;
   excludedEvents?: string[];
 }
 
